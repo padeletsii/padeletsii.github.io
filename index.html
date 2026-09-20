@@ -404,6 +404,18 @@ body.admin-mode .admin-nav-only{display:inline-flex!important}
  .proposal-actions button{width:100%;min-height:46px}
 }
 
+
+.proposal-admin-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.proposal-admin-head>div{display:flex;align-items:center;gap:9px}
+.proposal-admin-head small{color:var(--muted)}
+.proposal-admin-score{font-size:18px;font-weight:950;margin:6px 0}
+.admin-list{display:grid;gap:11px}
+@media(max-width:700px){
+ .proposal-admin-head{display:block}
+ .proposal-admin-head small{display:block;margin-top:6px}
+ .user-table{min-width:720px}
+}
+
 </style>
 </head>
 <body>
@@ -944,11 +956,37 @@ function openPlayerProposal(){
  openModal(`<h3>Proponer resultado</h3><p class="muted">Puedes subir un resultado de cualquier jornada pendiente, aunque los partidos no se hayan jugado en orden.</p><div class="result-proposal-form"><div class="proposal-match-select"><label>PARTIDO</label><select id="pmatch">${ms.map((m,i)=>`<option value="${i}">${esc(m.label)}</option>`).join("")}</select></div><div class="sets-grid"><div class="set-box"><div class="set-box-title">SET 1</div><div class="set-score-row"><input id="ps10" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps11" type="number" min="0" inputmode="numeric"></div></div><div class="set-box"><div class="set-box-title">SET 2</div><div class="set-score-row"><input id="ps20" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps21" type="number" min="0" inputmode="numeric"></div></div><div class="set-box"><div class="set-box-title">SET 3</div><div class="set-score-row"><input id="ps30" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps31" type="number" min="0" inputmode="numeric"></div></div></div><div class="proposal-actions"><button onclick="submitPlayerProposal()">Enviar propuesta</button><button class="secondary" onclick="closeModal();currentView='profile';render()">Volver</button></div></div>`)
 }
 async function submitPlayerProposal(){const m=window._playerMatches[+v("pmatch")];const sets=[[v("ps10"),v("ps11")],[v("ps20"),v("ps21")],[v("ps30"),v("ps31")]].filter(x=>x[0]!==""&&x[1]!=="").map(x=>x.map(Number));if(sets.length<2){alert("Introduce al menos dos sets.");return}try{await cloudWrite({action:"proposeResult",username:playerSession.username,token:playerSession.token,league:m.league,key:m.key,home:m.home,away:m.away,sets});alert("Resultado propuesto. Solo será oficial cuando lo confirme un usuario verificado de la pareja rival.");closeModal();currentView="profile";render()}catch(e){alert(e.message)}}
+async function renderAdminProposals(){
+ const c=document.getElementById("content");
+ document.getElementById("panelTitle").textContent="Resultados propuestos";
+ document.getElementById("panelSub").textContent="Propuestas enviadas por los jugadores";
+ c.innerHTML=`<p class="muted">Cargando propuestas…</p>`;
+ try{
+  const data=await cloudWrite({action:"adminProposals",password:adminPassword});
+  const rows=data.proposals||[];
+  c.innerHTML=rows.length?`<div class="admin-list">${rows.map(p=>`<div class="proposal-card"><div class="proposal-admin-head"><div><span class="status-pill ${p.status==="confirmed"?"status-ok":p.status==="pending"?"status-wait":"status-none"}">${esc(p.status==="confirmed"?"Confirmado":p.status==="pending"?"Pendiente":"Rechazado")}</span><b>${esc(p.leagueName)}</b></div><small>${esc(p.created_at||"")}</small></div><h4>${esc(p.home)} vs ${esc(p.away)}</h4><div class="proposal-admin-score">${esc(p.score||"Sin marcador")}</div><div class="muted">Propuesto por <b>@${esc(p.proposer_username||"")}</b> · ${esc(p.proposer_team||"")}${p.confirmed_by?` · confirmado por @${esc(p.confirmed_by)}`:""}</div></div>`).join("")}</div>`:`<div class="notice">Todavía no hay resultados propuestos.</div>`;
+ }catch(e){c.innerHTML=`<div class="notice">${esc(e.message)}</div>`}
+}
+
+async function renderUsersPage(){
+ const c=document.getElementById("content");
+ document.getElementById("panelTitle").textContent="Usuarios";
+ document.getElementById("panelSub").textContent="Cuentas de jugadores y solicitudes pendientes";
+ c.innerHTML=`<p class="muted">Cargando usuarios…</p>`;
+ try{
+  const data=await cloudWrite({action:"adminUsers",password:adminPassword,roster:PLAYER_ROSTER});
+  const s=data.summary||{},rows=data.players||[],req=data.requests||[];
+  c.innerHTML=`<div class="user-summary"><div><b>${s.verified||0}</b>Verificados</div><div><b>${s.pending||0}</b>Pendientes</div><div><b>${s.missing||0}</b>Sin registrar</div><div><b>${s.coveredTeams||0}/${s.totalTeams||0}</b>Parejas cubiertas</div></div>
+  ${req.length?`<h4>Solicitudes pendientes</h4>${req.map(r=>`<div class="proposal-card"><b>${esc(r.name)}</b><br><span class="muted">${esc(r.team)} · ${esc(r.leagueName||r.league)} · <b>@${esc(r.username||"")}</b></span><div class="actions"><button onclick="adminVerifyUser('${esc(r.id)}','verify')">✓ Verificar</button><button class="danger" onclick="adminVerifyUser('${esc(r.id)}','reject')">✕ Rechazar</button></div></div>`).join("")}`:"<p class='muted'>No hay solicitudes pendientes.</p>"}
+  <h4 style="margin-top:24px">Todos los jugadores</h4><div class="table-scroll"><table class="user-table"><thead><tr><th>Jugador</th><th>Usuario</th><th>Pareja</th><th>Liga</th><th>Estado</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${r.username?`@${esc(r.username)}`:"—"}</td><td>${esc(r.team)}</td><td>${esc(r.leagueName)}</td><td><span class="status-pill ${r.status==="Verificado"?"status-ok":r.status==="Pendiente"?"status-wait":"status-none"}">${esc(r.status)}</span></td></tr>`).join("")}</tbody></table></div>`;
+ }catch(e){c.innerHTML=`<div class="notice">${esc(e.message)}</div>`}
+}
+
 async function showUserAdmin(){
  if(!admin){alert("Entra primero en modo administrador.");return}openModal(`<h3>Usuarios</h3><p class="muted">Cargando…</p>`);
  try{const data=await cloudWrite({action:"adminUsers",password:adminPassword,roster:PLAYER_ROSTER});const s=data.summary||{},rows=data.players||[];openModal(`<h3>Usuarios de la liga</h3><div class="user-summary"><div><b>${s.verified||0}</b>Verificados</div><div><b>${s.pending||0}</b>Pendientes</div><div><b>${s.missing||0}</b>Sin registrar</div><div><b>${s.coveredTeams||0}/${s.totalTeams||0}</b>Parejas cubiertas</div></div>${(data.requests||[]).length?`<h4>Solicitudes pendientes</h4>${data.requests.map(r=>`<div class="proposal-card"><b>${esc(r.name)}</b><br><span class="muted">${esc(r.team)} · ${esc(r.leagueName||r.league)} · @${esc(r.username)}</span><div class="actions"><button onclick="adminVerifyUser('${esc(r.id)}','verify')">✓ Verificar</button><button class="danger" onclick="adminVerifyUser('${esc(r.id)}','reject')">✕ Rechazar</button></div></div>`).join("")}`:"<p class='muted'>No hay solicitudes pendientes.</p>"}<h4>Seguimiento de jugadores</h4><div class="table-scroll"><table class="user-table"><thead><tr><th>Jugador</th><th>Pareja</th><th>Liga</th><th>Estado</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.team)}</td><td>${esc(r.leagueName)}</td><td><span class="status-pill ${r.status==="Verificado"?"status-ok":r.status==="Pendiente"?"status-wait":"status-none"}">${esc(r.status)}</span></td></tr>`).join("")}</tbody></table></div>`)}catch(e){openModal(`<h3>Usuarios</h3><div class="notice">${esc(e.message)}</div>`)}
 }
-async function adminVerifyUser(id,decision){try{await cloudWrite({action:"verifyUser",password:adminPassword,id,decision});showUserAdmin()}catch(e){alert(e.message)}}
+async function adminVerifyUser(id,decision){try{await cloudWrite({action:"verifyUser",password:adminPassword,id,decision});if(currentView==="users")renderUsersPage();else showUserAdmin()}catch(e){alert(e.message)}}
 
 async function validateAdminPassword(p){
  if(!p) return false;
