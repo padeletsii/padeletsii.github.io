@@ -322,6 +322,30 @@ body.admin-mode .admin-nav-only{display:inline-flex!important}
  .profile-login-enter{min-height:50px}
 }
 
+
+.profile-user-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding:2px 0 8px}
+@media(max-width:700px){
+ .profile-user-head{display:block}
+ .profile-user-head .actions{margin-top:16px;display:grid;grid-template-columns:1fr}
+ .profile-user-head .actions button{width:100%;min-height:46px}
+}
+
+
+.contact-search-box{margin-top:22px;padding:17px;border:1px solid var(--line);border-radius:14px;background:#faf9f6;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.contact-search-box h4{margin:0 0 4px}
+.contact-search-box p{margin:0}
+.contact-search-box button{white-space:nowrap}
+.contact-finder{margin-top:12px;padding:16px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.contact-finder label{display:block;font-size:12px;font-weight:900;margin-bottom:10px}
+.contact-finder select{display:block;width:100%;box-sizing:border-box;margin-top:6px;min-height:46px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;font-size:16px}
+.contact-finder>button{margin:4px 7px 4px 0}
+#rivalContactResult{margin-top:12px}
+@media(max-width:700px){
+ .contact-search-box{display:block}
+ .contact-search-box button{width:100%;min-height:46px;margin-top:12px}
+ .contact-finder>button{width:100%;min-height:44px;margin:6px 0 0}
+}
+
 </style>
 </head>
 <body>
@@ -738,15 +762,46 @@ async function playerRegisterPageDo(){
  }catch(e){alert(e.message)}
 }
 async function playerDashboard(){
+ const c=document.getElementById("content");
+ if(!playerSession){playerLoginPage();return}
+ c.innerHTML=`<div class="card"><div class="card-h"><div><h2>Mi perfil</h2><div class="muted">${esc(playerSession.name)} · ${esc(playerSession.team)}</div></div></div><div class="card-b"><p class="muted">Cargando datos de tu cuenta…</p></div></div>`;
  try{
-  const [data,contactData]=await Promise.all([
-   cloudWrite({action:"playerDashboard",username:playerSession.username,token:playerSession.token}),
-   cloudWrite({action:"playerContacts",username:playerSession.username,token:playerSession.token})
-  ]);
-  const incoming=data.incoming||[],mine=data.mine||[],contacts=contactData.contacts||[];
-  const contactHtml=contacts.length?`<h4>📱 Contactos de tus rivales</h4><p class="muted">Pulsa en un teléfono para abrir WhatsApp y concretar el horario del partido.</p><div class="rival-list">${contacts.map(c=>`<div class="rival-card"><strong>${esc(c.team)}</strong>${c.players.length?c.players.map(p=>`<div class="rival-phone"><span>${esc(p.name)}</span><a class="wa-phone" href="https://wa.me/${waNumber(p.phone)}" target="_blank" rel="noopener">WhatsApp · ${esc(p.phone)}</a></div>`).join(""):`<span class="muted">Teléfono no disponible</span>`}</div>`).join("")}</div>`:"";
-  openModal(`<h3>Modo jugador</h3><p>Hola, <b>${esc(playerSession.name)}</b> · ${esc(playerSession.team)}</p><p class="muted">Cuenta verificada por administración.</p>${incoming.length?`<div class="pending-box"><b>${incoming.length} resultado(s) esperando tu confirmación</b></div>${incoming.map(proposalHtml).join("")}`:""}<div class="actions"><button onclick="openPlayerProposal()">Proponer resultado</button><button class="secondary" onclick="playerDashboard()">Actualizar</button><button class="secondary" onclick="playerLogout()">Cerrar sesión</button></div>${contactHtml}${mine.length?`<h4>Mis propuestas</h4>${mine.map(p=>`<div class="proposal-card"><b>${esc(p.home)} vs ${esc(p.away)}</b><br><span class="muted">${esc(p.score)} · ${esc(p.status)}</span></div>`).join("")}`:""}`)
- }catch(e){alert(e.message);playerLogout()}
+  /* El perfil NO descarga teléfonos. Solo carga propuestas/resultados. */
+  const data=await cloudWrite({action:"playerDashboard",username:playerSession.username,token:playerSession.token});
+  const incoming=data.incoming||[],mine=data.mine||[];
+
+  c.innerHTML=`<div class="card"><div class="card-h"><div><h2>Mi perfil</h2><div class="muted">${esc(playerSession.name)} · ${esc(playerSession.team)}</div></div></div><div class="card-b">
+   <div class="profile-user-head"><div><h3 style="margin:0 0 4px">${esc(playerSession.name)}</h3><b>${esc(playerSession.team)}</b><p class="muted" style="margin:8px 0 0">Cuenta verificada.</p></div><div class="actions"><button onclick="openPlayerProposal()">Proponer resultado</button><button class="secondary" onclick="playerDashboard()">Actualizar</button><button class="secondary" onclick="playerLogout()">Cerrar sesión</button></div></div>
+   ${incoming.length?`<div class="pending-box" style="margin-top:18px"><b>${incoming.length} resultado(s) esperando tu confirmación</b></div>${incoming.map(proposalHtml).join("")}`:""}
+   <div class="contact-search-box">
+    <div><h4>📱 Contactos de rivales</h4><p class="muted">Los teléfonos no se cargan automáticamente. Busca la pareja cuando necesites contactar con ella.</p></div>
+    <button onclick="openContactFinder()">Buscar pareja</button>
+   </div>
+   <div id="contactFinderResult"></div>
+   ${mine.length?`<h4 style="margin-top:24px">Mis propuestas</h4>${mine.map(p=>`<div class="proposal-card"><b>${esc(p.home)} vs ${esc(p.away)}</b><br><span class="muted">${esc(p.score)} · ${esc(p.status)}</span></div>`).join("")}`:""}
+  </div></div>`;
+ }catch(e){
+  c.innerHTML=`<div class="card"><div class="card-h"><div><h2>Mi perfil</h2><div class="muted">${esc(playerSession.name)} · ${esc(playerSession.team)}</div></div></div><div class="card-b"><div class="notice">No se han podido cargar los datos del perfil: ${esc(e.message)}</div><div class="actions" style="margin-top:14px"><button onclick="playerDashboard()">Reintentar</button><button class="secondary" onclick="playerLogout()">Cerrar sesión</button></div></div></div>`;
+ }
+}
+
+function openContactFinder(){
+ const box=document.getElementById("contactFinderResult");if(!box)return;
+ const rivals=[...new Set(PLAYER_ROSTER.filter(p=>p.league===playerSession.league&&p.team!==playerSession.team).map(p=>p.team))].sort((a,b)=>a.localeCompare(b,"es"));
+ box.innerHTML=`<div class="contact-finder"><label>Buscar pareja<select id="rivalTeamSelect"><option value="">Selecciona una pareja…</option>${rivals.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join("")}</select></label><button onclick="searchRivalContact()">Buscar contacto</button><button class="secondary" onclick="document.getElementById('contactFinderResult').innerHTML=''">Cancelar</button><div id="rivalContactResult"></div></div>`;
+}
+
+async function searchRivalContact(){
+ const team=v("rivalTeamSelect");if(!team){alert("Selecciona una pareja.");return}
+ const target=document.getElementById("rivalContactResult");if(!target)return;
+ target.innerHTML=`<p class="muted">Buscando contacto de ${esc(team)}…</p>`;
+ try{
+  /* Se pide al backend solo cuando el usuario pulsa Buscar. */
+  const data=await cloudWrite({action:"playerContacts",username:playerSession.username,token:playerSession.token});
+  const c=(data.contacts||[]).find(x=>x.team===team);
+  if(!c){target.innerHTML=`<div class="notice">No hay teléfonos disponibles para ${esc(team)}.</div>`;return}
+  target.innerHTML=`<div class="rival-card"><strong>${esc(c.team)}</strong>${(c.players||[]).map(p=>`<div class="rival-phone"><span>${esc(p.name)}</span><a class="wa-phone" href="https://wa.me/${waNumber(p.phone)}" target="_blank" rel="noopener">WhatsApp · ${esc(p.phone)}</a></div>`).join("")}</div>`;
+ }catch(e){target.innerHTML=`<div class="notice">No se pudo buscar el contacto: ${esc(e.message)}</div>`}
 }
 function proposalHtml(p){return `<div class="proposal-card"><b>${esc(p.home)} vs ${esc(p.away)}</b><br><span>${esc(p.score)}</span><div class="actions"><button onclick="confirmProposal('${esc(p.id)}','confirm')">Confirmar</button><button class="danger" onclick="confirmProposal('${esc(p.id)}','reject')">Rechazar</button></div></div>`}
 async function confirmProposal(id,decision){try{await cloudWrite({action:"confirmProposal",username:playerSession.username,token:playerSession.token,id,decision});if(decision==="confirm")await loadCloudResults();closeModal();currentView="profile";render()}catch(e){alert(e.message)}}
