@@ -219,8 +219,33 @@ async function loadCloudResults(){
     const data=await r.json();
     if(!data.ok) throw new Error(data.error||"Error");
     for(const L of Object.values(db.leagues)) L.results={};
-    (data.results||[]).forEach(x=>{
-      if(db.leagues[x.league]) db.leagues[x.league].results[x.key]={sets:x.sets||[],winner:x.winner};
+
+    const incoming=data.results||[];
+
+    // Primero cargamos las claves antiguas (0-1, 1-2, etc.) y las traducimos
+    // a la identidad real del partido según el calendario actual.
+    incoming.forEach(x=>{
+      const L=db.leagues[x.league];
+      if(!L) return;
+      const mm=String(x.key||"").match(/^(\d+)-(\d+)$/);
+      if(mm){
+        const r=Number(mm[1]), i=Number(mm[2]);
+        const match=L.schedule?.[r]?.[i];
+        if(match){
+          const k=stableMatchKey(match.home,match.away);
+          L.results[k]={sets:x.sets||[],winner:x.winner};
+        }
+      }
+    });
+
+    // Después cargamos las claves permanentes. Si un partido ya fue migrado,
+    // la versión nueva prevalece sobre la antigua.
+    incoming.forEach(x=>{
+      const L=db.leagues[x.league];
+      if(!L) return;
+      if(String(x.key||"").startsWith("v2:")){
+        L.results[x.key]={sets:x.sets||[],winner:x.winner};
+      }
     });
     setSync(true,"Actualizado");
     render();
@@ -239,8 +264,23 @@ async function cloudWrite(payload){
   return data;
 }
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
-function resultKey(r,m){return r+"-"+m}
-function getResult(L,r,m){return L.results?.[resultKey(r,m)]||null}
+function stableMatchKey(home,away){
+  // La clave no depende de la jornada ni del orden visual del calendario.
+  // Ordenamos los nombres para que A-vs-B y B-vs-A sean el mismo partido.
+  const pair=[String(home),String(away)].sort((a,b)=>a.localeCompare(b,"es",{sensitivity:"base"}));
+  return "v2:"+encodeURIComponent(pair[0])+"||"+encodeURIComponent(pair[1]);
+}
+function resultKey(L,r,m){
+  const match=L.schedule?.[r]?.[m];
+  if(!match) return "";
+  return stableMatchKey(match.home,match.away);
+}
+function legacyResultKey(r,m){return r+"-"+m}
+function getResult(L,r,m){
+  // Compatibilidad temporal: primero la clave nueva y, si aún no existe,
+  // la antigua. Así no se pierden los resultados ya introducidos.
+  return L.results?.[resultKey(L,r,m)] || L.results?.[legacyResultKey(r,m)] || null;
+}
 
 function calcStandings(L){
   let rows={};
@@ -414,8 +454,8 @@ async function saveResult(r,i){
  if(!winner){alert("Indica el ganador o introduce sets suficientes para detectarlo.");return}
  try{
    setSync(false,"Guardando…");
-   await cloudWrite({action:"save",password:adminPassword,league:currentLeague,key:resultKey(r,i),sets,winner});
-   L.results[resultKey(r,i)]={sets,winner};
+   await cloudWrite({action:"save",password:adminPassword,league:currentLeague,key:resultKey(L,r,i),sets,winner});
+   L.results[resultKey(L,r,i)]={sets,winner};
    closeModal();render();setSync(true,"Guardado");
  }catch(e){setSync(false,"Error al guardar");alert(e.message)}
 }
@@ -424,8 +464,11 @@ async function deleteResult(r,i){
  if(!confirm("¿Borrar este resultado?"))return;
  try{
    setSync(false,"Guardando…");
-   await cloudWrite({action:"delete",password:adminPassword,league:currentLeague,key:resultKey(r,i)});
-   delete db.leagues[currentLeague].results[resultKey(r,i)];
+   await cloudWrite({action:"delete",password:adminPassword,league:currentLeague,key:resultKey(L,r,i)});
+   // Intentamos retirar también la clave antigua si quedó de antes.
+   try{await cloudWrite({action:"delete",password:adminPassword,league:currentLeague,key:legacyResultKey(r,i)});}catch(_){}
+   delete L.results[resultKey(L,r,i)];
+   delete L.results[legacyResultKey(r,i)];
    render();setSync(true,"Guardado");
  }catch(e){setSync(false,"Error al guardar");alert(e.message)}
 }
