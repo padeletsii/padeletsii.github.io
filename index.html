@@ -372,6 +372,38 @@ body.admin-mode .admin-nav-only{display:inline-flex!important}
  .current-round-banner b{font-size:20px}
 }
 
+
+/* ===== Mi perfil: tarjetas y propuesta de resultado bien alineadas ===== */
+.profile-match{display:grid!important;grid-template-columns:92px minmax(0,1fr) auto!important;align-items:center!important;gap:14px!important;min-height:70px!important;box-sizing:border-box!important}
+.profile-match-round{margin:0!important;line-height:1.15!important}
+.profile-match-main{min-width:0!important;display:flex!important;flex-wrap:nowrap!important;gap:7px!important;align-items:center!important}
+.profile-match-main b{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.profile-match-score{margin:0!important;white-space:nowrap!important;text-align:right!important}
+.result-proposal-form{margin-top:16px}
+.result-proposal-form label{display:block;font-size:11px;font-weight:900;margin-bottom:6px}
+.result-proposal-form select{width:100%;box-sizing:border-box;min-height:46px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;font-size:16px}
+.proposal-match-select{margin-bottom:16px}
+.sets-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.set-box{border:1px solid var(--line);border-radius:13px;padding:11px;background:#faf9f6}
+.set-box-title{font-size:10px;font-weight:950;letter-spacing:1px;color:var(--blue);margin-bottom:8px}
+.set-score-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:7px;align-items:center}
+.set-score-row input{width:100%;min-width:0;box-sizing:border-box;min-height:44px;padding:7px;text-align:center;border:1px solid #cbc6bc;border-radius:9px;font:inherit;font-size:16px}
+.set-score-row span{font-size:11px;color:var(--muted)}
+.proposal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:16px}
+@media(max-width:700px){
+ .profile-match{grid-template-columns:66px minmax(0,1fr)!important;gap:5px 10px!important;min-height:66px!important;padding:11px 12px!important}
+ .profile-match-round{grid-column:1;grid-row:1 / span 2;align-self:center;font-size:8px!important;letter-spacing:1px!important}
+ .profile-match-main{grid-column:2;grid-row:1;font-size:14px!important}
+ .profile-match-main b{font-size:14px!important}
+ .profile-match-main span{font-size:9px!important;flex:0 0 auto}
+ .profile-match-score{grid-column:2;grid-row:2;text-align:left!important;font-size:10px!important}
+ .sets-grid{grid-template-columns:1fr!important;gap:8px}
+ .set-box{display:grid;grid-template-columns:50px minmax(0,1fr);align-items:center;gap:8px;padding:9px 11px}
+ .set-box-title{margin:0}
+ .proposal-actions{display:grid;grid-template-columns:1fr;margin-top:12px}
+ .proposal-actions button{width:100%;min-height:46px}
+}
+
 </style>
 </head>
 <body>
@@ -902,7 +934,15 @@ async function searchRivalContact(){
 }
 function proposalHtml(p){return `<div class="proposal-card"><b>${esc(p.home)} vs ${esc(p.away)}</b><br><span>${esc(p.score)}</span><div class="actions"><button onclick="confirmProposal('${esc(p.id)}','confirm')">Confirmar</button><button class="danger" onclick="confirmProposal('${esc(p.id)}','reject')">Rechazar</button></div></div>`}
 async function confirmProposal(id,decision){try{await cloudWrite({action:"confirmProposal",username:playerSession.username,token:playerSession.token,id,decision});if(decision==="confirm")await loadCloudResults();closeModal();currentView="profile";render()}catch(e){alert(e.message)}}
-function openPlayerProposal(){const ms=myLocalMatches().filter(m=>!m.played);if(!ms.length){openModal(`<h3>Proponer resultado</h3><p class="muted">No tienes partidos pendientes disponibles.</p><div class="actions"><button class="secondary" onclick="closeModal();currentView='profile';render()">Volver</button></div>`);return}window._playerMatches=ms;openModal(`<h3>Proponer resultado</h3><p class="muted">Puedes subir un resultado de cualquier jornada pendiente, aunque los partidos no se hayan jugado en orden.</p><label>Partido<select id="pmatch">${ms.map((m,i)=>`<option value="${i}">${esc(m.label)}</option>`).join("")}</select></label><div class="set-grid"><b>Set 1</b><input id="ps10" type="number" min="0"><input id="ps11" type="number" min="0"><b>Set 2</b><input id="ps20" type="number" min="0"><input id="ps21" type="number" min="0"><b>Set 3</b><input id="ps30" type="number" min="0"><input id="ps31" type="number" min="0"></div><div class="actions"><button onclick="submitPlayerProposal()">Enviar propuesta</button><button class="secondary" onclick="closeModal();currentView='profile';render()">Volver</button></div>`)}
+function openPlayerProposal(){
+ const ms=myLocalMatches().filter(m=>!m.played);
+ if(!ms.length){
+  openModal(`<h3>Proponer resultado</h3><p class="muted">No tienes partidos pendientes disponibles.</p><div class="proposal-actions"><button class="secondary" onclick="closeModal();currentView='profile';render()">Volver</button></div>`);
+  return
+ }
+ window._playerMatches=ms;
+ openModal(`<h3>Proponer resultado</h3><p class="muted">Puedes subir un resultado de cualquier jornada pendiente, aunque los partidos no se hayan jugado en orden.</p><div class="result-proposal-form"><div class="proposal-match-select"><label>PARTIDO</label><select id="pmatch">${ms.map((m,i)=>`<option value="${i}">${esc(m.label)}</option>`).join("")}</select></div><div class="sets-grid"><div class="set-box"><div class="set-box-title">SET 1</div><div class="set-score-row"><input id="ps10" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps11" type="number" min="0" inputmode="numeric"></div></div><div class="set-box"><div class="set-box-title">SET 2</div><div class="set-score-row"><input id="ps20" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps21" type="number" min="0" inputmode="numeric"></div></div><div class="set-box"><div class="set-box-title">SET 3</div><div class="set-score-row"><input id="ps30" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps31" type="number" min="0" inputmode="numeric"></div></div></div><div class="proposal-actions"><button onclick="submitPlayerProposal()">Enviar propuesta</button><button class="secondary" onclick="closeModal();currentView='profile';render()">Volver</button></div></div>`)
+}
 async function submitPlayerProposal(){const m=window._playerMatches[+v("pmatch")];const sets=[[v("ps10"),v("ps11")],[v("ps20"),v("ps21")],[v("ps30"),v("ps31")]].filter(x=>x[0]!==""&&x[1]!=="").map(x=>x.map(Number));if(sets.length<2){alert("Introduce al menos dos sets.");return}try{await cloudWrite({action:"proposeResult",username:playerSession.username,token:playerSession.token,league:m.league,key:m.key,home:m.home,away:m.away,sets});alert("Resultado propuesto. Solo será oficial cuando lo confirme un usuario verificado de la pareja rival.");closeModal();currentView="profile";render()}catch(e){alert(e.message)}}
 async function showUserAdmin(){
  if(!admin){alert("Entra primero en modo administrador.");return}openModal(`<h3>Usuarios</h3><p class="muted">Cargando…</p>`);
