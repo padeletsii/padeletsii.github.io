@@ -701,6 +701,10 @@ function closeModal(){document.getElementById("modal").classList.remove("open");
 let playerSession=null;
 function rosterOptions(){return PLAYER_ROSTER.map((p,i)=>`<option value="${i}">${esc(p.name)} · ${esc(p.team)} · ${esc(p.leagueName)}</option>`).join("")}
 
+function loadProfilePage(){
+ currentView="profile";
+ renderProfile();
+}
 function renderProfile(){
  const c=document.getElementById("content");
  document.getElementById("panelTitle").textContent="Mi perfil";
@@ -710,7 +714,7 @@ function renderProfile(){
    return;
  }
  c.innerHTML=`<p class="muted">Cargando tu perfil…</p>`;
- loadProfilePage();
+ playerDashboard();
 }
 function playerLoginPage(){
  const c=document.getElementById("content");
