@@ -135,10 +135,20 @@ footer{text-align:center;color:var(--muted);padding:24px}
  .content,.panel-head{padding:16px}
  .journey-grid{grid-template-columns:1fr}
 }
+
+/* Estadísticas privadas de administración */
+.stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:14px}
+.stat-card{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff;text-align:center}
+.stat-number{font-size:28px;font-weight:950;line-height:1;color:var(--blue)}
+.stat-label{font-size:12px;color:var(--muted);font-weight:800;margin-top:7px}
+.stats-period{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
+.stats-period button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;font-weight:800;cursor:pointer}
+.stats-period button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+@media(max-width:760px){.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats-grid .stat-card:first-child{grid-column:1/-1}}
 </style>
 </head>
 <body>
-<div id="adminbar" class="adminbar"><div class="wrap"><b>MODO ADMINISTRADOR</b><div><button class="secondary" onclick="exportData()">Exportar copia</button> <button class="danger" onclick="toggleAdmin(false)">Salir</button></div></div></div>
+<div id="adminbar" class="adminbar"><div class="wrap"><b>MODO ADMINISTRADOR</b><div><button class="secondary" onclick="showAnalytics()">Estadísticas</button> <button class="secondary" onclick="exportData()">Exportar copia</button> <button class="danger" onclick="toggleAdmin(false)">Salir</button></div></div></div>
 <header>
  <div class="wrap">
   <div class="brand"><div class="brand-left"><div><h1>LIGA PÁDEL<br>ETSII</h1><p>Partidos · clasificación · cruces · copa</p></div></div><div class="badge">CD INDUSTRIALES · 2026/27</div></div>
@@ -316,7 +326,7 @@ function render(){
   if(currentView==="cup") renderCup(L);
   if(currentView==="info") renderInfo();
 }
-document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{currentView=b.dataset.view;render()});
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{if(b.dataset.view==="info") trackEvent("info");currentView=b.dataset.view;render()});
 document.getElementById("content").addEventListener("click",function(e){
   const btn=e.target.closest(".team-link");
   if(!btn)return;
@@ -426,9 +436,9 @@ function renderInfo(){
        <p>Los partidos de la liga se disputan en las pistas de la Escuela.</p>
      </div>
      <div class="info-kicker">Club Deportivo</div>
-     <a class="info-social" href="https://www.instagram.com/cdindustriales/" target="_blank" rel="noopener">@cdindustriales</a>
+     <a class="info-social" onclick="trackEvent('instagram_cdindustriales')" href="https://www.instagram.com/cdindustriales/" target="_blank" rel="noopener">@cdindustriales</a>
      <div class="credits">
-       <div>Liga organizada y gestionada por <b>Lucía Velasco</b> · <a class="info-social" href="https://www.instagram.com/velasco9_/" target="_blank" rel="noopener">@velasco9_</a></div>
+       <div>Liga organizada y gestionada por <b>Lucía Velasco</b> · <a class="info-social" onclick="trackEvent('instagram_velasco9')" href="https://www.instagram.com/velasco9_/" target="_blank" rel="noopener">@velasco9_</a></div>
        <div>Página web diseñada por <b>Lucía Velasco</b></div>
      </div>
    </div>
@@ -484,6 +494,41 @@ function toggleAdmin(force){
  }else{admin=false;adminPassword="";document.getElementById("adminbar").classList.remove("on")}
  render();
 }
+function analyticsVisitorId(){
+ try{
+   let id=localStorage.getItem("padel_etsii_visitor_id");
+   if(!id){id=(crypto.randomUUID?crypto.randomUUID():(Date.now().toString(36)+Math.random().toString(36).slice(2)));localStorage.setItem("padel_etsii_visitor_id",id)}
+   return id;
+ }catch(_){return "anon-"+Date.now().toString(36)}
+}
+function trackEvent(eventName){
+ if(!apiReady()) return;
+ const body=new URLSearchParams({action:"track",event:eventName,visitor:analyticsVisitorId()});
+ fetch(API_URL,{method:"POST",body,keepalive:true}).catch(()=>{});
+}
+async function showAnalytics(period="total"){
+ if(!admin){alert("Entra primero en modo administrador.");return}
+ openModal(`<h3>Estadísticas</h3><p class="muted">Cargando…</p>`);
+ try{
+   const data=await cloudWrite({action:"analytics",password:adminPassword,period});
+   const a=data.analytics||{};
+   const label=period==="today"?"Hoy":period==="7d"?"Últimos 7 días":"Total";
+   openModal(`<h3>Estadísticas</h3>
+     <div class="stats-period">
+       <button class="${period==="today"?"active":""}" onclick="showAnalytics('today')">Hoy</button>
+       <button class="${period==="7d"?"active":""}" onclick="showAnalytics('7d')">7 días</button>
+       <button class="${period==="total"?"active":""}" onclick="showAnalytics('total')">Total</button>
+     </div>
+     <p class="muted">${label} · los visitantes únicos son aproximados por navegador.</p>
+     <div class="stats-grid">
+       <div class="stat-card"><div class="stat-number">${a.visits||0}</div><div class="stat-label">Visitas</div></div>
+       <div class="stat-card"><div class="stat-number">${a.unique||0}</div><div class="stat-label">Visitantes únicos</div></div>
+       <div class="stat-card"><div class="stat-number">${a.info||0}</div><div class="stat-label">Clics en Info</div></div>
+       <div class="stat-card"><div class="stat-number">${a.instagram_velasco9||0}</div><div class="stat-label">Clics en @velasco9_</div></div>
+       <div class="stat-card"><div class="stat-number">${a.instagram_cdindustriales||0}</div><div class="stat-label">Clics en @cdindustriales</div></div>
+     </div>`);
+ }catch(e){openModal(`<h3>Estadísticas</h3><div class="notice">${esc(e.message)}</div>`)}
+}
 function exportData(){
  const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="liga-etsii-backup.json";a.click();URL.revokeObjectURL(a.href);
@@ -492,6 +537,7 @@ function importData(e){
  const f=e.target.files[0];if(!f)return;
  const rd=new FileReader();rd.onload=()=>{try{db=JSON.parse(rd.result);saveDB();render();alert("Copia importada.");}catch(err){alert("Archivo no válido.")}};rd.readAsText(f);
 }
+trackEvent("visit");
 render();
 loadCloudResults();
 setInterval(()=>{if(!admin)loadCloudResults()},30000);
