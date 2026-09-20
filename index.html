@@ -184,6 +184,7 @@ let adminPassword = "";
 let currentLeague = "pro";
 let currentView = "standings";
 let admin = false;
+const ADMIN_SESSION_KEY = "liga_etsii_admin_session";
 
 function deepClone(x){return JSON.parse(JSON.stringify(x))}
 function roundRobin(teams){
@@ -510,15 +511,48 @@ async function deleteResult(r,i){
 }
 function openModal(x){document.getElementById("modalCard").innerHTML=x;document.getElementById("modal").classList.add("open")}
 function closeModal(){document.getElementById("modal").classList.remove("open")}
-function toggleAdmin(force){
- if(force===false){admin=false;document.getElementById("adminbar").classList.remove("on");render();return}
+async function validateAdminPassword(p){
+ if(!p) return false;
+ try{
+   await cloudWrite({action:"analytics",password:p,period:"total"});
+   return true;
+ }catch(_){
+   return false;
+ }
+}
+async function toggleAdmin(force){
+ if(force===false){
+   admin=false;adminPassword="";
+   try{sessionStorage.removeItem(ADMIN_SESSION_KEY)}catch(_){}
+   document.getElementById("adminbar").classList.remove("on");
+   render();return;
+ }
  if(!admin){
    const p=prompt("Clave de administrador:");
    if(p===null||!p)return;
-   adminPassword=p;
-   admin=true;document.getElementById("adminbar").classList.add("on");
- }else{admin=false;adminPassword="";document.getElementById("adminbar").classList.remove("on")}
+   const ok=await validateAdminPassword(p);
+   if(!ok){alert("Contraseña de administrador incorrecta.");return}
+   adminPassword=p;admin=true;
+   try{sessionStorage.setItem(ADMIN_SESSION_KEY,p)}catch(_){}
+   document.getElementById("adminbar").classList.add("on");
+ }else{
+   admin=false;adminPassword="";
+   try{sessionStorage.removeItem(ADMIN_SESSION_KEY)}catch(_){}
+   document.getElementById("adminbar").classList.remove("on");
+ }
  render();
+}
+async function restoreAdminSession(){
+ let p="";
+ try{p=sessionStorage.getItem(ADMIN_SESSION_KEY)||""}catch(_){}
+ if(!p) return;
+ if(await validateAdminPassword(p)){
+   adminPassword=p;admin=true;
+   document.getElementById("adminbar").classList.add("on");
+   render();
+ }else{
+   try{sessionStorage.removeItem(ADMIN_SESSION_KEY)}catch(_){}
+ }
 }
 function analyticsVisitorId(){
  try{
@@ -566,6 +600,7 @@ function importData(e){
 trackEvent("visit");
 render();
 loadCloudResults();
+restoreAdminSession();
 setInterval(()=>{if(!admin)loadCloudResults()},30000);
 </script>
 </body>
