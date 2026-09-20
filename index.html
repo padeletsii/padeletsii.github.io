@@ -874,6 +874,14 @@ async function playerDashboard(){
  }
 }
 
+function waNumber(phone){
+  let digits=String(phone||"").replace(/\D/g,"");
+  if(!digits)return "";
+  if(digits.startsWith("00"))digits=digits.slice(2);
+  if(digits.length===9)digits="34"+digits;
+  return digits;
+}
+
 function openContactFinder(){
  const box=document.getElementById("contactFinderResult");if(!box)return;
  const rivals=[...new Set(PLAYER_ROSTER.filter(p=>p.league===playerSession.league&&p.team!==playerSession.team).map(p=>p.team))].sort((a,b)=>a.localeCompare(b,"es"));
@@ -889,7 +897,7 @@ async function searchRivalContact(){
   const data=await cloudWrite({action:"playerContacts",username:playerSession.username,token:playerSession.token});
   const c=(data.contacts||[]).find(x=>x.team===team);
   if(!c){target.innerHTML=`<div class="notice">No hay teléfonos disponibles para ${esc(team)}.</div>`;return}
-  target.innerHTML=`<div class="rival-card"><strong>${esc(c.team)}</strong>${(c.players||[]).map(p=>`<div class="rival-phone"><span>${esc(p.name)}</span><a class="wa-phone" href="https://wa.me/${waNumber(p.phone)}" target="_blank" rel="noopener">WhatsApp · ${esc(p.phone)}</a></div>`).join("")}</div>`;
+  target.innerHTML=`<div class="rival-card"><strong>${esc(c.team)}</strong>${(c.players||[]).map(p=>`<div class="rival-phone"><span>${esc(p.name)}</span>${waNumber(p.phone)?`<a class="wa-phone" href="https://wa.me/${waNumber(p.phone)}" target="_blank" rel="noopener">WhatsApp · ${esc(p.phone)}</a>`:`<span class="muted">Teléfono no disponible</span>`}</div>`).join("")}</div>`;
  }catch(e){target.innerHTML=`<div class="notice">No se pudo buscar el contacto: ${esc(e.message)}</div>`}
 }
 function proposalHtml(p){return `<div class="proposal-card"><b>${esc(p.home)} vs ${esc(p.away)}</b><br><span>${esc(p.score)}</span><div class="actions"><button onclick="confirmProposal('${esc(p.id)}','confirm')">Confirmar</button><button class="danger" onclick="confirmProposal('${esc(p.id)}','reject')">Rechazar</button></div></div>`}
