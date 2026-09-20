@@ -471,16 +471,42 @@ async function saveResult(r,i){
 }
 function v(id){return document.getElementById(id).value}
 async function deleteResult(r,i){
- if(!confirm("¿Borrar este resultado?"))return;
+ if(!confirm("¿Borrar este resultado?")) return;
+
+ const L = db.leagues[currentLeague];
+ const newKey = resultKey(L,r,i);
+ const oldKey = legacyResultKey(r,i);
+
  try{
-   setSync(false,"Guardando…");
-   await cloudWrite({action:"delete",password:adminPassword,league:currentLeague,key:resultKey(L,r,i)});
-   // Intentamos retirar también la clave antigua si quedó de antes.
-   try{await cloudWrite({action:"delete",password:adminPassword,league:currentLeague,key:legacyResultKey(r,i)});}catch(_){}
-   delete L.results[resultKey(L,r,i)];
-   delete L.results[legacyResultKey(r,i)];
-   render();setSync(true,"Guardado");
- }catch(e){setSync(false,"Error al guardar");alert(e.message)}
+   setSync(false,"Borrando…");
+
+   await cloudWrite({
+     action:"delete",
+     password:adminPassword,
+     league:currentLeague,
+     key:newKey
+   });
+
+   if(oldKey !== newKey){
+     try{
+       await cloudWrite({
+         action:"delete",
+         password:adminPassword,
+         league:currentLeague,
+         key:oldKey
+       });
+     }catch(_){}
+   }
+
+   delete L.results[newKey];
+   delete L.results[oldKey];
+
+   render();
+   setSync(true,"Borrado");
+ }catch(e){
+   setSync(false,"Error al borrar");
+   alert("No se ha podido borrar el resultado: " + e.message);
+ }
 }
 function openModal(x){document.getElementById("modalCard").innerHTML=x;document.getElementById("modal").classList.add("open")}
 function closeModal(){document.getElementById("modal").classList.remove("open")}
