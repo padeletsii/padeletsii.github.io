@@ -372,6 +372,45 @@ body.admin-mode .admin-nav-only{display:inline-flex!important}
  .current-round-banner b{font-size:20px}
 }
 
+/* ===== Mi perfil: rediseño ===== */
+.pf-hero{position:relative;border-radius:20px;padding:26px 24px;margin:4px 0 20px;background:linear-gradient(135deg,var(--blue),#1c3f6e);color:#fff;display:flex;align-items:center;gap:18px;flex-wrap:wrap;overflow:hidden}
+.pf-hero::after{content:"";position:absolute;inset:0;background:radial-gradient(160px 160px at 90% -20%,rgba(255,255,255,.22),transparent 60%);pointer-events:none}
+.pf-avatar{width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:950;flex:0 0 auto}
+.pf-hero-info{flex:1;min-width:180px;position:relative}
+.pf-hero-info h3{margin:0 0 4px;font-size:23px;color:#fff}
+.pf-hero-team{font-weight:900;font-size:15px;opacity:.95}
+.pf-hero-league{display:inline-block;margin-top:9px;padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.16);font-size:11px;font-weight:900;letter-spacing:.3px}
+.pf-hero-actions{display:flex;gap:8px;flex-wrap:wrap;position:relative}
+.pf-hero-actions button{border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.14);color:#fff}
+.pf-hero-actions button.secondary{background:transparent}
+.pf-hero-actions button:hover{background:rgba(255,255,255,.26)}
+@media(max-width:560px){.pf-hero{flex-direction:column;align-items:flex-start;text-align:left}.pf-hero-actions{width:100%}.pf-hero-actions button{flex:1;min-height:44px}}
+.pf-next{border-radius:18px;padding:20px 22px;margin:0 0 22px;background:#fff;border:1px solid var(--line);box-shadow:0 10px 26px -20px rgba(20,30,50,.5)}
+.pf-next.has-match{border:2px solid var(--blue)}
+.pf-next-eyebrow{font-size:10px;font-weight:950;letter-spacing:1.6px;color:var(--blue);text-transform:uppercase;margin-bottom:10px}
+.pf-next-vs{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;font-size:21px;font-weight:900;margin-bottom:13px}
+.pf-next-vs span{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase}
+.pf-next-when{display:flex;gap:8px;flex-wrap:wrap}
+.pf-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#eef3fa;color:var(--blue);font-weight:900;font-size:13px}
+.pf-chip-muted{background:#f1f3f5;color:var(--muted);font-weight:800}
+.pf-match-list{display:grid;gap:10px}
+.pf-match-row{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:14px;padding:12px 15px;background:#fff}
+.pf-match-row.pf-win{border-left:4px solid #2d8a57}
+.pf-match-row.pf-loss{border-left:4px solid #c94b4b}
+.pf-match-round{flex:0 0 auto;font-size:9px;font-weight:950;letter-spacing:1.2px;color:var(--muted);min-width:30px}
+.pf-match-body{flex:1;min-width:0}
+.pf-match-vs{font-weight:900;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pf-match-when{margin-top:4px;font-size:11.5px;color:var(--muted);font-weight:700}
+.pf-match-side{flex:0 0 auto;text-align:right}
+.pf-result-pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:950;letter-spacing:.3px;white-space:nowrap}
+.pf-result-pill.win{background:#e8f5ee;color:#17603a}
+.pf-result-pill.loss{background:#fdecec;color:#a32e2e}
+.pf-result-pill.pending{background:#fff4d8;color:#8a5a00}
+@media(max-width:560px){
+ .pf-match-row{flex-wrap:wrap}
+ .pf-match-side{width:100%;text-align:left;margin-top:2px}
+}
+
 
 /* ===== Mi perfil: tarjetas y propuesta de resultado bien alineadas ===== */
 .profile-match{display:grid!important;grid-template-columns:92px minmax(0,1fr) auto!important;align-items:center!important;gap:14px!important;min-height:70px!important;box-sizing:border-box!important}
@@ -589,6 +628,9 @@ function formatMatchDate(iso){
   const dias=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
   return `${dias[dt.getDay()]} ${d}/${mo}`;
 }
+function initialsOf(name){
+  return String(name||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
+}
 function matchWhenHTML(si){
   if(!si||!si.date) return "";
   const parts=[formatMatchDate(si.date)]; if(si.time) parts.push(si.time); if(si.court) parts.push(si.court);
@@ -716,11 +758,13 @@ function renderMatches(L){
 }
 function adminScheduleImportBox(){
  return `<div class="admin-round-box" style="align-items:flex-start;flex-direction:column;gap:10px">
-  <div><b>Importar horario de partidos</b><span>Pega aquí el bloque de texto con los días, horas y pistas (el mismo formato de siempre) y se asignará automáticamente a cada partido, en cualquier liga.</span></div>
-  <textarea id="scheduleImportText" rows="8" style="width:100%;box-sizing:border-box;font:inherit;padding:8px" placeholder="JORNADA 1 - 28sept
-
-Lunes 28
+  <div><b>Importar horario de partidos</b><span>Pega aquí los días, horas y pistas y se asignará automáticamente a cada partido, en cualquier liga. La cabecera "JORNADA N - fecha" es opcional: si no la pones, se asume el mes actual (o el siguiente si esa fecha ya pasó).</span></div>
+  <textarea id="scheduleImportText" rows="8" style="width:100%;box-sizing:border-box;font:inherit;padding:8px" placeholder="Lunes 28
 De la croix VS Alou/Coquillat 12:30 P1
+Black y Rivers VS Violadores del verso 15:30 P1
+
+Martes 29
+Pa amb tomàquet - Toca y vuela, ciruela 13:30 P1
 ..."></textarea>
   <div class="admin-round-actions"><button onclick="importScheduleFromText()">Importar horario</button></div>
  </div>`;
@@ -730,8 +774,9 @@ async function importScheduleFromText(){
  if(!text||!text.trim()){alert("Pega primero el texto del calendario.");return}
  try{
   const data=await cloudWrite({action:"importSchedule",password:adminPassword,text});
-  const jornadas=[...new Set((data.entries||[]).map(x=>x.jornada))].join(", ");
-  alert(`Horario importado: ${data.imported} partido(s) (jornada ${jornadas}).`);
+  const jornadas=[...new Set((data.entries||[]).map(x=>x.jornada).filter(j=>j>0))];
+  const jTxt=jornadas.length?` (jornada ${jornadas.join(", ")})`:"";
+  alert(`Horario actualizado: ${data.imported} partido(s)${jTxt}. Nuevos: ${data.created||0} · Actualizados: ${data.updated||0}.`);
   await loadCloudResults();
  }catch(e){alert(e.message)}
 }
@@ -949,13 +994,39 @@ async function playerDashboard(){
     const dbb=b.round>=cur?b.round-cur:1000+b.round;
     return da-dbb;
   });
-  const matchCard=(m,old=false)=>`<div class="profile-match ${m.round===cur?"is-current":""}"><div class="profile-match-round">JORNADA ${m.round}${m.round===cur?" · ACTUAL":""}</div><div class="profile-match-main"><b>${esc(playerSession.team)}</b><span>vs</span><b>${esc(m.opponent)}</b></div>${matchWhenHTML(m.when)}${old?`<div class="profile-match-score">${esc(formatScore(m.result))} · ${m.result.winner===playerSession.team?"Victoria":"Derrota"}</div>`:`<div class="profile-match-score muted">${m.round===cur?"Tu partido de esta jornada":"Pendiente"}</div>`}</div>`;
-  c.innerHTML=`<div class="card"><div class="card-h"><div><h2>Mi perfil</h2><div class="muted">${esc(playerSession.name)} · ${esc(playerSession.team)}</div></div></div><div class="card-b">
-   <div class="profile-user-head"><div><h3 style="margin:0 0 4px">${esc(playerSession.name)}</h3><b>${esc(playerSession.team)}</b><p class="muted" style="margin:8px 0 0">${esc(L?.name||k)} · Cuenta verificada</p></div><div class="actions"><button onclick="openPlayerProposal()">Proponer resultado</button><button class="secondary" onclick="playerDashboard()">Actualizar</button><button class="secondary" onclick="playerLogout()">Cerrar sesión</button></div></div>
-   <div class="current-round-banner"><span>JORNADA ACTUAL</span><b>Jornada ${cur}</b><small>Marcada por la organización</small></div>
-   ${current?`<div class="profile-section"><h4>Tu partido de la jornada actual</h4>${matchCard(current,current.played)}</div>`:`<div class="profile-section"><h4>Jornada actual</h4><div class="notice">No tienes partido asignado en la jornada ${cur}.</div></div>`}
-   <div class="profile-section"><h4>Próximos partidos</h4>${upcoming.length?`<div class="profile-match-list">${upcoming.slice(0,5).map(m=>matchCard(m,false)).join("")}</div>`:`<p class="muted">No tienes partidos pendientes.</p>`}</div>
-   <div class="profile-section"><h4>Partidos anteriores</h4>${past.length?`<div class="profile-match-list">${past.map(m=>matchCard(m,true)).join("")}</div>`:`<p class="muted">Todavía no tienes partidos con resultado confirmado.</p>`}</div>
+  const stRow=calcStandings(L).find(x=>x.team===playerSession.team)||{pj:0,pg:0,pp:0};
+  const pfWhenChip=(when)=>{
+    if(!when||!when.date) return `<span class="pf-chip pf-chip-muted">Fecha por confirmar</span>`;
+    const parts=[formatMatchDate(when.date)]; if(when.time) parts.push(when.time); if(when.court) parts.push(when.court);
+    return `<span class="pf-chip">🗓️ ${esc(parts.join(" · "))}</span>`;
+  };
+  const matchRow=(m,old=false)=>{
+    const won=old&&m.result?.winner===playerSession.team;
+    const rowCls=old?(won?"pf-win":"pf-loss"):"";
+    const when=m.when&&m.when.date?esc([formatMatchDate(m.when.date),m.when.time,m.when.court].filter(Boolean).join(" · ")):"Fecha por confirmar";
+    const side=old
+      ?`<span class="pf-result-pill ${won?"win":"loss"}">${won?"VICTORIA":"DERROTA"}</span><div class="muted" style="font-size:11px;margin-top:4px">${esc(formatScore(m.result))}</div>`
+      :`<span class="pf-result-pill pending">${m.round===cur?"ESTA JORNADA":"PENDIENTE"}</span>`;
+    return `<div class="pf-match-row ${rowCls}"><div class="pf-match-round">J${m.round}</div><div class="pf-match-body"><div class="pf-match-vs">${esc(playerSession.team)} <span class="muted" style="font-weight:700">vs</span> ${esc(m.opponent)}</div><div class="pf-match-when">${when}</div></div><div class="pf-match-side">${side}</div></div>`;
+  };
+  const nextMatchHTML=current
+    ?`<div class="pf-next has-match"><div class="pf-next-eyebrow">Tu partido · Jornada ${cur}</div><div class="pf-next-vs">${esc(playerSession.team)} <span>vs</span> ${esc(current.opponent)}</div><div class="pf-next-when">${pfWhenChip(current.when)}</div></div>`
+    :`<div class="pf-next"><div class="pf-next-eyebrow">Jornada ${cur}</div><div class="muted">No tienes partido asignado en esta jornada.</div></div>`;
+  c.innerHTML=`<div class="card"><div class="card-b">
+   <div class="pf-hero">
+    <div class="pf-avatar">${esc(initialsOf(playerSession.name))}</div>
+    <div class="pf-hero-info"><h3>${esc(playerSession.name)}</h3><div class="pf-hero-team">${esc(playerSession.team)}</div><span class="pf-hero-league">${esc(L?.name||k)}</span></div>
+    <div class="pf-hero-actions"><button onclick="openPlayerProposal()">Proponer resultado</button><button class="secondary" onclick="playerDashboard()">Actualizar</button><button class="secondary" onclick="playerLogout()">Cerrar sesión</button></div>
+   </div>
+   <div class="profile-stats">
+    <div class="profile-stat"><strong>${stRow.pj}</strong><span>Jugados</span></div>
+    <div class="profile-stat"><strong>${stRow.pg}</strong><span>Ganados</span></div>
+    <div class="profile-stat"><strong>${stRow.pp}</strong><span>Perdidos</span></div>
+    <div class="profile-stat"><strong>${upcoming.length}</strong><span>Por jugar</span></div>
+   </div>
+   ${nextMatchHTML}
+   <div class="profile-section"><h4>Próximos partidos</h4>${upcoming.length?`<div class="pf-match-list">${upcoming.slice(0,5).map(m=>matchRow(m,false)).join("")}</div>`:`<p class="muted">No tienes partidos pendientes.</p>`}</div>
+   <div class="profile-section"><h4>Partidos anteriores</h4>${past.length?`<div class="pf-match-list">${past.map(m=>matchRow(m,true)).join("")}</div>`:`<p class="muted">Todavía no tienes partidos con resultado confirmado.</p>`}</div>
    ${incoming.length?`<div class="pending-box" style="margin-top:18px"><b>${incoming.length} resultado(s) esperando tu confirmación</b></div>${incoming.map(proposalHtml).join("")}`:""}
    <div class="contact-search-box"><div><h4>📱 Contactos de rivales</h4><p class="muted">Busca una pareja solo cuando necesites su contacto.</p></div><button onclick="openContactFinder()">Buscar pareja</button></div>
    <div id="contactFinderResult"></div>
