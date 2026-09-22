@@ -457,6 +457,7 @@ const PLAYER_ROSTER = [{"league":"pro","leagueName":"Masculina PRO","team":"Los 
 const STORAGE_KEY = "liga_etsii_2026_v4_fem9";
 let db = initDB();
 let adminPassword = "";
+let matchSchedule = {};
 let currentLeague = "pro";
 let currentView = "standings";
 let admin = false;
@@ -536,6 +537,14 @@ async function loadCloudResults(){
         L.results[x.key]={sets:x.sets||[],winner:x.winner};
       }
     });
+
+    // Horario de partidos (fecha, hora, pista), importado por la administradora
+    // desde el panel de administración sin tocar el código fuente.
+    matchSchedule={};
+    (data.schedule||[]).forEach(x=>{
+      if(!x||!x.league||!x.home||!x.away) return;
+      matchSchedule[scheduleMapKey(x.league,x.home,x.away)]={date:x.date||"",time:x.time||"",court:x.court||"",jornada:x.jornada||0};
+    });
     setSync(true,"Actualizado");
     render();
   }catch(e){
@@ -569,6 +578,21 @@ function getResult(L,r,m){
   // Compatibilidad temporal: primero la clave nueva y, si aún no existe,
   // la antigua. Así no se pierden los resultados ya introducidos.
   return L.results?.[resultKey(L,r,m)] || L.results?.[legacyResultKey(r,m)] || null;
+}
+function scheduleMapKey(league,home,away){return league+"|"+stableMatchKey(home,away);}
+function getMatchSchedule(league,home,away){return matchSchedule[scheduleMapKey(league,home,away)]||null;}
+function formatMatchDate(iso){
+  const mm=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(!mm) return "";
+  const y=Number(mm[1]),mo=Number(mm[2]),d=Number(mm[3]);
+  const dt=new Date(y,mo-1,d);
+  const dias=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+  return `${dias[dt.getDay()]} ${d}/${mo}`;
+}
+function matchWhenHTML(si){
+  if(!si||!si.date) return "";
+  const parts=[formatMatchDate(si.date)]; if(si.time) parts.push(si.time); if(si.court) parts.push(si.court);
+  return `<div class="muted" style="font-size:12px;margin:0 0 4px">${esc(parts.join(" · "))}</div>`;
 }
 
 function calcStandings(L){
@@ -666,7 +690,8 @@ function localMatchesForPlayer(){
       out.push({
         league:k,round:r+1,key:resultKey(L,r,i),home:m.home,away:m.away,
         opponent:m.home===playerSession.team?m.away:m.home,
-        isHome:m.home===playerSession.team,result:res,played:!!res?.winner
+        isHome:m.home===playerSession.team,result:res,played:!!res?.winner,
+        when:getMatchSchedule(k,m.home,m.away)
       });
     }
   }));
@@ -680,13 +705,35 @@ function myLocalMatches(){
 }
 
 function renderMatches(L){
- const c=document.getElementById("content"),k=leagueKeyFromObject(L),roundAdmin=adminRoundControl(k,L);
- if(!L.complete){c.innerHTML=roundAdmin+(L.provisional?`<div class="tennis-note"><b>Calendario todavía no publicado.</b> La jornada actual puede dejarse preparada aunque la liga siga abierta.</div>`+teamsCards(L):`<div class="notice">Los cruces se generarán automáticamente cuando se cierre esta categoría.</div>`+teamsCards(L));return}
- c.innerHTML=roundAdmin+`<div class="journey-grid">${L.schedule.map((round,r)=>`<div class="journey"><h3>Jornada ${r+1}</h3>${round.map((m,i)=>{
+ const c=document.getElementById("content"),k=leagueKeyFromObject(L),roundAdmin=adminRoundControl(k,L),scheduleBox=admin?adminScheduleImportBox():"";
+ if(!L.complete){c.innerHTML=roundAdmin+scheduleBox+(L.provisional?`<div class="tennis-note"><b>Calendario todavía no publicado.</b> La jornada actual puede dejarse preparada aunque la liga siga abierta.</div>`+teamsCards(L):`<div class="notice">Los cruces se generarán automáticamente cuando se cierre esta categoría.</div>`+teamsCards(L));return}
+ c.innerHTML=roundAdmin+scheduleBox+`<div class="journey-grid">${L.schedule.map((round,r)=>`<div class="journey"><h3>Jornada ${r+1}</h3>${round.map((m,i)=>{
   const res=getResult(L,r,i);
   const score=res?formatScore(res):"—";
-  return `<div class="match"><div class="match-line"><span>${esc(m.home)}</span><span class="score ${res?"played":"pending"}">${score}</span><span class="away">${esc(m.away)}</span></div><div class="admin-edit"><button onclick="editMatch(${r},${i})">${res?"Editar resultado":"Añadir resultado"}</button>${res?`<button onclick="deleteResult(${r},${i})">Borrar</button>`:""}</div></div>`
+  const si=getMatchSchedule(k,m.home,m.away);
+  return `<div class="match">${matchWhenHTML(si)}<div class="match-line"><span>${esc(m.home)}</span><span class="score ${res?"played":"pending"}">${score}</span><span class="away">${esc(m.away)}</span></div><div class="admin-edit"><button onclick="editMatch(${r},${i})">${res?"Editar resultado":"Añadir resultado"}</button>${res?`<button onclick="deleteResult(${r},${i})">Borrar</button>`:""}</div></div>`
  }).join("")}</div>`).join("")}</div>`;
+}
+function adminScheduleImportBox(){
+ return `<div class="admin-round-box" style="align-items:flex-start;flex-direction:column;gap:10px">
+  <div><b>Importar horario de partidos</b><span>Pega aquí el bloque de texto con los días, horas y pistas (el mismo formato de siempre) y se asignará automáticamente a cada partido, en cualquier liga.</span></div>
+  <textarea id="scheduleImportText" rows="8" style="width:100%;box-sizing:border-box;font:inherit;padding:8px" placeholder="JORNADA 1 - 28sept
+
+Lunes 28
+De la croix VS Alou/Coquillat 12:30 P1
+..."></textarea>
+  <div class="admin-round-actions"><button onclick="importScheduleFromText()">Importar horario</button></div>
+ </div>`;
+}
+async function importScheduleFromText(){
+ const text=v("scheduleImportText");
+ if(!text||!text.trim()){alert("Pega primero el texto del calendario.");return}
+ try{
+  const data=await cloudWrite({action:"importSchedule",password:adminPassword,text});
+  const jornadas=[...new Set((data.entries||[]).map(x=>x.jornada))].join(", ");
+  alert(`Horario importado: ${data.imported} partido(s) (jornada ${jornadas}).`);
+  await loadCloudResults();
+ }catch(e){alert(e.message)}
 }
 function formatScore(res){return (res.sets||[]).filter(s=>s[0]!==""&&s[1]!=="").map(s=>`${s[0]}-${s[1]}`).join(" · ") || "Resultado"}
 function teamsCards(L){return `<div class="cards">${L.teams.map(t=>L.sport==="Tenis"?`<div class="card"><h3>${esc(t.p1)}</h3></div>`:`<div class="card"><h3>${esc(t.team)}</h3><p>${esc(t.p1)}</p><p>${esc(t.p2)}</p></div>`).join("")}</div>`}
@@ -706,7 +753,7 @@ function showTeam(k,name){
        outcome=res.winner===name?"W":"L";
        form.push(outcome);
      }
-     matches.push({r,m,res,opponent,outcome});
+     matches.push({r,m,res,opponent,outcome,when:getMatchSchedule(k,m.home,m.away)});
    }
  }));
  const played=matches.filter(x=>x.res?.winner);
@@ -737,7 +784,8 @@ function profileMatchHTML(x,name){
  const score=x.res?formatScore(x.res):"Pendiente";
  const cls=x.outcome==="W"?"win":x.outcome==="L"?"loss":"pending";
  const tag=x.outcome==="W"?"VICTORIA":x.outcome==="L"?"DERROTA":"PENDIENTE";
- return `<div class="profile-match"><span class="j">J${x.r+1}</span><span class="opp"><span class="muted">vs</span> <b>${esc(x.opponent)}</b>${x.res?`<span class="muted">${esc(score)}</span>`:""}</span><span class="profile-result ${cls}">${tag}</span></div>`;
+ const when=x.when&&x.when.date?` <span class="muted">· ${esc(formatMatchDate(x.when.date))}${x.when.time?` ${esc(x.when.time)}`:""}</span>`:"";
+ return `<div class="profile-match"><span class="j">J${x.r+1}</span><span class="opp"><span class="muted">vs</span> <b>${esc(x.opponent)}</b>${when}${x.res?`<span class="muted">${esc(score)}</span>`:""}</span><span class="profile-result ${cls}">${tag}</span></div>`;
 }
 function allLeaguePlayed(L){
  return L.complete && L.schedule.every((round,r)=>round.every((m,i)=>getResult(L,r,i)?.winner));
@@ -901,7 +949,7 @@ async function playerDashboard(){
     const dbb=b.round>=cur?b.round-cur:1000+b.round;
     return da-dbb;
   });
-  const matchCard=(m,old=false)=>`<div class="profile-match ${m.round===cur?"is-current":""}"><div class="profile-match-round">JORNADA ${m.round}${m.round===cur?" · ACTUAL":""}</div><div class="profile-match-main"><b>${esc(playerSession.team)}</b><span>vs</span><b>${esc(m.opponent)}</b></div>${old?`<div class="profile-match-score">${esc(formatScore(m.result))} · ${m.result.winner===playerSession.team?"Victoria":"Derrota"}</div>`:`<div class="profile-match-score muted">${m.round===cur?"Tu partido de esta jornada":"Pendiente"}</div>`}</div>`;
+  const matchCard=(m,old=false)=>`<div class="profile-match ${m.round===cur?"is-current":""}"><div class="profile-match-round">JORNADA ${m.round}${m.round===cur?" · ACTUAL":""}</div><div class="profile-match-main"><b>${esc(playerSession.team)}</b><span>vs</span><b>${esc(m.opponent)}</b></div>${matchWhenHTML(m.when)}${old?`<div class="profile-match-score">${esc(formatScore(m.result))} · ${m.result.winner===playerSession.team?"Victoria":"Derrota"}</div>`:`<div class="profile-match-score muted">${m.round===cur?"Tu partido de esta jornada":"Pendiente"}</div>`}</div>`;
   c.innerHTML=`<div class="card"><div class="card-h"><div><h2>Mi perfil</h2><div class="muted">${esc(playerSession.name)} · ${esc(playerSession.team)}</div></div></div><div class="card-b">
    <div class="profile-user-head"><div><h3 style="margin:0 0 4px">${esc(playerSession.name)}</h3><b>${esc(playerSession.team)}</b><p class="muted" style="margin:8px 0 0">${esc(L?.name||k)} · Cuenta verificada</p></div><div class="actions"><button onclick="openPlayerProposal()">Proponer resultado</button><button class="secondary" onclick="playerDashboard()">Actualizar</button><button class="secondary" onclick="playerLogout()">Cerrar sesión</button></div></div>
    <div class="current-round-banner"><span>JORNADA ACTUAL</span><b>Jornada ${cur}</b><small>Marcada por la organización</small></div>
@@ -964,8 +1012,16 @@ async function renderAdminProposals(){
  try{
   const data=await cloudWrite({action:"adminProposals",password:adminPassword});
   const rows=data.proposals||[];
-  c.innerHTML=rows.length?`<div class="admin-list">${rows.map(p=>`<div class="proposal-card"><div class="proposal-admin-head"><div><span class="status-pill ${p.status==="confirmed"?"status-ok":p.status==="pending"?"status-wait":"status-none"}">${esc(p.status==="confirmed"?"Confirmado":p.status==="pending"?"Pendiente":"Rechazado")}</span><b>${esc(p.leagueName)}</b></div><small>${esc(p.created_at||"")}</small></div><h4>${esc(p.home)} vs ${esc(p.away)}</h4><div class="proposal-admin-score">${esc(p.score||"Sin marcador")}</div><div class="muted">Propuesto por <b>@${esc(p.proposer_username||"")}</b> · ${esc(p.proposer_team||"")}${p.confirmed_by?` · confirmado por @${esc(p.confirmed_by)}`:""}</div></div>`).join("")}</div>`:`<div class="notice">Todavía no hay resultados propuestos.</div>`;
+  c.innerHTML=rows.length?`<div class="admin-list">${rows.map(p=>`<div class="proposal-card"><div class="proposal-admin-head"><div><span class="status-pill ${p.status==="confirmed"?"status-ok":p.status==="pending"?"status-wait":"status-none"}">${esc(p.status==="confirmed"?"Confirmado":p.status==="pending"?"Pendiente":"Rechazado")}</span><b>${esc(p.leagueName)}</b></div><small>${esc(p.created_at||"")}</small></div><h4>${esc(p.home)} vs ${esc(p.away)}</h4><div class="proposal-admin-score">${esc(p.score||"Sin marcador")}</div><div class="muted">Propuesto por <b>@${esc(p.proposer_username||"")}</b> · ${esc(p.proposer_team||"")}${p.confirmed_by?` · confirmado por @${esc(p.confirmed_by)}`:""}</div><div class="actions">${p.status==="pending"?`<button onclick="adminResolveProposal('${esc(p.id)}','confirm')">✓ Confirmar</button>`:""}<button class="danger" onclick="adminResolveProposal('${esc(p.id)}','delete')">🗑 Eliminar</button></div></div>`).join("")}</div>`:`<div class="notice">Todavía no hay resultados propuestos.</div>`;
  }catch(e){c.innerHTML=`<div class="notice">${esc(e.message)}</div>`}
+}
+async function adminResolveProposal(id,decision){
+ if(decision==="delete" && !confirm("¿Seguro que quieres eliminar este resultado propuesto? No se puede deshacer."))return;
+ try{
+  await cloudWrite({action:"adminResolveProposal",password:adminPassword,id,decision});
+  await loadCloudResults();
+  renderAdminProposals();
+ }catch(e){alert(e.message)}
 }
 
 async function renderUsersPage(){
