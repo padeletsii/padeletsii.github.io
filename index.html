@@ -538,11 +538,19 @@ function setSync(ok,text){
   el.textContent=text;
 }
 function apiReady(){return API_URL && !API_URL.includes("PEGA_AQUI")}
+let cloudLoadInFlight=false;
 async function loadCloudResults(){
   if(!apiReady()){setSync(false,"Falta conectar");render();return}
+  // Si ya hay una petición en marcha (por ejemplo el refresco automático de 30s
+  // solapándose con una recarga manual), no lanzamos otra por encima: así nunca
+  // se acumulan peticiones y "Actualizando…" no se queda colgado por eso.
+  if(cloudLoadInFlight) return;
+  cloudLoadInFlight=true;
+  const ctrl=new AbortController();
+  const killTimer=setTimeout(()=>ctrl.abort(),15000);
   try{
     setSync(false,"Actualizando…");
-    const r=await fetch(API_URL+"?action=state&t="+Date.now(),{cache:"no-store"});
+    const r=await fetch(API_URL+"?action=state&t="+Date.now(),{cache:"no-store",signal:ctrl.signal});
     const data=await r.json();
     if(!data.ok) throw new Error(data.error||"Error");
     for(const L of Object.values(db.leagues)) L.results={};
@@ -587,7 +595,10 @@ async function loadCloudResults(){
     render();
   }catch(e){
     console.error(e);
-    setSync(false,"Sin conexión");
+    setSync(false,e.name==="AbortError"?"Tardó demasiado, reintentando…":"Sin conexión");
+  }finally{
+    clearTimeout(killTimer);
+    cloudLoadInFlight=false;
   }
 }
 async function cloudWrite(payload){
