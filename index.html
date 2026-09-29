@@ -351,6 +351,9 @@ body.admin-mode .admin-nav-only{display:inline-flex!important}
 
 
 /* ===== Mi perfil: acceso limpio tipo zona privada ===== */
+.profile-page-head{padding:18px 4px 0}
+.profile-page-head h2{margin:0;font-size:22px;color:var(--ink)}
+.profile-page-head .muted{margin-top:3px}
 .profile-login-wrap{display:flex;justify-content:center;padding:28px 10px 34px}
 .profile-login-card{
  width:min(100%,480px);box-sizing:border-box;background:#fff;border:2px solid #1a1a1a;
@@ -870,10 +873,57 @@ body.admin-mode table tbody tr:hover td{background:rgba(14,124,134,.08)!importan
 body.admin-mode .admin-nav-only.active,body.admin-mode #nav button.active[data-view="adminProposals"],
 body.admin-mode #nav button.active[data-view="users"]{background:#fff!important;color:var(--admin)!important}
 
+/* ---------------------------------------------------------------------
+   Amistosos: tablón para buscar partidos sueltos, separado de las ligas.
+--------------------------------------------------------------------- */
+#nav button.amistosos-tab{background:linear-gradient(135deg,#f0bb3b,#e0a11c)!important;color:#241a00!important;position:relative}
+#nav button.amistosos-tab.active{background:#fff9ea!important;color:#8a5a00!important}
+.bottom-nav button.amistosos-tab.active .bn-icon-wrap{background:rgba(240,187,59,.4)!important}
+.bottom-nav button.amistosos-tab.active{color:#8a5a00!important}
+.am-level-gate{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#eef4fc;border:1px solid #cfe0f5;border-radius:14px;padding:14px 16px;margin-bottom:16px}
+.am-level-gate label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.02em}
+.am-level-gate select{min-height:42px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;font:inherit;font-size:13.5px;font-weight:700;color:var(--ink);min-width:260px}
+.am-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.am-filters{display:flex;gap:8px;flex-wrap:wrap}
+.am-filters button{border:0;border-radius:999px;padding:9px 14px;cursor:pointer;font-weight:800;font-size:12.5px;background:#e7e1d5;color:#4c5560}
+.am-filters button.active{background:var(--blue);color:#fff}
+.am-publish-btn{background:#f0bb3b;color:#241a00;border:0;border-radius:999px;padding:11px 18px;font-weight:950;font-size:13px;cursor:pointer;white-space:nowrap}
+.am-list{display:grid;gap:12px}
+.am-card{border:1px solid var(--line);border-radius:16px;padding:15px 16px;background:#fff;display:flex;gap:14px;align-items:flex-start}
+.am-avatar{width:42px;height:42px;border-radius:50%;background:#eef1f4;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#4c5560;flex-shrink:0}
+.am-body{flex:1;min-width:0}
+.am-body .am-name{font-weight:900;font-size:14.5px}
+.am-body .am-sub{color:var(--muted);font-size:12px;margin-top:2px}
+.am-tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.am-tag{font-size:10.5px;font-weight:900;padding:3px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.02em}
+.am-tag.sport{background:#eef4fc;color:#1a5fb4}
+.am-tag.level{background:#f1f3f5;color:#4c5560}
+.am-tag.day{background:#fff4d8;color:#8a5a00}
+.am-msg{font-size:13px;color:#333;margin:6px 0 10px;line-height:1.4}
+.am-actions{display:flex;justify-content:flex-end;gap:8px}
+.am-wa{display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:#e9f8ef;color:#146c3b;border-radius:999px;padding:8px 14px;font-weight:900;font-size:12.5px;white-space:nowrap}
+.am-close{border:0;background:#f1f3f5;color:#667085;border-radius:999px;padding:8px 12px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap}
+.am-form-card{border:1px solid var(--line);border-radius:16px;padding:18px;background:#fff;margin-bottom:18px}
+.am-form-card h3{margin:0 0 4px}
+.am-form-card p.muted{margin:0 0 14px;color:var(--muted);font-size:12.5px}
+.reg-mode-tabs{display:flex;gap:8px;margin-bottom:14px}
+.reg-mode-tabs button{flex:1;border:0;border-radius:11px;padding:11px;font-weight:900;font-size:12.5px;cursor:pointer;background:#e7e1d5;color:#4c5560}
+.reg-mode-tabs button.active{background:var(--blue);color:#fff}
+
+/* ---- Banner de publicidad temporal (gestionable desde Admin) ---- */
+.promo-banner{background:linear-gradient(135deg,#1b2f57,#14213e);color:#faf3e4}
+.promo-banner .wrap{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;padding:12px 20px;text-align:center}
+.promo-banner strong{font-weight:950;letter-spacing:.01em}
+.promo-banner a.promo-cta{background:#bcd9f5;color:#14213e;text-decoration:none;font-weight:950;padding:8px 16px;border-radius:999px;white-space:nowrap;font-size:12.5px}
+.admin-promo-form{display:grid;gap:10px;margin-top:10px}
+.admin-promo-form label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.02em}
+.admin-promo-form input,.admin-promo-form textarea{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;font:inherit;font-size:13px;font-weight:600;color:var(--ink)}
+.admin-promo-form .checkbox-row{flex-direction:row;align-items:center;gap:8px;font-size:12.5px;text-transform:none}
 </style>
 </head>
 <body>
-<div id="adminbar" class="adminbar"><div class="wrap"><b>MODO ADMINISTRADOR</b><div><button class="secondary" onclick="showAnalytics()">Estadísticas</button> <button class="secondary" onclick="downloadUpdatedSite()">Descargar web actualizada</button> <button class="secondary" onclick="exportData()">Exportar copia</button> <button class="danger" onclick="toggleAdmin(false)">Salir</button></div></div></div>
+<div id="promoBanner"></div>
+<div id="adminbar" class="adminbar"><div class="wrap"><b>MODO ADMINISTRADOR</b><div><button class="secondary" onclick="openPromoBannerAdmin()">Publicidad</button> <button class="secondary" onclick="showAnalytics()">Estadísticas</button> <button class="secondary" onclick="downloadUpdatedSite()">Descargar web actualizada</button> <button class="secondary" onclick="exportData()">Exportar copia</button> <button class="danger" onclick="toggleAdmin(false)">Salir</button></div></div></div>
 <div id="nameSuggestions"></div>
 <header>
  <div class="wrap">
@@ -885,6 +935,7 @@ body.admin-mode #nav button.active[data-view="users"]{background:#fff!important;
    <button data-view="matches">Partidos</button>
    <button data-view="teams">Parejas</button>
    <button data-view="cup">Copa</button>
+   <button data-view="amistosos" class="amistosos-tab">🤝 Amistosos</button>
    <button data-view="info">Info</button>
    <button data-view="users" class="admin-nav-only">Usuarios</button>
   </nav>
@@ -911,6 +962,7 @@ body.admin-mode #nav button.active[data-view="users"]{background:#fff!important;
  <button data-view="matches"><span class="bn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle class="bn-stroke" cx="12" cy="12" r="9"/><path class="bn-accent" d="M4.5 6.5c3 2.2 3 8.8 0 11M19.5 6.5c-3 2.2-3 8.8 0 11"/></svg></span><span class="bn-label">Partidos</span></button>
  <button data-view="teams"><span class="bn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle class="bn-accent" cx="16.5" cy="7.5" r="2.5"/><path class="bn-accent" d="M13.5 20c.4-2.6 2-4.7 4-5.5"/><circle class="bn-stroke" cx="9" cy="9" r="3.2"/><path class="bn-stroke" d="M3.5 20c0-3.6 2.5-6.2 5.5-6.2s5.5 2.6 5.5 6.2"/></svg></span><span class="bn-label">Parejas</span></button>
  <button data-view="cup"><span class="bn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="bn-accent" d="M9 12.5 6.5 21l5.5-3 5.5 3-2.5-8.5"/><circle class="bn-stroke" cx="12" cy="8.5" r="5.5"/></svg></span><span class="bn-label">Copa</span></button>
+ <button data-view="amistosos" class="amistosos-tab"><span class="bn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle class="bn-stroke" cx="10.5" cy="10.5" r="6.5"/><path class="bn-accent" d="M15.3 15.3 20 20"/></svg></span><span class="bn-label">Amistosos</span></button>
  <button data-view="info"><span class="bn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle class="bn-stroke" cx="12" cy="12" r="9"/><path class="bn-stroke" d="M11 11h1v6h1"/><path class="bn-accent" d="M12 7.6h.01"/></svg></span><span class="bn-label">Info</span></button>
 </nav>
 
@@ -971,6 +1023,12 @@ let currentView = "inicio";
 let admin = false;
 const ADMIN_SESSION_KEY = "liga_etsii_admin_session";
 let currentRounds={pro:1,media:1,fem:1,mixta:1,tenis:1};
+let friendlies=[]; // Anuncios abiertos del tablón de amistosos (se cargan con loadCloudResults()).
+let promoBanner={enabled:false,text:"",cta:"",url:"",until:""}; // Banner de publicidad temporal, gestionado desde Admin.
+let amLevel=(function(){try{return localStorage.getItem("liga_etsii_am_level")||""}catch(_){return ""}})();
+let amSport="Todos";
+let amFormOpen=false;
+let amRegisterMode="liga";
 
 function deepClone(x){return JSON.parse(JSON.stringify(x))}
 function roundRobin(teams){
@@ -1081,6 +1139,9 @@ async function loadCloudResults(){
     });
     registerNameSuggestionsForSchedule(data.schedule||[]);
     renderNameSuggestions();
+    friendlies=data.friendlies||[];
+    promoBanner=data.promo||promoBanner;
+    renderPromoBanner();
     setSync(true,"Actualizado");
     render();
   }catch(e){
@@ -1432,11 +1493,18 @@ function render(){
   document.querySelectorAll("#nav button,#bottomNav button").forEach(b=>b.classList.toggle("active",b.dataset.view===currentView));
   updateProfileFab();
   const isHome=currentView==="inicio";
-  document.getElementById("leagueTabs").style.display=isHome?"none":"";
+  const isAmistosos=currentView==="amistosos";
+  document.getElementById("leagueTabs").style.display=(isHome||isAmistosos)?"none":"";
   document.getElementById("homePanel").style.display=isHome?"":"none";
   const panelSection=document.getElementById("panelSection");
   if(panelSection) panelSection.style.display=isHome?"none":"";
   if(isHome) return;
+  if(isAmistosos){
+    document.getElementById("panelTitle").textContent="Amistosos";
+    document.getElementById("panelSub").textContent="Partidos sueltos, fuera de la competición de liga";
+    renderAmistosos();
+    return;
+  }
   const L=db.leagues[currentLeague];
   document.getElementById("panelTitle").textContent=L.name;
   document.getElementById("panelSub").textContent=L.provisional?`${L.teams.length} ${L.sport==="Tenis"?"jugadores":"parejas"} inscritas · clasificación provisional`:L.complete?"":`${L.teams.length} parejas inscritas · inscripción aún abierta`;
@@ -1738,18 +1806,120 @@ function allLeaguePlayed(L){
 }
 function renderCup(L){
  const c=document.getElementById("content"),k=leagueKeyFromObject(L);
- if(currentLeague==="pro"||currentLeague==="media"){
+ if(currentLeague==="pro"||currentLeague==="media"||currentLeague==="fem"){
    const done=allLeaguePlayed(L);
    const top=calcStandings(L).slice(0,8);
-   c.innerHTML=`<div class="notice"><b>Copa masculina:</b> será única para las categorías masculinas. ${done?"Esta liga ya tiene cerrada su clasificación.":"Los cruces definitivos se mostrarán cuando termine la fase regular."}</div>
+   const cupLabel=currentLeague==="fem"?"Copa femenina":"Copa masculina";
+   const cupScope=currentLeague==="fem"?"será única para la categoría femenina.":"será única para las categorías masculinas.";
+   c.innerHTML=`<div class="notice"><b>${cupLabel}:</b> ${cupScope} ${done?"Esta liga ya tiene cerrada su clasificación.":"Los cruces definitivos se mostrarán cuando termine la fase regular."}</div>
    <div class="cup">
     <div class="round"><h3>Clasificados provisionales</h3>${top.map((x,i)=>`<div class="slot">${i+1}. ${teamLinkHTML(k,x.team)}</div>`).join("")}</div>
-    <div class="round"><h3>Semifinales</h3><div class="slot muted">Pendiente de formato de Copa masculina</div><div class="slot muted">Pendiente de formato de Copa masculina</div></div>
+    <div class="round"><h3>Semifinales</h3><div class="slot muted">Pendiente de formato de ${cupLabel.toLowerCase()}</div><div class="slot muted">Pendiente de formato de ${cupLabel.toLowerCase()}</div></div>
     <div class="round"><h3>Final</h3><div class="slot muted">Pendiente</div></div>
    </div>`;
  }else{
    c.innerHTML=`<div class="notice">La Copa de ${esc(L.name.toLowerCase())} se generará con las 8 primeras parejas cuando termine la liga.</div>`;
  }
+}
+
+// ---------------------------------------------------------------------------
+// Amistosos: tablón para buscar partidos sueltos, fuera de la competición.
+// ---------------------------------------------------------------------------
+function friendlyTimeAgo(iso){
+  const d=new Date(iso); if(isNaN(d.getTime())) return "";
+  const mins=Math.round((Date.now()-d.getTime())/60000);
+  if(mins<1) return "Ahora mismo";
+  if(mins<60) return `Hace ${mins} min`;
+  const hours=Math.round(mins/60);
+  if(hours<24) return `Hace ${hours} h`;
+  const days=Math.round(hours/24);
+  if(days===1) return "Ayer";
+  if(days<7) return `Hace ${days} días`;
+  return formatMatchDate(d.toISOString().slice(0,10));
+}
+function setAmLevel(v){
+  amLevel=v;
+  try{localStorage.setItem("liga_etsii_am_level",v)}catch(_){}
+  render();
+}
+function setAmSport(v){ amSport=v; render(); }
+function toggleAmForm(){
+  if(!playerSession){ currentView="profile"; render(); return; }
+  amFormOpen=!amFormOpen; render();
+}
+async function submitAmistoso(){
+  try{
+   await cloudWrite({
+    action:"postFriendly", username:playerSession.username, token:playerSession.token,
+    sport:v("am_sport"), level:v("am_level_form"), availability:v("am_avail"), message:v("am_msg"),
+   });
+   amFormOpen=false;
+   alert("Anuncio publicado.");
+   await loadCloudResults();
+  }catch(e){alert(e.message)}
+}
+async function closeAmistoso(id){
+  if(!playerSession) return;
+  if(!confirm("¿Cerrar este anuncio? Dejará de verse en el tablón.")) return;
+  try{
+   await cloudWrite({action:"closeFriendly", username:playerSession.username, token:playerSession.token, id});
+   await loadCloudResults();
+  }catch(e){alert(e.message)}
+}
+function renderAmistosos(){
+ const c=document.getElementById("content");
+ if(!amLevel){
+  c.innerHTML=`<div class="notice">Busca o publica partidos amistosos, fuera de la competición de liga.</div>
+  <div class="am-level-gate">
+   <label>Tu nivel<select id="am_level_gate" onchange="setAmLevel(this.value)">
+    <option value="">— Elige tu nivel para ver los amistosos —</option>
+    <option value="Pro">Pro</option>
+    <option value="Media">Media</option>
+    <option value="Iniciación">Iniciación</option>
+   </select></label>
+   <span class="muted" style="font-size:12px">Hay que elegir nivel antes de ver la lista, así no aparecen emparejamientos descompensados.</span>
+  </div>`;
+  return;
+ }
+ const sportOk=(f)=>amSport==="Todos"||f.sport===amSport;
+ const levelOk=(f)=>!f.level||f.level===amLevel;
+ const list=(friendlies||[]).filter(f=>sportOk(f)&&levelOk(f));
+ const formHTML=!amFormOpen?"":`<div class="am-form-card">
+  <h3>Publicar amistoso</h3>
+  <p class="muted">Se publica con tu nombre${playerSession.team?" y equipo":""} y el teléfono de tu cuenta.</p>
+  <div class="admin-team-form">
+   <label>Deporte<select id="am_sport"><option>Pádel</option><option>Tenis</option></select></label>
+   <label>Nivel<select id="am_level_form"><option value="">Sin indicar</option><option>Pro</option><option>Media</option><option>Iniciación</option></select></label>
+   <label>Disponibilidad<input id="am_avail" placeholder="Ej: sábado por la mañana"></label>
+   <label>Mensaje<input id="am_msg" placeholder="Buscamos rival para..."></label>
+  </div>
+  <div style="margin-top:14px;display:flex;gap:10px"><button class="primary" onclick="submitAmistoso()">Publicar amistoso</button><button class="secondary" onclick="amFormOpen=false;render()">Cancelar</button></div>
+ </div>`;
+ const cardHTML=(f)=>{
+  const mine=playerSession&&f.name===playerSession.name&&(f.team||"")===(playerSession.team||"");
+  const wa=waNumber(f.phone);
+  return `<div class="am-card">
+   <div class="am-avatar">${esc(initialsOf(f.name))}</div>
+   <div class="am-body">
+    <div class="am-name">${esc(f.name)}${f.team?` <span class="muted" style="font-weight:600">· ${esc(f.team)}</span>`:""}</div>
+    <div class="am-sub">Publicado ${friendlyTimeAgo(f.created_at).toLowerCase()}</div>
+    <div class="am-tags"><span class="am-tag sport">${esc(f.sport)}</span><span class="am-tag level">${f.level?"Nivel "+esc(f.level).toLowerCase():"Sin nivel indicado"}</span>${f.availability?`<span class="am-tag day">${esc(f.availability)}</span>`:""}</div>
+    ${f.message?`<div class="am-msg">${esc(f.message)}</div>`:""}
+    <div class="am-actions">${mine?`<button class="am-close" onclick="closeAmistoso('${esc(f.id)}')">Cerrar anuncio</button>`:""}${wa?`<a class="am-wa" href="https://wa.me/${wa}" target="_blank" rel="noopener">💬 Contactar por WhatsApp</a>`:`<span class="muted" style="font-size:12px">Teléfono no disponible</span>`}</div>
+   </div>
+  </div>`;
+ };
+ c.innerHTML=`<div class="notice">Busca o publica partidos amistosos, fuera de la competición de liga. <a href="javascript:void(0)" onclick="setAmLevel('')">Cambiar nivel</a></div>
+ ${formHTML}
+ <div class="am-toolbar">
+  <div class="am-filters">
+   <button class="${amSport==="Todos"?"active":""}" onclick="setAmSport('Todos')">Todos</button>
+   <button class="${amSport==="Pádel"?"active":""}" onclick="setAmSport('Pádel')">Pádel</button>
+   <button class="${amSport==="Tenis"?"active":""}" onclick="setAmSport('Tenis')">Tenis</button>
+  </div>
+  <button class="am-publish-btn" onclick="toggleAmForm()">${playerSession?(amFormOpen?"Ocultar formulario":"+ Publicar amistoso"):"Inicia sesión para publicar"}</button>
+ </div>
+ ${list.length?`<div class="am-list">${list.map(cardHTML).join("")}</div>`:`<div class="am-empty-note notice">No hay amistosos abiertos con estos filtros todavía. ¡Sé el primero en publicar uno!</div>`}`;
 }
 function renderInfo(){
  document.getElementById("panelTitle").textContent="Información de la liga";
@@ -1861,11 +2031,29 @@ function renderProfile(){
 }
 function playerLoginPage(){
  const c=document.getElementById("content");
- c.innerHTML=`<div class="card"><div class="card-h"><div><h2>Mi perfil</h2><div class="muted">Acceso de jugadores</div></div></div><div class="card-b"><div class="profile-login-wrap"><div class="profile-login-card"><div class="profile-login-eyebrow">ZONA DE JUGADORES</div><h3>ACCESO JUGADOR</h3><label>USUARIO<input id="pu_page" autocomplete="username" autocapitalize="none" spellcheck="false"></label><label>CONTRASEÑA<input id="pp_page" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')playerLoginPageDo()"></label><button class="profile-login-enter" onclick="playerLoginPageDo()">ENTRAR</button><button class="profile-create-link" onclick="playerRegisterPage()">No tengo cuenta, <b>crear cuenta</b></button></div></div></div></div>`;
+ c.innerHTML=`<div class="profile-login-wrap"><div class="profile-login-card"><div class="profile-login-eyebrow">ZONA DE JUGADORES</div><h3>ACCESO JUGADOR</h3><label>USUARIO<input id="pu_page" autocomplete="username" autocapitalize="none" spellcheck="false"></label><label>CONTRASEÑA<input id="pp_page" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')playerLoginPageDo()"></label><button class="profile-login-enter" onclick="playerLoginPageDo()">ENTRAR</button><button class="profile-create-link" onclick="playerRegisterPage()">No tengo cuenta, <b>crear cuenta</b></button></div></div>`;
 }
-function playerRegisterPage(){
+function playerRegisterPage(mode){
+ amRegisterMode=mode||amRegisterMode||"liga";
  const c=document.getElementById("content");
- c.innerHTML=`<div class="card"><div class="card-h"><div><h2>Crear cuenta</h2><div class="muted">Acceso de jugadores</div></div></div><div class="card-b"><div class="profile-login-wrap"><div class="profile-login-card"><button class="profile-back" onclick="playerLoginPage()">← Volver al inicio de sesión</button><div class="profile-login-eyebrow">NUEVA CUENTA</div><h3>CREAR CUENTA</h3><label>JUGADOR<select id="pr_page">${rosterOptions()}</select></label><label>USUARIO<input id="pnu_page" autocomplete="username" autocapitalize="none" spellcheck="false"></label><label>CONTRASEÑA<input id="pnp_page" type="password" autocomplete="new-password"></label><button class="profile-login-enter" onclick="playerRegisterPageDo()">ENVIAR SOLICITUD</button><div class="profile-login-note">La cuenta se activará cuando la administradora verifique tu identidad.</div></div></div></div></div>`;
+ const tabsHTML=`<div class="reg-mode-tabs"><button class="${amRegisterMode==="liga"?"active":""}" onclick="playerRegisterPage('liga')">Juego una liga</button><button class="${amRegisterMode==="amistosos"?"active":""}" onclick="playerRegisterPage('amistosos')">Solo amistosos</button></div>`;
+ const bodyHTML=amRegisterMode==="liga"
+  ?`<label>JUGADOR<select id="pr_page">${rosterOptions()}</select></label><label>USUARIO<input id="pnu_page" autocomplete="username" autocapitalize="none" spellcheck="false"></label><label>CONTRASEÑA<input id="pnp_page" type="password" autocomplete="new-password"></label><button class="profile-login-enter" onclick="playerRegisterPageDo()">ENVIAR SOLICITUD</button>`
+  :`<label>NOMBRE Y APELLIDOS<input id="pra_name" autocomplete="name"></label><label>Nº DE MATRÍCULA<input id="pra_matricula"></label><label>TELÉFONO<input id="pra_phone" type="tel"></label><label>CORREO<input id="pra_email" type="email" autocomplete="email"></label><label>USUARIO<input id="pra_user" autocomplete="username" autocapitalize="none" spellcheck="false"></label><label>CONTRASEÑA<input id="pra_pass" type="password" autocomplete="new-password"></label><button class="profile-login-enter" onclick="playerRegisterAmistosoDo()">ENVIAR SOLICITUD</button>`;
+ const trailNote=amRegisterMode==="liga"
+  ?"La cuenta se activará cuando la administradora verifique tu identidad."
+  :"La cuenta se activará cuando la administradora verifique tu identidad. Solo sirve para publicar o contactar amistosos: no entra en clasificaciones, resultados de liga ni partidos oficiales.";
+ c.innerHTML=`<div class="profile-page-head"><h2>Crear cuenta</h2><div class="muted">Acceso de jugadores</div></div><div class="profile-login-wrap"><div class="profile-login-card"><button class="profile-back" onclick="playerLoginPage()">← Volver al inicio de sesión</button><div class="profile-login-eyebrow">NUEVA CUENTA</div><h3>CREAR CUENTA</h3>${tabsHTML}${bodyHTML}<div class="profile-login-note">${trailNote}</div></div></div>`;
+}
+async function playerRegisterAmistosoDo(){
+ try{
+  await cloudWrite({
+   action:"registerUser", league:"amistosos",
+   name:v("pra_name"), matricula:v("pra_matricula"), phone:v("pra_phone"), email:v("pra_email"),
+   username:v("pra_user"), password:v("pra_pass"),
+  });
+  alert("Solicitud enviada. La administradora debe verificar tu cuenta antes de que puedas iniciar sesión.");playerLoginPage()
+ }catch(e){alert(e.message)}
 }
 async function playerLoginPageDo(){
  try{
@@ -2142,6 +2330,40 @@ async function showAnalytics(period="total"){
        <div class="stat-card"><div class="stat-number">${a.instagram_cdindustriales||0}</div><div class="stat-label">Clics en @cdindustriales</div></div>
      </div>`);
  }catch(e){openModal(`<h3>Estadísticas</h3><div class="notice">${esc(e.message)}</div>`)}
+}
+function renderPromoBanner(){
+ const el=document.getElementById("promoBanner");
+ if(!el) return;
+ const b=promoBanner||{};
+ const expired=b.until&&todayISO()>=b.until;
+ if(!b.enabled||expired||!b.text){ el.innerHTML=""; return; }
+ el.innerHTML=`<div class="promo-banner"><div class="wrap"><strong>${esc(b.text)}</strong>${b.url?`<a class="promo-cta" href="${esc(b.url)}" target="_blank" rel="noopener" onclick="trackEvent('promo_click')">${esc(b.cta||"Ver más")}</a>`:""}</div></div>`;
+}
+function openPromoBannerAdmin(){
+ if(!admin){alert("Entra primero en modo administrador.");return}
+ const b=promoBanner||{};
+ openModal(`<h3>Banner de publicidad</h3>
+  <p class="muted">Se ve arriba del todo, en toda la web, hasta la fecha que pongas (o hasta que lo desactives tú desde aquí).</p>
+  <div class="admin-promo-form">
+   <label>Mensaje<textarea id="promo_text" rows="2">${esc(b.text||"COMPRA ENTRADAS PARA LA SANGRIADA DE CD INDUSTRIALES ¿TE LO VAS A PERDER?")}</textarea></label>
+   <label>Texto del botón<input id="promo_cta" value="${esc(b.cta||"Comprar entradas")}"></label>
+   <label>Enlace<input id="promo_url" value="${esc(b.url||"https://cdindustriales.mygocu.com/grupos/viajes/17566")}"></label>
+   <label>Se oculta a partir de<input id="promo_until" type="date" value="${esc(b.until||"2026-10-03")}"></label>
+   <label class="checkbox-row"><input id="promo_enabled" type="checkbox" ${b.enabled?"checked":""} style="width:auto"> Banner activo</label>
+  </div>
+  <div class="actions"><button onclick="savePromoBanner()">Guardar</button><button class="secondary" onclick="closeModal()">Cerrar</button></div>`);
+}
+async function savePromoBanner(){
+ try{
+  const data=await cloudWrite({
+   action:"setPromoBanner", password:adminPassword,
+   enabled: document.getElementById("promo_enabled").checked?"1":"0",
+   text: v("promo_text"), cta: v("promo_cta"), url: v("promo_url"), until: v("promo_until"),
+  });
+  promoBanner=data.promo||promoBanner;
+  renderPromoBanner();
+  closeModal();
+ }catch(e){alert(e.message)}
 }
 function exportData(){
  const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
