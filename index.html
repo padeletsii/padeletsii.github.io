@@ -1619,7 +1619,7 @@ function renderMatches(L){
 }
 function adminScheduleImportBox(){
  return `<div class="admin-round-box" style="align-items:flex-start;flex-direction:column;gap:10px">
-  <div><b>Importar horario de partidos</b><span>Pega aquí los días, horas y pistas y se asignará automáticamente a cada partido, en cualquier liga. La cabecera "JORNADA N - fecha" es opcional: si no la pones, se asume el mes actual (o el siguiente si esa fecha ya pasó).</span></div>
+  <div><b>Importar horario de partidos</b><span>Pega aquí los días, horas y pistas y se asignará automáticamente a cada partido, en cualquier liga. La cabecera "JORNADA N - fecha" es opcional: si no la pones, se asume el mes actual (o el siguiente si esa fecha ya pasó). Si el mes no se adivina bien, pon el día como "Lunes 28/09" (con el mes incluido).</span></div>
   <textarea id="scheduleImportText" rows="8" style="width:100%;box-sizing:border-box;font:inherit;padding:8px" placeholder="Lunes 28
 De la croix VS Alou/Coquillat 12:30 P1
 Black y Rivers VS Violadores del verso 15:30 P1
