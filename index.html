@@ -1883,21 +1883,8 @@ async function closeAmistoso(id){
 }
 function renderAmistosos(){
  const c=document.getElementById("content");
- if(!amLevel){
-  c.innerHTML=`<div class="notice">Busca o publica partidos amistosos, fuera de la competición de liga.</div>
-  <div class="am-level-gate">
-   <label>Tu nivel<select id="am_level_gate" onchange="setAmLevel(this.value)">
-    <option value="">— Elige tu nivel para ver los amistosos —</option>
-    <option value="Pro">Pro</option>
-    <option value="Media">Media</option>
-    <option value="Iniciación">Iniciación</option>
-   </select></label>
-   <span class="muted" style="font-size:12px">Hay que elegir nivel antes de ver la lista, así no aparecen emparejamientos descompensados.</span>
-  </div>`;
-  return;
- }
  const sportOk=(f)=>amSport==="Todos"||f.sport===amSport;
- const levelOk=(f)=>!f.level||f.level===amLevel;
+ const levelOk=(f)=>!amLevel||!f.level||f.level===amLevel;
  const list=(friendlies||[]).filter(f=>sportOk(f)&&levelOk(f));
  const formHTML=!amFormOpen?"":`<div class="am-form-card">
   <h3>Publicar amistoso</h3>
@@ -1924,13 +1911,19 @@ function renderAmistosos(){
    </div>
   </div>`;
  };
- c.innerHTML=`<div class="notice">Busca o publica partidos amistosos, fuera de la competición de liga. <a href="javascript:void(0)" onclick="setAmLevel('')">Cambiar nivel</a></div>
+ c.innerHTML=`<div class="notice">Busca o publica partidos amistosos, fuera de la competición de liga.</div>
  ${formHTML}
  <div class="am-toolbar">
   <div class="am-filters">
    <button class="${amSport==="Todos"?"active":""}" onclick="setAmSport('Todos')">Todos</button>
    <button class="${amSport==="Pádel"?"active":""}" onclick="setAmSport('Pádel')">Pádel</button>
    <button class="${amSport==="Tenis"?"active":""}" onclick="setAmSport('Tenis')">Tenis</button>
+  </div>
+  <div class="am-filters">
+   <button class="${amLevel===""?"active":""}" onclick="setAmLevel('')">Todos los niveles</button>
+   <button class="${amLevel==="Pro"?"active":""}" onclick="setAmLevel('Pro')">Pro</button>
+   <button class="${amLevel==="Media"?"active":""}" onclick="setAmLevel('Media')">Media</button>
+   <button class="${amLevel==="Iniciación"?"active":""}" onclick="setAmLevel('Iniciación')">Iniciación</button>
   </div>
   <button class="am-publish-btn" onclick="toggleAmForm()">${playerSession?(amFormOpen?"Ocultar formulario":"+ Publicar amistoso"):"Inicia sesión para publicar"}</button>
  </div>
