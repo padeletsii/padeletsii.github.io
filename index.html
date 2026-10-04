@@ -1107,6 +1107,30 @@ body.tennis-theme .theme-toggle,body.admin-mode .theme-toggle{border-color:rgba(
 html.dark .theme-toggle{color:#0a0a0a}
 html.dark body.tennis-theme .theme-toggle,html.dark body.admin-mode .theme-toggle{color:#fff}
 #modalCard .pcard-form select{width:100%}
+
+/* ---- avisos, insignias, calendario, galería ---- */
+.auto-note{font-size:12px;color:var(--muted);margin-top:6px}
+.cal-btn{border:1px solid var(--line);background:var(--soft);border-radius:8px;padding:3px 8px;font-size:13px;cursor:pointer;margin-left:6px;color:var(--text)}
+.next-hero .cal-btn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25);color:#fff}
+.pf-remind{background:#fff4d8;border:1px solid #ead28d;color:#5a3d00;border-radius:12px;padding:12px 14px;margin:0 0 12px;font-size:14px}
+.pf-change{border-radius:12px;padding:10px 14px;margin:0 0 12px;font-size:13.5px;font-weight:700}
+.pf-change.up{background:#e8f7ee;color:#1d7a46}.pf-change.down{background:#fdecec;color:#9b2525}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.bdg{display:inline-flex;align-items:center;gap:6px;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:5px 11px 5px 7px;font-size:12px;font-weight:800}
+.bdg i{font-style:normal;font-size:15px}
+.team-extra{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.team-extra div{border:1px solid var(--line);border-radius:12px;padding:9px;text-align:center;background:var(--paper)}
+.team-extra b{display:block;font-size:17px}.team-extra span{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.gal-section{margin-top:22px}.gal-section h3{margin:0 0 12px}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.gal-item{position:relative;border:0;padding:0;border-radius:12px;overflow:hidden;cursor:pointer;aspect-ratio:1;background:var(--soft)}
+.gal-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease}
+.gal-item:hover img{transform:scale(1.05)}
+.gal-item span{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font-size:11.5px;font-weight:700;padding:16px 8px 7px;text-align:left}
+.gal-big{width:100%;border-radius:12px;display:block}
+.gal-admin{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+html.dark .pf-remind{background:#2b2616;border-color:#4a3f1c;color:#f2efe6}
+html.dark .pf-change.up{background:#12301f;color:#7be0a4}html.dark .pf-change.down{background:#3a1a1a;color:#ff9a9a}
 </style>
 </head>
 <body>
@@ -1957,6 +1981,25 @@ async function copyTeamSql(btn){
   }
 }
 function renderTeams(L){document.getElementById("content").innerHTML=adminTeamManageBox(L)+teamsCards(L)}
+function computeBadges(list,name){
+ // list: [{m:{home,away}, res}] solo partidos con ganador
+ const out=[]; let run=0,best=0,clean=0,comeback=0,wins=0,losses=0;
+ list.forEach(x=>{
+  const home=x.m.home===name, won=x.res.winner===name;
+  if(won){wins++;run++;best=Math.max(best,run)} else {losses++;run=0}
+  const sets=(x.res.sets||[]).filter(t=>t[0]!==""&&t[1]!=="").map(t=>home?[+t[0],+t[1]]:[+t[1],+t[0]]);
+  if(won&&sets.length&&sets.every(t=>t[0]>t[1])) clean++;
+  if(won&&sets.length>=3&&sets[0][0]<sets[0][1]) comeback++;
+ });
+ if(wins>=1) out.push(["🥇","Primera victoria"]);
+ if(best>=3) out.push(["🔥","Racha de "+best]);
+ if(list.length>=2&&losses===0) out.push(["✨","Pleno de victorias"]);
+ if(clean>=1) out.push(["💎","Ganó sin ceder set"+(clean>1?" ×"+clean:"")]);
+ if(comeback>=1) out.push(["💪","Remontada"+(comeback>1?" ×"+comeback:"")]);
+ if(list.length>=5) out.push(["🎖️",list.length+" partidos jugados"]);
+ return out;
+}
+function badgesHTML(b){return b.length?`<div class="badge-row">${b.map(x=>`<span class="bdg" title="${esc(x[1])}"><i>${x[0]}</i>${esc(x[1])}</span>`).join("")}</div>`:""}
 function showTeam(k,name){
  const L=db.leagues[k],t=L.teams.find(x=>x.team===name); if(!t)return;
  const standings=calcStandings(L);
@@ -1995,16 +2038,38 @@ function showTeam(k,name){
    <div class="profile-stat"><strong>${pending.length}</strong><span>Por jugar</span></div>
  </div>
  <div class="streak-wrap"><span class="streak-label">Racha</span>${streak}</div>
+ <div class="team-extra"><div><b>${st.sf}–${st.sc}</b><span>Sets</span></div><div><b>${st.jf}–${st.jc}</b><span>Juegos</span></div><div><b>${(st.sf-st.sc)>0?"+":""}${st.sf-st.sc}</b><span>Dif. sets</span></div></div>
+ ${badgesHTML(computeBadges(played,name))}
  <div class="profile-section"><h4>Partidos jugados</h4>${playedHTML}</div>
  <div class="profile-section"><h4>Próximos partidos · ${pending.length}</h4>${pendingHTML}</div>
  <div class="actions"><button class="secondary" onclick="closeModal()">Cerrar</button></div>`);
 }
+function icsButton(k,home,away){
+ const si=getMatchSchedule(k,home,away); if(!si||!si.date||!si.time) return "";
+ return `<button type="button" class="cal-btn" data-league="${esc(k)}" data-home="${esc(home)}" data-away="${esc(away)}" title="Añadir al calendario">📅</button>`;
+}
+function downloadICS(k,home,away){
+ const si=getMatchSchedule(k,home,away); if(!si||!si.date||!si.time) return;
+ const d=si.date.replace(/-/g,""), t=si.time.replace(":","")+"00";
+ const end=new Date(matchTimestamp(si.date,si.time)+MATCH_DURATION_MIN*60000);
+ const p=n=>String(n).padStart(2,"0");
+ const e=`${end.getFullYear()}${p(end.getMonth()+1)}${p(end.getDate())}T${p(end.getHours())}${p(end.getMinutes())}00`;
+ const L=db.leagues[k];
+ const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Liga Padel ETSII//ES","CALSCALE:GREGORIAN","BEGIN:VEVENT",
+  `UID:${k}-${d}-${t}-${Math.abs((home+away).split("").reduce((a,c)=>a*31+c.charCodeAt(0)|0,0))}@padeletsii`,
+  `DTSTAMP:${d}T${t}`,`DTSTART;TZID=Europe/Madrid:${d}T${t}`,`DTEND;TZID=Europe/Madrid:${e}`,
+  `SUMMARY:${(L?L.name:"Liga")} · ${home} vs ${away}`,`LOCATION:ETSII UPM${si.court?" · "+si.court:""}`,
+  "DESCRIPTION:Liga Pádel ETSII","BEGIN:VALARM","TRIGGER:-PT2H","ACTION:DISPLAY","DESCRIPTION:Partido en 2 horas","END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
+ const blob=new Blob([ics],{type:"text/calendar"}); const a=document.createElement("a");
+ a.href=URL.createObjectURL(blob); a.download="partido-liga-etsii.ics"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+document.addEventListener("click",e=>{const b=e.target.closest(".cal-btn"); if(b){e.stopPropagation();downloadICS(b.dataset.league,b.dataset.home,b.dataset.away)}});
 function profileMatchHTML(x,name,k){
  const score=x.res?formatScore(x.res):"Pendiente";
  const cls=x.outcome==="W"?"win":x.outcome==="L"?"loss":"pending";
  const tag=x.outcome==="W"?"VICTORIA":x.outcome==="L"?"DERROTA":"PENDIENTE";
  const when=x.when&&x.when.date?` <span class="muted">· ${esc(formatMatchDate(x.when.date))}${x.when.time?` ${esc(x.when.time)}`:""}</span>`:"";
- return `<div class="profile-match"><span class="j">J${x.r+1}</span><span class="opp"><span class="muted">vs</span> <b>${teamLinkHTML(k,x.opponent)}</b>${when}${x.res?` <span class="muted">${esc(score)}</span>`:""}</span><span class="profile-result ${cls}">${tag}</span></div>`;
+ return `<div class="profile-match"><span class="j">J${x.r+1}</span><span class="opp"><span class="muted">vs</span> <b>${teamLinkHTML(k,x.opponent)}</b>${when}${x.res?` <span class="muted">${esc(score)}</span>`:""}</span><span class="profile-result ${cls}">${tag}</span>${!x.res?icsButton(k,x.m.home,x.m.away):""}</div>`;
 }
 function allLeaguePlayed(L){
  return L.complete && L.schedule.every((round,r)=>round.every((m,i)=>getResult(L,r,i)?.winner));
@@ -2137,7 +2202,49 @@ function renderInfo(){
        <div>Página web diseñada por <b>Lucía Velasco</b></div>
      </div>
    </div>
- </div>`;
+ </div>
+ <div class="gal-section"><h3>📸 Fotos de la liga</h3><div id="galBox"><div class="muted">Cargando fotos…</div></div></div>`;
+ loadGallery();
+}
+let galItems=null;
+async function loadGallery(){
+ const box=document.getElementById("galBox"); if(!box) return;
+ try{ const r=await cloudWrite({action:"gallery"}); galItems=r.items||[]; }
+ catch(e){ box.innerHTML=`<div class="muted">No se han podido cargar las fotos.</div>`; return; }
+ drawGallery();
+}
+function drawGallery(){
+ const box=document.getElementById("galBox"); if(!box) return;
+ const adm=admin?`<div class="gal-admin"><label class="file-btn">📷 Subir foto<input type="file" accept="image/*" onchange="uploadPhoto(this)"></label><input id="gal_caption" class="user-search" style="max-width:320px;margin:0" placeholder="Pie de foto (opcional)"></div>`:"";
+ box.innerHTML=adm+((galItems||[]).length?`<div class="gal-grid">${galItems.map((it,i)=>`<button class="gal-item" onclick="openPhoto(${i})"><img loading="lazy" src="${esc(it.image)}" alt="${esc(it.caption||"Foto de la liga")}">${it.caption?`<span>${esc(it.caption)}</span>`:""}</button>`).join("")}</div>`:`<div class="muted">Todavía no hay fotos. ¡Pronto subiremos las de las primeras jornadas!</div>`);
+}
+function openPhoto(i){
+ const it=(galItems||[])[i]; if(!it) return;
+ openModal(`<img class="gal-big" src="${esc(it.image)}" alt=""><p style="margin:10px 0">${esc(it.caption||"")}</p><div class="admin-round-actions">${admin?`<button class="danger" onclick="deletePhoto('${esc(it.id)}')">Eliminar</button>`:""}<button class="secondary" onclick="closeModal()">Cerrar</button></div>`);
+}
+function uploadPhoto(input){
+ const f=input.files&&input.files[0]; if(!f) return;
+ const rd=new FileReader();
+ rd.onload=()=>{
+  const img=new Image();
+  img.onload=async()=>{
+   const M=800, sc=Math.min(1,M/Math.max(img.width,img.height)), cv=document.createElement("canvas");
+   cv.width=Math.round(img.width*sc); cv.height=Math.round(img.height*sc);
+   cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
+   let q=0.72,out=cv.toDataURL("image/jpeg",q);
+   while(out.length>300000&&q>0.35){q-=0.1;out=cv.toDataURL("image/jpeg",q)}
+   try{
+    await cloudWrite({action:"adminAddPhoto",password:adminPassword,image:out,caption:v("gal_caption")});
+    showToast("Foto subida"); loadGallery();
+   }catch(e){alert(e.message)}
+  };
+  img.src=rd.result;
+ };
+ rd.readAsDataURL(f);
+}
+async function deletePhoto(id){
+ if(!confirm("¿Eliminar esta foto?")) return;
+ try{ await cloudWrite({action:"adminDeletePhoto",password:adminPassword,id}); closeModal(); loadGallery(); }catch(e){alert(e.message)}
 }
 function editMatch(r,i){
  const L=db.leagues[currentLeague],m=L.schedule[r][i],old=getResult(L,r,i)||{sets:[["",""],["",""],["",""]],winner:""};
@@ -2346,7 +2453,7 @@ async function playerDashboard(){
     ?(matchLiveStatus(current.when.date,current.when.time)==="live"?"🔴 Tu partido · En juego":`Tu partido · ${relativeDayLabel(current.when.date)}`)
     :"Tu próximo partido";
   const nextMatchHTML=current
-    ?`<div class="pf-next has-match"><div class="pf-next-eyebrow">${esc(nextEyebrow)}</div><div class="pf-next-vs">${teamLinkHTML(k,playerSession.team)} <span>vs</span> ${teamLinkHTML(k,current.opponent)}</div><div class="pf-next-when">${pfWhenChip(current.when)}</div></div>`
+    ?`<div class="pf-next has-match"><div class="pf-next-eyebrow">${esc(nextEyebrow)}</div><div class="pf-next-vs">${teamLinkHTML(k,playerSession.team)} <span>vs</span> ${teamLinkHTML(k,current.opponent)}</div><div class="pf-next-when">${pfWhenChip(current.when)} ${icsButton(k,current.home,current.away)}</div></div>`
     :`<div class="pf-next"><div class="pf-next-eyebrow">Sin partidos pendientes</div><div class="muted">No tienes ningún partido asignado todavía.</div></div>`;
   c.innerHTML=`<div class="card"><div class="card-b">
    <div class="pf-hero">
@@ -2360,14 +2467,17 @@ async function playerDashboard(){
     <div class="profile-stat"><strong>${stRow.pp}</strong><span>Perdidos</span></div>
     <div class="profile-stat"><strong>${upcoming.length}</strong><span>Por jugar</span></div>
    </div>
+   ${reminderHTML(current)}
+   ${changesHTML(k,L)}
    ${nextMatchHTML}
+   ${badgesHTML(computeBadges(past.map(m=>({m:{home:m.home,away:m.away},res:m.result})),playerSession.team))}
    <div class="profile-section"><h4>Próximos partidos</h4>${upcoming.length?`<div class="pf-match-list">${upcoming.slice(0,5).map(m=>matchRow(m,false)).join("")}</div>`:`<p class="muted">No tienes partidos pendientes.</p>`}</div>
    <div class="profile-section"><h4>Partidos anteriores</h4>${past.length?`<div class="pf-match-list">${past.map(m=>matchRow(m,true)).join("")}</div>`:`<p class="muted">Todavía no tienes partidos con resultado confirmado.</p>`}</div>
    ${incoming.length?`<div class="pending-box" style="margin-top:18px"><b>${incoming.length} resultado(s) esperando tu confirmación</b></div>${incoming.map(proposalHtml).join("")}`:""}
    ${invitesSectionHTML()}
    <div class="contact-search-box"><div><h4>📱 Contactos de rivales</h4><p class="muted">Busca una pareja solo cuando necesites su contacto.</p></div><button onclick="openContactFinder()">Buscar pareja</button></div>
    <div id="contactFinderResult"></div>
-   ${mine.length?`<div class="profile-section"><h4>Mis propuestas de resultado</h4>${mine.map(p=>`<div class="proposal-card"><b>${esc(p.home)} vs ${esc(p.away)}</b><br><span class="muted">${esc(p.score)} · ${esc(p.status)}</span></div>`).join("")}</div>`:""}
+   ${mine.length?`<div class="profile-section"><h4>Mis propuestas de resultado</h4>${mine.map(p=>`<div class="proposal-card"><b>${esc(p.home)} vs ${esc(p.away)}</b><br><span class="muted">${esc(p.score)} · ${esc(({pending:"pendiente",confirmed:"confirmado",rejected:"rechazado"})[p.status]||p.status)}</span>${p.status==="pending"?autoConfirmNote(p,true):""}</div>`).join("")}</div>`:""}
   </div></div>`;
  }catch(e){
   if(/sesión no válida/i.test(e.message||"")){
@@ -2552,6 +2662,22 @@ async function sendInvite(to){
  }catch(e){alert(e.message)}
 }
 
+function reminderHTML(m){
+ if(!m||!m.when||!m.when.date||!m.when.time) return "";
+ const ts=matchTimestamp(m.when.date,m.when.time); if(!ts) return "";
+ const ms=ts-Date.now(); if(ms<0||ms>36*3600000) return "";
+ const sameDay=daysDiffFromToday(m.when.date)===0;
+ return `<div class="pf-remind">⏰ <b>${sameDay?"Hoy juegas":"Mañana juegas"}</b> a las ${esc(m.when.time)}${m.when.court?" · "+esc(m.when.court):""} contra <b>${esc(m.opponent)}</b>. ${icsButton(m.league,m.home,m.away)}</div>`;
+}
+function changesHTML(k,L){
+ try{
+  const base=posStore()[k]; if(!base||!L) return "";
+  const st=calcStandings(L); const i=st.findIndex(x=>x.team===playerSession.team);
+  const was=base[playerSession.team]; if(i<0||was===undefined||was===i) return "";
+  const d=was-i;
+  return `<div class="pf-change ${d>0?"up":"down"}">${d>0?"▲":"▼"} Desde la última vez que miraste la clasificación, tu pareja ha ${d>0?"subido":"bajado"} ${Math.abs(d)} puesto${Math.abs(d)>1?"s":""} (ahora ${i+1}º).</div>`;
+ }catch(_){return ""}
+}
 function waNumber(phone){
   let digits=String(phone||"").replace(/\D/g,"");
   if(!digits)return "";
@@ -2583,7 +2709,14 @@ async function searchRivalContact(){
   target.innerHTML=`<div class="rival-card"><strong>${esc(c.team)}</strong>${(c.players||[]).map(p=>`<div class="rival-phone"><span>${esc(p.name)}</span>${waNumber(p.phone)?`<a class="wa-phone" href="https://wa.me/${waNumber(p.phone)}" target="_blank" rel="noopener">WhatsApp · ${esc(p.phone)}</a>`:`<span class="muted">Teléfono no disponible</span>`}</div>`).join("")}</div>`;
  }catch(e){target.innerHTML=`<div class="notice">No se pudo buscar el contacto: ${esc(e.message)}</div>`}
 }
-function proposalHtml(p){return `<div class="proposal-card"><b>${esc(p.home)} vs ${esc(p.away)}</b><br><span>${esc(p.score)}</span><div class="actions"><button onclick="confirmProposal('${esc(p.id)}','confirm')">Confirmar</button><button class="danger" onclick="confirmProposal('${esc(p.id)}','reject')">Rechazar</button></div></div>`}
+function autoConfirmNote(p,mineSide){
+ const t=new Date(p.created_at||"").getTime(); if(!t) return "";
+ const left=Math.max(0,48-(Date.now()-t)/3600000);
+ const h=Math.ceil(left);
+ const txt=left<=0?"Se confirmará sola en breve":`Se confirmará sola en ${h>=24?Math.floor(h/24)+" d "+(h%24)+" h":h+" h"}`;
+ return `<div class="auto-note">⏱ ${txt}${mineSide?" si la otra pareja no responde":" si no respondes"}</div>`;
+}
+function proposalHtml(p){return `<div class="proposal-card"><b>${esc(p.home)} vs ${esc(p.away)}</b><br><span>${esc(p.score)}</span>${autoConfirmNote(p,false)}<div class="actions"><button onclick="confirmProposal('${esc(p.id)}','confirm')">Confirmar</button><button class="danger" onclick="confirmProposal('${esc(p.id)}','reject')">Rechazar</button></div></div>`}
 async function confirmProposal(id,decision){try{await cloudWrite({action:"confirmProposal",username:playerSession.username,token:playerSession.token,id,decision});if(decision==="confirm")await loadCloudResults();closeModal();currentView="profile";render()}catch(e){alert(e.message)}}
 function openPlayerProposal(){
  const ms=myLocalMatches().filter(m=>!m.played);
@@ -2592,7 +2725,7 @@ function openPlayerProposal(){
   return
  }
  window._playerMatches=ms;
- openModal(`<h3>Proponer resultado</h3><p class="muted">Puedes subir un resultado de cualquier jornada pendiente, aunque los partidos no se hayan jugado en orden.</p><div class="result-proposal-form"><div class="proposal-match-select"><label>PARTIDO</label><select id="pmatch">${ms.map((m,i)=>`<option value="${i}">${esc(m.label)}</option>`).join("")}</select></div><div class="sets-grid"><div class="set-box"><div class="set-box-title">SET 1</div><div class="set-score-row"><input id="ps10" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps11" type="number" min="0" inputmode="numeric"></div></div><div class="set-box"><div class="set-box-title">SET 2</div><div class="set-score-row"><input id="ps20" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps21" type="number" min="0" inputmode="numeric"></div></div><div class="set-box"><div class="set-box-title">SET 3</div><div class="set-score-row"><input id="ps30" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps31" type="number" min="0" inputmode="numeric"></div></div></div><div class="proposal-actions"><button onclick="submitPlayerProposal()">Enviar propuesta</button><button class="secondary" onclick="closeModal();currentView='profile';render()">Volver</button></div></div>`)
+ openModal(`<h3>Proponer resultado</h3><p class="muted">Puedes subir un resultado de cualquier jornada pendiente, aunque los partidos no se hayan jugado en orden. Si la otra pareja no lo confirma ni lo rechaza en 48 h, se da por bueno automáticamente.</p><div class="result-proposal-form"><div class="proposal-match-select"><label>PARTIDO</label><select id="pmatch">${ms.map((m,i)=>`<option value="${i}">${esc(m.label)}</option>`).join("")}</select></div><div class="sets-grid"><div class="set-box"><div class="set-box-title">SET 1</div><div class="set-score-row"><input id="ps10" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps11" type="number" min="0" inputmode="numeric"></div></div><div class="set-box"><div class="set-box-title">SET 2</div><div class="set-score-row"><input id="ps20" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps21" type="number" min="0" inputmode="numeric"></div></div><div class="set-box"><div class="set-box-title">SET 3</div><div class="set-score-row"><input id="ps30" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps31" type="number" min="0" inputmode="numeric"></div></div></div><div class="proposal-actions"><button onclick="submitPlayerProposal()">Enviar propuesta</button><button class="secondary" onclick="closeModal();currentView='profile';render()">Volver</button></div></div>`)
 }
 async function submitPlayerProposal(){const m=window._playerMatches[+v("pmatch")];const sets=[[v("ps10"),v("ps11")],[v("ps20"),v("ps21")],[v("ps30"),v("ps31")]].filter(x=>x[0]!==""&&x[1]!=="").map(x=>x.map(Number));if(sets.length<2){alert("Introduce al menos dos sets.");return}try{await cloudWrite({action:"proposeResult",username:playerSession.username,token:playerSession.token,league:m.league,key:m.key,home:m.home,away:m.away,sets});alert("Resultado propuesto. Solo será oficial cuando lo confirme un usuario verificado de la pareja rival.");closeModal();currentView="profile";render()}catch(e){alert(e.message)}}
 async function renderAdminProposals(){
@@ -3048,7 +3181,7 @@ function nextHeroHTML(live,todayRest,upcoming){
   const when=[relativeDayLabel(pick.date),pick.time,pick.court].filter(Boolean).join(" · ");
   const kick=isLive?"EN JUEGO AHORA":(daysDiffFromToday(pick.date)===0?"HOY":"PRÓXIMO PARTIDO")+" · "+esc(pick.leagueName.toUpperCase());
   const tail=isLive?`<div class="live-now-tag"><i></i> En juego ahora</div>`:(ts&&ts>Date.now()?`<div class="cd" data-cd="${ts}">${cdCells(ts-Date.now())}</div>`:"");
-  return `<div class="next-hero"><div class="k">${kick}</div><div class="vs">${teamLinkHTML(pick.league,pick.home)} <span style="opacity:.55;font-weight:700">vs</span> ${teamLinkHTML(pick.league,pick.away)}</div><div class="when">${esc(when)}</div>${tail}</div>`;
+  return `<div class="next-hero"><div class="k">${kick}</div><div class="vs">${teamLinkHTML(pick.league,pick.home)} <span style="opacity:.55;font-weight:700">vs</span> ${teamLinkHTML(pick.league,pick.away)}</div><div class="when">${esc(when)} ${icsButton(pick.league,pick.home,pick.away)}</div>${tail}</div>`;
 }
 setInterval(()=>{
   let expired=false;
