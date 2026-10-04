@@ -1131,11 +1131,43 @@ html.dark body.tennis-theme .theme-toggle,html.dark body.admin-mode .theme-toggl
 .gal-admin{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
 html.dark .pf-remind{background:#2b2616;border-color:#4a3f1c;color:#f2efe6}
 html.dark .pf-change.up{background:#12301f;color:#7be0a4}html.dark .pf-change.down{background:#3a1a1a;color:#ff9a9a}
+
+/* ---- clasificación en móvil: puntos visibles ---- */
+@media(max-width:700px){
+ .st-table{min-width:0;table-layout:fixed;width:100%}
+ .st-table th:nth-child(n+6):not(:last-child),.st-table td:nth-child(n+6):not(:last-child){display:none}
+ .st-table th,.st-table td{padding:11px 3px}
+ .st-table th:first-child,.st-table td:first-child{width:32px;text-align:center}
+ .st-table th:nth-child(2),.st-table td:nth-child(2){width:auto;text-align:left;overflow:hidden}
+ .st-table td:nth-child(2) .team-link{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+ .st-table th:nth-child(3),.st-table td:nth-child(3),.st-table th:nth-child(4),.st-table td:nth-child(4),.st-table th:nth-child(5),.st-table td:nth-child(5){width:34px}
+ .st-table th:last-child,.st-table td:last-child{width:50px;padding-right:10px}
+ .st-table td:last-child b{font-size:18px}
+ .st-table th{font-size:11px;letter-spacing:.02em}
+}
+/* ---- recorte de foto y vista grande ---- */
+.crop-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin:6px 0 14px}
+#cropCv{width:240px;height:240px;border-radius:14px;background:#222;touch-action:none;cursor:grab;max-width:100%}
+#cropCv:active{cursor:grabbing}
+.crop-hint{font-size:12px;color:var(--muted)}
+#cropZoom{width:240px;max-width:100%}
+.av-big{display:block;width:min(86vw,340px);aspect-ratio:1;object-fit:cover;border-radius:50%;margin:6px auto 0;box-shadow:0 12px 34px rgba(0,0,0,.3)}
+/* ---- amistosos simplificado ---- */
+.am-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.am-count{font-size:14px;color:var(--muted)}.am-count b{color:var(--text);font-size:18px}
+.am-head-btns{display:flex;gap:8px}
+.am-head .am-publish-btn,.am-head .am-players-btn{padding:9px 14px;font-size:13px;border-radius:999px}
+.am-filterbar{display:flex;gap:8px;margin:0 0 12px}
+.am-filterbar select{flex:1;min-width:0;border:1px solid var(--line);background:var(--paper);color:var(--text);border-radius:10px;padding:8px 10px;font:inherit;font-size:13px}
+.am-back{margin:0 0 12px}
+.exp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.exp-item{display:flex;flex-direction:column;gap:8px;align-items:center}
+.exp-item img{width:100%;border-radius:12px;box-shadow:0 8px 22px rgba(0,0,0,.25)}
 </style>
 </head>
 <body>
 <div id="promoBanner"></div>
-<div id="adminbar" class="adminbar"><div class="wrap"><b>MODO ADMINISTRADOR</b><div><button class="secondary" onclick="openPromoBannerAdmin()">Publicidad</button> <button class="secondary" onclick="showAnalytics()">Estadísticas</button> <button class="secondary" onclick="downloadUpdatedSite()">Descargar web actualizada</button> <button class="secondary" onclick="exportData()">Exportar copia</button> <button class="danger" onclick="toggleAdmin(false)">Salir</button></div></div></div>
+<div id="adminbar" class="adminbar"><div class="wrap"><b>MODO ADMINISTRADOR</b><div><button class="secondary" onclick="openPromoBannerAdmin()">Publicidad</button> <button class="secondary" onclick="showAnalytics()">Estadísticas</button> <button class="secondary" onclick="exportAllStandings()">Exportar clasificaciones</button> <button class="secondary" onclick="downloadUpdatedSite()">Descargar web actualizada</button> <button class="secondary" onclick="exportData()">Exportar copia</button> <button class="danger" onclick="toggleAdmin(false)">Salir</button></div></div></div>
 <div id="nameSuggestions"></div>
 <header>
  <div class="wrap">
@@ -1758,9 +1790,9 @@ document.body.addEventListener("click",function(e){
 function renderStandings(L){
  const c=document.getElementById("content"),k=leagueKeyFromObject(L);
  if(!L.complete && !L.provisional){c.innerHTML=`<div class="notice">Esta liga todavía no está cerrada. La clasificación y los cruces se activarán cuando estén todas las parejas.</div>`+teamsCards(L);return}
- if(L.provisional){const st=calcStandings(L);const isTennis=L.sport==="Tenis";c.innerHTML=`<div class="tennis-note"><b>Clasificación provisional.</b> Se muestra con ${isTennis?"los jugadores":"las parejas"} inscritos actualmente. Podrán añadirse más ${isTennis?"jugadores":"parejas"} antes de cerrar la liga.</div><div class="table-scroll"><table><thead><tr><th>#</th><th>${isTennis?"Jugador":"Pareja"}</th><th>PJ</th><th>PG</th><th>PP</th>${isTennis?"":"<th>SF</th><th>SC</th><th>JF</th><th>JC</th>"}<th>PTS</th></tr></thead><tbody>${st.map((x,i)=>`<tr><td class="rank">${i+1}</td><td>${teamLinkHTML(k,x.team)}</td><td>${x.pj}</td><td>${x.pg}</td><td>${x.pp}</td>${isTennis?"":`<td>${x.sf}</td><td>${x.sc}</td><td>${x.jf}</td><td>${x.jc}</td>`}<td><b>${x.pts}</b></td></tr>`).join("")}</tbody></table></div><div class="standings-note">Clasificación inicial provisional · todavía pueden añadirse ${isTennis?"jugadores":"parejas"}.</div>`;return}
+ if(L.provisional){const st=calcStandings(L);const isTennis=L.sport==="Tenis";c.innerHTML=`<div class="tennis-note"><b>Clasificación provisional.</b> Se muestra con ${isTennis?"los jugadores":"las parejas"} inscritos actualmente. Podrán añadirse más ${isTennis?"jugadores":"parejas"} antes de cerrar la liga.</div><div class="table-scroll"><table class="st-table"><thead><tr><th>#</th><th>${isTennis?"Jugador":"Pareja"}</th><th>PJ</th><th>PG</th><th>PP</th>${isTennis?"":"<th>SF</th><th>SC</th><th>JF</th><th>JC</th>"}<th>PTS</th></tr></thead><tbody>${st.map((x,i)=>`<tr><td class="rank">${i+1}</td><td>${teamLinkHTML(k,x.team)}</td><td>${x.pj}</td><td>${x.pg}</td><td>${x.pp}</td>${isTennis?"":`<td>${x.sf}</td><td>${x.sc}</td><td>${x.jf}</td><td>${x.jc}</td>`}<td><b>${x.pts}</b></td></tr>`).join("")}</tbody></table></div><div class="standings-note">Clasificación inicial provisional · todavía pueden añadirse ${isTennis?"jugadores":"parejas"}.</div>`;return}
  const s=calcStandings(L);
- c.innerHTML=`<div class="table-scroll"><table><thead><tr><th>#</th><th>Pareja</th><th>PJ</th><th>PG</th><th>PP</th><th>SF</th><th>SC</th><th>JF</th><th>JC</th><th>PTS</th></tr></thead><tbody>
+ c.innerHTML=`<div class="table-scroll"><table class="st-table"><thead><tr><th>#</th><th>Pareja</th><th>PJ</th><th>PG</th><th>PP</th><th>SF</th><th>SC</th><th>JF</th><th>JC</th><th>PTS</th></tr></thead><tbody>
  ${s.map((x,i)=>`<tr class="${i<3?"top3 ":""}${i<8?"top8":""}"><td class="rank">${i+1}</td><td class="team">${teamLinkHTML(k,x.team)}</td><td>${x.pj}</td><td>${x.pg}</td><td>${x.pp}</td><td>${x.sf}</td><td>${x.sc}</td><td>${x.jf}</td><td>${x.jc}</td><td><b>${x.pts}</b></td></tr>`).join("")}
  </tbody></table></div>
  <div class="standings-note">Victoria: 1 punto · Derrota: 0 puntos · Las 8 primeras parejas se clasifican para la fase final.</div>`;
@@ -2162,23 +2194,12 @@ function renderAmistosos(){
    </div>
   </div>`;
  };
- c.innerHTML=`${amistososSubTabs("amistosos")}<div class="notice">Busca o publica partidos amistosos, fuera de la competición de liga.</div>
+ const optS=["Todos","Pádel","Tenis"].map(x=>`<option value="${x}" ${amSport===x?"selected":""}>${x==="Todos"?"Todo deporte":x}</option>`).join("");
+ const optL=[["","Todo nivel"],["Pro","Pro"],["Media","Media"],["Iniciación","Iniciación"]].map(x=>`<option value="${x[0]}" ${amLevel===x[0]?"selected":""}>${x[1]}</option>`).join("");
+ c.innerHTML=`<div class="am-head"><div class="am-count"><b>${list.length}</b> amistoso${list.length===1?"":"s"} abierto${list.length===1?"":"s"}</div><div class="am-head-btns"><button class="am-publish-btn" onclick="toggleAmForm()">${playerSession?(amFormOpen?"Cerrar":"＋ Publicar"):"＋ Publicar"}</button><button class="secondary am-players-btn" onclick="openPlayersView()">👥 Jugadores</button></div></div>
  ${formHTML}
- <div class="am-toolbar">
-  <div class="am-filters">
-   <button class="${amSport==="Todos"?"active":""}" onclick="setAmSport('Todos')">Todos</button>
-   <button class="${amSport==="Pádel"?"active":""}" onclick="setAmSport('Pádel')">Pádel</button>
-   <button class="${amSport==="Tenis"?"active":""}" onclick="setAmSport('Tenis')">Tenis</button>
-  </div>
-  <div class="am-filters">
-   <button class="${amLevel===""?"active":""}" onclick="setAmLevel('')">Todos los niveles</button>
-   <button class="${amLevel==="Pro"?"active":""}" onclick="setAmLevel('Pro')">Pro</button>
-   <button class="${amLevel==="Media"?"active":""}" onclick="setAmLevel('Media')">Media</button>
-   <button class="${amLevel==="Iniciación"?"active":""}" onclick="setAmLevel('Iniciación')">Iniciación</button>
-  </div>
-  <button class="am-publish-btn" onclick="toggleAmForm()">${playerSession?(amFormOpen?"Ocultar formulario":"+ Publicar amistoso"):"Inicia sesión para publicar"}</button>
- </div>
- ${list.length?`<div class="am-list">${list.map(cardHTML).join("")}</div>`:`<div class="am-empty-note notice">No hay amistosos abiertos con estos filtros todavía. ¡Sé el primero en publicar uno!</div>`}`;
+ <div class="am-filterbar"><select onchange="setAmSport(this.value)">${optS}</select><select onchange="setAmLevel(this.value)">${optL}</select></div>
+ ${list.length?`<div class="am-list">${list.map(cardHTML).join("")}</div>`:`<div class="am-empty-note notice">No hay amistosos abiertos todavía. ¡Sé el primero en publicar uno!</div>`}`;
 }
 function renderInfo(){
  document.getElementById("panelTitle").textContent="Información de la liga";
@@ -2457,7 +2478,7 @@ async function playerDashboard(){
     :`<div class="pf-next"><div class="pf-next-eyebrow">Sin partidos pendientes</div><div class="muted">No tienes ningún partido asignado todavía.</div></div>`;
   c.innerHTML=`<div class="card"><div class="card-b">
    <div class="pf-hero">
-    <div class="pf-avatar" onclick="openEditProfile()" title="Cambiar foto" style="cursor:pointer">${myProfile&&myProfile.avatar?`<img src="${esc(myProfile.avatar)}" alt="">`:esc(initialsOf(playerSession.name))}<span class="pf-avatar-cam">📷</span></div>
+    <div class="pf-avatar" onclick="openAvatarBig(myProfile&&myProfile.avatar,playerSession.name,true)" title="Ver foto" style="cursor:pointer">${myProfile&&myProfile.avatar?`<img src="${esc(myProfile.avatar)}" alt="">`:esc(initialsOf(playerSession.name))}<span class="pf-avatar-cam">📷</span></div>
     <div class="pf-hero-info"><h3>${esc(playerSession.name)}</h3><div class="pf-hero-team">${esc(playerSession.team)}</div><span class="pf-hero-league">${esc(L?.name||k)}</span>${myProfile&&myProfile.bio?`<div class="pf-bio">${esc(myProfile.bio)}</div>`:""}</div>
     <div class="pf-hero-actions"><button onclick="openEditProfile()">Editar perfil</button><button onclick="openPlayerProposal()">Proponer resultado</button><button class="secondary" onclick="playerDashboard()">Actualizar</button><button class="secondary" onclick="playerLogout()">Cerrar sesión</button></div>
    </div>
@@ -2522,15 +2543,16 @@ async function refreshInvites(silent){
  }catch(e){ invitesCache=null; if(!silent) console.warn(e); }
 }
 /* ---- editar perfil ---- */
+const CROP_V=240;
+let crop=null; // {img,s,min,ox,oy}
 function openEditProfile(){
  if(!playerSession) return;
- pendingAvatar=undefined;
+ pendingAvatar=undefined; crop=null;
  const p=myProfile||{};
  openModal(`<h3>Editar perfil</h3>
-  <div class="edit-av-row"><span id="editAvPreview">${avatarHTML({name:playerSession.name,avatar:p.avatar},84)}</span>
+  <div id="avStage"><div class="edit-av-row"><span id="editAvPreview">${avatarHTML({name:playerSession.name,avatar:p.avatar},84)}</span>
    <div><label class="file-btn">📷 Subir foto<input type="file" accept="image/*" onchange="pickAvatar(this)"></label>
-   <button class="secondary" type="button" onclick="clearAvatar()">Quitar foto</button>
-   <div class="muted" style="font-size:11.5px;margin-top:6px">Se recorta en cuadrado y se reduce automáticamente.</div></div></div>
+   <button class="secondary" type="button" onclick="clearAvatar()">Quitar foto</button></div></div></div>
   <label>Sobre mí (opcional, máx. 200)<textarea id="ep_bio" maxlength="200" rows="3" placeholder="Nivel, horarios que te vienen bien, si buscas pareja…">${esc(p.bio||"")}</textarea></label>
   <label class="check-row"><input type="checkbox" id="ep_hidden" ${p.hidden?"checked":""}> Ocultarme del buscador de jugadores</label>
   <p class="muted" style="font-size:11.5px">Tu teléfono nunca se muestra en tu perfil: solo lo ve quien tú aceptes en una invitación.</p>
@@ -2543,35 +2565,76 @@ function pickAvatar(input){
  reader.onload=()=>{
   const img=new Image();
   img.onload=()=>{
-   const N=128, cv=document.createElement("canvas"); cv.width=cv.height=N;
-   const ctx=cv.getContext("2d"), m=Math.min(img.width,img.height);
-   ctx.fillStyle="#fff"; ctx.fillRect(0,0,N,N);
-   ctx.drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,N,N);
-   let q=0.8,out=cv.toDataURL("image/jpeg",q);
-   while(out.length>36000&&q>0.35){q-=0.1;out=cv.toDataURL("image/jpeg",q)}
-   if(out.length>38000){alert("La imagen es demasiado compleja. Prueba con otra.");return}
-   pendingAvatar=out;
-   const box=document.getElementById("editAvPreview"); if(box) box.innerHTML=avatarHTML({name:playerSession.name,avatar:out},84);
+   const min=CROP_V/Math.min(img.width,img.height);
+   crop={img,s:min,min,ox:(CROP_V-img.width*min)/2,oy:(CROP_V-img.height*min)/2};
+   const st=document.getElementById("avStage"); if(!st) return;
+   st.innerHTML=`<div class="crop-wrap"><canvas id="cropCv" width="${CROP_V}" height="${CROP_V}"></canvas>
+    <div class="crop-hint">Arrastra para encuadrar · usa el control para ampliar</div>
+    <input type="range" id="cropZoom" min="1" max="4" step="0.01" value="1" aria-label="Zoom">
+    <label class="file-btn" style="margin-top:8px">Elegir otra foto<input type="file" accept="image/*" onchange="pickAvatar(this)"></label></div>`;
+   initCropEvents(); drawCrop();
   };
   img.onerror=()=>alert("No se ha podido leer esa imagen.");
   img.src=reader.result;
  };
  reader.readAsDataURL(f);
 }
+function clampCrop(){
+ const w=crop.img.width*crop.s,h=crop.img.height*crop.s;
+ crop.ox=Math.min(0,Math.max(CROP_V-w,crop.ox)); crop.oy=Math.min(0,Math.max(CROP_V-h,crop.oy));
+}
+function drawCrop(){
+ const cv=document.getElementById("cropCv"); if(!cv||!crop) return;
+ const x=cv.getContext("2d"); clampCrop();
+ x.clearRect(0,0,CROP_V,CROP_V);
+ x.drawImage(crop.img,crop.ox,crop.oy,crop.img.width*crop.s,crop.img.height*crop.s);
+ x.fillStyle="rgba(0,0,0,.55)"; x.beginPath(); x.rect(0,0,CROP_V,CROP_V); x.arc(CROP_V/2,CROP_V/2,CROP_V/2-3,0,Math.PI*2,true); x.fill();
+ x.strokeStyle="#fff"; x.lineWidth=2; x.beginPath(); x.arc(CROP_V/2,CROP_V/2,CROP_V/2-3,0,Math.PI*2); x.stroke();
+}
+function initCropEvents(){
+ const cv=document.getElementById("cropCv"), z=document.getElementById("cropZoom"); let drag=null;
+ cv.addEventListener("pointerdown",e=>{drag={x:e.clientX,y:e.clientY,ox:crop.ox,oy:crop.oy};cv.setPointerCapture(e.pointerId)});
+ cv.addEventListener("pointermove",e=>{if(!drag)return;const r=cv.getBoundingClientRect(),k=CROP_V/r.width;crop.ox=drag.ox+(e.clientX-drag.x)*k;crop.oy=drag.oy+(e.clientY-drag.y)*k;drawCrop()});
+ const end=()=>{drag=null}; cv.addEventListener("pointerup",end); cv.addEventListener("pointercancel",end);
+ z.addEventListener("input",()=>{
+  const old=crop.s, ns=crop.min*(+z.value), c=CROP_V/2;
+  crop.ox=c-(c-crop.ox)*(ns/old); crop.oy=c-(c-crop.oy)*(ns/old); crop.s=ns; drawCrop();
+ });
+}
+function exportCrop(){
+ // devuelve {full:256px, sm:96px} ya recortados al círculo (cuadrado en JPEG)
+ const sx=-crop.ox/crop.s, sy=-crop.oy/crop.s, sw=CROP_V/crop.s;
+ const make=(N,max,q0)=>{
+  const cv=document.createElement("canvas"); cv.width=cv.height=N; const x=cv.getContext("2d");
+  x.fillStyle="#fff"; x.fillRect(0,0,N,N); x.imageSmoothingQuality="high";
+  x.drawImage(crop.img,sx,sy,sw,sw,0,0,N,N);
+  let q=q0,out=cv.toDataURL("image/jpeg",q);
+  while(out.length>max&&q>0.35){q-=0.08;out=cv.toDataURL("image/jpeg",q)}
+  return out;
+ };
+ return {full:make(256,38000,0.88),sm:make(96,11000,0.82)};
+}
 function clearAvatar(){
- pendingAvatar="";
- const box=document.getElementById("editAvPreview"); if(box) box.innerHTML=avatarHTML({name:playerSession.name,avatar:""},84);
+ pendingAvatar=""; crop=null;
+ const st=document.getElementById("avStage");
+ if(st) st.innerHTML=`<div class="edit-av-row"><span id="editAvPreview">${avatarHTML({name:playerSession.name,avatar:""},84)}</span><div><label class="file-btn">📷 Subir foto<input type="file" accept="image/*" onchange="pickAvatar(this)"></label></div></div>`;
 }
 async function saveProfile(){
  const payload={action:"updateProfile",...authPayload(),bio:v("ep_bio"),hidden:document.getElementById("ep_hidden").checked?"true":"false"};
- if(pendingAvatar!==undefined) payload.avatar=pendingAvatar;
+ if(crop){ const o=exportCrop(); payload.avatar=o.full; payload.avatar_sm=o.sm; }
+ else if(pendingAvatar===""){ payload.avatar=""; payload.avatar_sm=""; }
  try{
   await cloudWrite(payload);
-  closeModal(); dirCache=null;
+  closeModal(); dirCache=null; crop=null;
   await refreshMyProfile();
   if(currentView==="profile") playerDashboard();
   showToast("Perfil guardado");
  }catch(e){alert(e.message)}
+}
+/* ---- ver foto en grande ---- */
+function openAvatarBig(src,name,own){
+ if(!src){ if(own) openEditProfile(); return; }
+ openModal(`<img class="av-big" src="${esc(src)}" alt="${esc(name||"")}"><h3 style="text-align:center;margin:12px 0 4px">${esc(name||"")}</h3><div class="admin-round-actions" style="justify-content:center">${own?`<button class="primary" onclick="openEditProfile()">Cambiar foto</button>`:""}<button class="secondary" onclick="closeModal()">Cerrar</button></div>`);
 }
 /* ---- invitaciones ---- */
 function invitesSectionHTML(){
@@ -2620,7 +2683,7 @@ async function renderPlayersDirectory(){
  drawDirectory();
 }
 function amistososSubTabs(active){
- return `<div class="sub-tabs"><button class="${active==="amistosos"?"active":""}" onclick="currentView='amistosos';render()">📋 Anuncios</button><button class="${active==="players"?"active":""}" onclick="openPlayersView()">👥 Jugadores</button></div>`;
+ return active==="players"?`<div class="am-back"><button class="secondary" onclick="currentView='amistosos';render()">← Amistosos</button></div>`:"";
 }
 function drawDirectory(){
  const c=document.getElementById("content"); if(!c||currentView!=="players") return;
@@ -2648,11 +2711,20 @@ function dirSetLeague(l){dirLeague=l;drawDirectory()}
 function openPlayerCard(i){
  const p=(window._dirList||[])[i]; if(!p) return;
  const defSport=playerSession&&playerSession.league==="tenis"?"Tenis":"Pádel";
- openModal(`<div class="pcard">${avatarHTML(p,88)}<h3>${esc(p.name)}</h3><div class="muted">${esc(p.team?p.team+" · ":"")}${esc(p.leagueName)}</div>${p.bio?`<p class="pcard-bio">${esc(p.bio)}</p>`:""}</div>
+ openModal(`<div class="pcard"><span id="pcAv" ${p.avatar?'style="cursor:zoom-in"':""}>${avatarHTML(p,88)}</span><h3>${esc(p.name)}</h3><div class="muted">${esc(p.team?p.team+" · ":"")}${esc(p.leagueName)}</div>${p.bio?`<p class="pcard-bio">${esc(p.bio)}</p>`:""}</div>
   <div class="pcard-form"><label>Deporte<select id="inv_sport"><option ${defSport==="Pádel"?"selected":""}>Pádel</option><option ${defSport==="Tenis"?"selected":""}>Tenis</option><option>Otro</option></select></label>
   <label>Mensaje<textarea id="inv_msg" rows="3" maxlength="300">¡Hola ${esc(p.name.split(" ")[0])}! ¿Te apetece echar un partido esta semana?</textarea></label>
   <p class="muted" style="font-size:11.5px">Tu WhatsApp solo se comparte si ${esc(p.name.split(" ")[0])} acepta la invitación.</p>
   <div class="admin-round-actions"><button class="primary" onclick="sendInvite('${esc(p.username)}')">Enviar invitación</button><button class="secondary" onclick="closeModal()">Cerrar</button></div></div>`);
+ if(p.avatar) loadFullAvatar(p);
+}
+async function loadFullAvatar(p){
+ try{
+  const r=await cloudWrite({action:"getAvatar",...authPayload(),username:p.username});
+  const box=document.getElementById("pcAv"); if(!box||!r.avatar) return;
+  box.innerHTML=avatarHTML({name:p.name,avatar:r.avatar},88);
+  box.onclick=()=>openAvatarBig(r.avatar,p.name,false);
+ }catch(_){}
 }
 async function sendInvite(to){
  try{
@@ -3230,33 +3302,79 @@ function addShareButton(c){
   tbl.insertAdjacentHTML("beforebegin",`<button class="share-btn" onclick="shareStandings()">📤 Compartir clasificación</button>`);
 }
 function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
-async function buildShareImage(L,k){
-  try{ await document.fonts.load("900 40px Archivo"); }catch(_){}
-  const W=1080,H=1350, cv=document.createElement("canvas"); cv.width=W; cv.height=H;
-  const x=cv.getContext("2d"), F="Archivo, Inter, Arial, sans-serif";
-  const g=x.createLinearGradient(0,0,W*.4,H); g.addColorStop(0,"#0a0a0a"); g.addColorStop(.6,"#0a0a0a"); g.addColorStop(1,"#26360a");
-  x.fillStyle=g; x.fillRect(0,0,W,H);
-  x.fillStyle="#ccff00"; x.font=`900 30px ${F}`; x.fillText("LIGA PÁDEL ETSII · 2026/27",70,110);
-  x.fillStyle="#fff"; x.font=`900 78px ${F}`;
-  const title=L.name.toUpperCase(); x.fillText(title,70,200);
-  x.fillStyle="rgba(255,255,255,.6)"; x.font=`700 30px ${F}`;
-  x.fillText("CLASIFICACIÓN"+(L.provisional?" PROVISIONAL":""),70,252);
-  const st=calcStandings(L).slice(0,10);
-  const y0=310, rh=92;
+const SHARE_THEMES={
+  padel:{bg:["#0a0a0a","#0a0a0a","#26360a"],accent:"#ccff00",text:"#fff",sub:"rgba(255,255,255,.6)",row:"rgba(204,255,0,.10)"},
+  tenis:{bg:["#b84400","#e8600a","#ff9a4d"],accent:"#fff3d6",text:"#fff",sub:"rgba(255,255,255,.78)",row:"rgba(255,255,255,.16)"}
+};
+function shareFont(){return "Archivo, Inter, Arial, sans-serif"}
+function drawStandingsPanel(x,L,ox,oy,w,th,opt){
+  // dibuja una clasificación completa (o las `max` primeras) en un panel
+  const F=shareFont(), st=calcStandings(L).slice(0,opt.max||99), rh=opt.rh||52;
+  x.textAlign="left"; x.fillStyle=th.accent; x.font=`900 ${opt.title||44}px ${F}`;
+  x.fillText(L.name.toUpperCase(),ox,oy);
+  x.fillStyle=th.sub; x.font=`700 ${Math.round((opt.title||44)*.45)}px ${F}`;
+  x.fillText("CLASIFICACIÓN"+(L.provisional?" PROVISIONAL":""),ox,oy+Math.round((opt.title||44)*.7));
+  const y0=oy+Math.round((opt.title||44)*1.1);
   st.forEach((t,i)=>{
     const y=y0+i*rh;
-    if(i<8){ x.fillStyle="rgba(204,255,0,.10)"; rrect(x,60,y,W-120,rh-12,18); x.fill(); }
-    x.fillStyle=i<3?"#ccff00":"#fff"; x.font=`900 40px ${F}`; x.textAlign="left"; x.fillText(String(i+1),90,y+54);
-    x.font=`800 38px ${F}`; let nm=t.team; while(x.measureText(nm).width>600&&nm.length>3) nm=nm.slice(0,-2);
-    if(nm!==t.team) nm+="…"; x.fillText(nm,160,y+54);
-    x.fillStyle="rgba(255,255,255,.55)"; x.font=`700 26px ${F}`; x.textAlign="right"; x.fillText(`${t.pg}G ${t.pp}P`,W-230,y+52);
-    x.fillStyle=i<3?"#ccff00":"#fff"; x.font=`900 44px ${F}`; x.fillText(String(t.pts),W-90,y+54);
+    x.fillStyle=th.row; rrect(x,ox-14,y,w+28,rh-8,14); x.fill();
+    x.fillStyle=i<3?th.accent:th.text; x.font=`900 ${rh*.52}px ${F}`; x.textAlign="left"; x.fillText(String(i+1),ox+8,y+rh*.66);
+    x.font=`800 ${rh*.48}px ${F}`; let nm=t.team; const maxW=w-210;
+    while(x.measureText(nm).width>maxW&&nm.length>3) nm=nm.slice(0,-2);
+    if(nm!==t.team) nm+="…"; x.fillText(nm,ox+(rh*.95),y+rh*.66);
+    x.fillStyle=th.sub; x.font=`700 ${rh*.36}px ${F}`; x.textAlign="right"; x.fillText(`${t.pg}G ${t.pp}P`,ox+w-90,y+rh*.64);
+    x.fillStyle=i<3?th.accent:th.text; x.font=`900 ${rh*.56}px ${F}`; x.fillText(String(t.pts),ox+w,y+rh*.67);
     x.textAlign="left";
   });
-  x.fillStyle="rgba(255,255,255,.55)"; x.font=`700 26px ${F}`; x.textAlign="left";
-  x.fillText("Victoria = 1 punto · Las 8 primeras pasan a la fase final",70,H-120);
-  x.fillStyle="#ccff00"; x.font=`900 28px ${F}`; x.fillText("padeletsii.github.io",70,H-70);
+  return y0+st.length*rh;
+}
+function themeFor(L){return L.sport==="Tenis"?SHARE_THEMES.tenis:SHARE_THEMES.padel}
+function paintBg(x,W,H,th){
+  const g=x.createLinearGradient(0,0,W*.4,H); g.addColorStop(0,th.bg[0]); g.addColorStop(.6,th.bg[1]); g.addColorStop(1,th.bg[2]);
+  x.fillStyle=g; x.fillRect(0,0,W,H);
+}
+async function buildShareImage(L,k){
+  try{ await document.fonts.load("900 40px Archivo"); }catch(_){}
+  const th=themeFor(L), W=1080, n=Math.min(10,L.teams.length), H=Math.max(1000,380+n*92+170);
+  const cv=document.createElement("canvas"); cv.width=W; cv.height=H; const x=cv.getContext("2d"), F=shareFont();
+  paintBg(x,W,H,th);
+  x.fillStyle=th.accent; x.font=`900 30px ${F}`; x.fillText("LIGA "+(L.sport==="Tenis"?"TENIS":"PÁDEL")+" ETSII · 2026/27",70,110);
+  const yEnd=drawStandingsPanel(x,L,70,200,W-140,th,{max:10,rh:92,title:78});
+  x.fillStyle=th.accent; x.font=`900 28px ${F}`; x.fillText("padeletsii.github.io",70,Math.max(yEnd+70,H-70));
   return await new Promise(res=>cv.toBlob(res,"image/png"));
+}
+// Exportación de la administradora: todas las ligas de pádel en una imagen y el tenis aparte
+async function buildAllPadelImage(){
+  try{ await document.fonts.load("900 40px Archivo"); }catch(_){}
+  const th=SHARE_THEMES.padel, F=shareFont();
+  const leagues=Object.entries(db.leagues).filter(([k,L])=>L.sport!=="Tenis"&&L.teams.length);
+  const rh=46, colW=980, gap=90, pad=80, cols=2;
+  const rows=Math.ceil(leagues.length/cols);
+  const heightOf=(L)=>Math.round(44*1.1)+L.teams.length*rh+60;
+  const rowH=[];for(let r=0;r<rows;r++){rowH.push(Math.max(...leagues.slice(r*cols,r*cols+cols).map(([k,L])=>heightOf(L))))}
+  const W=pad*2+colW*cols+gap*(cols-1), H=200+rowH.reduce((a,b)=>a+b,0)+rows*20+110;
+  const cv=document.createElement("canvas"); cv.width=W; cv.height=H; const x=cv.getContext("2d");
+  paintBg(x,W,H,th);
+  x.fillStyle=th.accent; x.font=`900 40px ${F}`; x.fillText("LIGA PÁDEL ETSII · 2026/27",pad,100);
+  x.fillStyle=th.text; x.font=`900 78px ${F}`; x.fillText("CLASIFICACIONES",pad,180);
+  let oy=290;
+  for(let r=0;r<rows;r++){
+    leagues.slice(r*cols,r*cols+cols).forEach(([k,L],c)=>{ drawStandingsPanel(x,L,pad+c*(colW+gap),oy,colW,th,{rh,title:44}); });
+    oy+=rowH[r]+20;
+  }
+  x.fillStyle=th.accent; x.font=`900 30px ${F}`; x.fillText("padeletsii.github.io",pad,H-50);
+  return await new Promise(res=>cv.toBlob(res,"image/png"));
+}
+async function exportAllStandings(){
+  if(!admin){alert("Solo en modo administrador.");return}
+  showToast("Generando imágenes…");
+  try{
+    const items=[];
+    items.push({name:"clasificaciones-padel.png",title:"Pádel · todas las ligas",blob:await buildAllPadelImage()});
+    const tk=Object.entries(db.leagues).find(([k,L])=>L.sport==="Tenis");
+    if(tk) items.push({name:"clasificacion-tenis.png",title:"Tenis",blob:await buildShareImage(tk[1],tk[0])});
+    openModal(`<h3>Clasificaciones exportadas</h3><div class="exp-grid">${items.map(it=>{const u=URL.createObjectURL(it.blob);return `<div class="exp-item"><img src="${u}" alt=""><b>${esc(it.title)}</b><a class="wa-btn" href="${u}" download="${it.name}">⬇ Descargar</a></div>`}).join("")}</div><div class="admin-round-actions" style="margin-top:12px"><button class="secondary" onclick="closeModal()">Cerrar</button></div>`);
+  }catch(e){alert("No se han podido crear las imágenes: "+e.message)}
 }
 async function shareStandings(){
   const L=db.leagues[currentLeague]; if(!L) return;
