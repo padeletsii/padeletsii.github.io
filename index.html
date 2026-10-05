@@ -1128,22 +1128,37 @@ html.dark body.tennis-theme .theme-toggle,html.dark body.admin-mode .theme-toggl
 .gal-item:hover img{transform:scale(1.05)}
 .gal-item span{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font-size:11.5px;font-weight:700;padding:16px 8px 7px;text-align:left}
 .gal-big{width:100%;border-radius:12px;display:block}
+.gal-pending{margin:0 0 18px;padding:12px;border:2px dashed #ff9a4d;border-radius:16px;background:rgba(255,154,77,.08)}
+.gal-pending h4{margin:0 0 10px}
+.gal-pcard{display:flex;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.gal-pcard img{width:84px;height:84px;object-fit:cover;border-radius:12px;cursor:pointer;flex:0 0 84px;background:var(--soft)}
+.gal-pinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.gal-pinfo span{font-size:12.5px;color:var(--text2)}
+.gal-pend-actions{display:flex;gap:6px;margin-top:6px}
+.gal-pend-actions button{flex:1;padding:6px;font-size:12px;border-radius:10px}
+.gal-item em{display:block;font-style:normal;font-size:10.5px;opacity:.8}
 .gal-admin{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
 html.dark .pf-remind{background:#2b2616;border-color:#4a3f1c;color:#f2efe6}
 html.dark .pf-change.up{background:#12301f;color:#7be0a4}html.dark .pf-change.down{background:#3a1a1a;color:#ff9a9a}
 
-/* ---- clasificación en móvil: puntos visibles ---- */
+/* ---- clasificación en móvil: puntos primero ---- */
 @media(max-width:700px){
- .st-table{min-width:0;table-layout:fixed;width:100%}
+ .st-table,.st-table thead,.st-table tbody{display:block;min-width:0;width:100%}
+ .st-table tr{display:grid;grid-template-columns:34px 56px minmax(0,1fr) 30px 30px 30px;align-items:center;column-gap:4px}
+ .st-table th,.st-table td{padding:12px 2px;text-align:center;border-bottom:1px solid var(--line)}
  .st-table th:nth-child(n+6):not(:last-child),.st-table td:nth-child(n+6):not(:last-child){display:none}
- .st-table th,.st-table td{padding:11px 3px}
- .st-table th:first-child,.st-table td:first-child{width:32px;text-align:center}
- .st-table th:nth-child(2),.st-table td:nth-child(2){width:auto;text-align:left;overflow:hidden}
+ .st-table th:first-child,.st-table td:first-child{order:1}
+ .st-table th:last-child,.st-table td:last-child{order:2}
+ .st-table th:nth-child(2),.st-table td:nth-child(2){order:3;text-align:left;overflow:hidden;padding-left:6px}
+ .st-table th:nth-child(3),.st-table td:nth-child(3){order:4}
+ .st-table th:nth-child(4),.st-table td:nth-child(4){order:5}
+ .st-table th:nth-child(5),.st-table td:nth-child(5){order:6}
  .st-table td:nth-child(2) .team-link{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
- .st-table th:nth-child(3),.st-table td:nth-child(3),.st-table th:nth-child(4),.st-table td:nth-child(4),.st-table th:nth-child(5),.st-table td:nth-child(5){width:34px}
- .st-table th:last-child,.st-table td:last-child{width:50px;padding-right:10px}
- .st-table td:last-child b{font-size:18px}
- .st-table th{font-size:11px;letter-spacing:.02em}
+ .st-table td:last-child{padding:6px 0}
+ .st-table td:last-child b{display:inline-block;min-width:38px;padding:4px 0;border-radius:10px;background:var(--tennis);color:#0a0a0a;font-size:18px}
+ body.tennis-theme .st-table td:last-child b{background:#e8600a;color:#fff}
+ body.admin-mode .st-table td:last-child b{background:var(--admin);color:#fff}
+ .st-table th{font-size:11px;letter-spacing:.02em;border-bottom:0}
 }
 /* ---- recorte de foto y vista grande ---- */
 .crop-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin:6px 0 14px}
@@ -1163,6 +1178,96 @@ html.dark .pf-change.up{background:#12301f;color:#7be0a4}html.dark .pf-change.do
 .exp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
 .exp-item{display:flex;flex-direction:column;gap:8px;align-items:center}
 .exp-item img{width:100%;border-radius:12px;box-shadow:0 8px 22px rgba(0,0,0,.25)}
+
+/* ================= PERFIL RENOVADO ================= */
+.pf2-hero{position:relative;border-radius:24px;padding:26px 20px 22px;margin:2px 0 14px;text-align:center;color:#fff;overflow:hidden;
+ background:linear-gradient(150deg,#0a0a0a 30%,#223000);--pf-acc:#ccff00}
+.pf2-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(260px 200px at 85% -10%,rgba(204,255,0,.32),transparent 65%),radial-gradient(220px 180px at -10% 110%,rgba(204,255,0,.14),transparent 60%);pointer-events:none}
+.pf2-hero>*{position:relative}
+.pf2-tennis{background:linear-gradient(150deg,#c24d00,#ff9a4d);--pf-acc:#fff3d6}
+.pf2-tennis::before{background:radial-gradient(260px 200px at 85% -10%,rgba(255,255,255,.35),transparent 65%)}
+.pf2-tools{position:absolute!important;top:12px;right:12px;display:flex;gap:8px}
+.pf2-ico{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);color:#fff;font-size:16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;backdrop-filter:blur(4px)}
+.pf2-ico:hover{background:rgba(255,255,255,.25)}
+.pf2-avatar{position:relative;width:104px;height:104px;border-radius:50%;margin:34px auto 14px;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:950;color:#0a0a0a;background:var(--pf-acc);border:4px solid var(--pf-acc);box-shadow:0 0 0 6px rgba(255,255,255,.12),0 14px 30px rgba(0,0,0,.35);cursor:pointer;overflow:visible}
+.pf2-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.pf2-cam{position:absolute;right:-2px;bottom:-2px;width:32px;height:32px;border-radius:50%;background:#fff;color:#0a0a0a;font-size:15px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,.3)}
+.pf2-name{margin:0;font-size:25px;letter-spacing:-.01em;color:#fff!important;text-transform:uppercase}
+.pf2-team{margin-top:3px;font-weight:900;font-size:15px;color:var(--pf-acc)}
+.pf2-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.pf2-chips span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:5px 12px;font-size:12px;font-weight:800}
+.pf2-bio{margin:14px auto 0;max-width:36ch;font-size:13.5px;line-height:1.45;opacity:.92;font-style:italic}
+.pf2-addbio{margin-top:14px;border:1px dashed rgba(255,255,255,.45);background:transparent;color:#fff;border-radius:999px;padding:8px 16px;font-size:12.5px;font-weight:800;cursor:pointer}
+.pf2-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 16px}
+.pf2-stat{border-radius:16px;background:var(--paper);border:1px solid var(--line);padding:12px 4px;text-align:center;box-shadow:0 8px 20px -16px rgba(0,0,0,.4)}
+.pf2-stat strong{display:block;font-size:24px;line-height:1;letter-spacing:-.02em}
+.pf2-stat span{display:block;margin-top:5px;font-size:10.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.pf2-stat.win strong{color:#17803d}
+html.dark .pf2-stat.win strong{color:#6ee79a}
+.pf2-cta{display:flex;width:100%;align-items:center;justify-content:center;gap:10px;margin-top:16px;min-height:54px;border:0;border-radius:16px;background:var(--tennis);color:#0a0a0a;font-weight:950;font-size:16px;letter-spacing:.01em;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.85),0 14px 24px -12px rgba(0,0,0,.5);transition:transform .12s,box-shadow .12s}
+.pf2-cta:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.85)}
+.pf2-cta span{font-size:19px}
+body.tennis-theme .pf2-cta{background:#e8600a;color:#fff}
+body.admin-mode .pf2-cta{background:var(--admin);color:#fff}
+.pf-next.has-match{border:0;background:var(--paper);box-shadow:0 14px 30px -18px rgba(0,0,0,.45);border-radius:20px;border-top:5px solid var(--tennis)}
+.pf-next-vs{font-size:23px}
+.profile-section>h4{display:flex;align-items:center;gap:8px}
+.profile-section>h4::after{content:"";flex:1;height:1px;background:var(--line)}
+.contact-search-box{border-radius:18px}
+/* filas de partido sin desbordar */
+.pf-match-list{min-width:0}
+.pf-match-row{box-sizing:border-box;width:100%;max-width:100%;min-width:0}
+.pf-match-row>*{min-width:0}
+@media(max-width:560px){.pf2-name{font-size:22px}.pf2-stat strong{font-size:21px}.pf2-hero{padding:22px 14px 18px}}
+
+/* ================= MIS PARTIDOS (perfil compacto + tarjetas de partido) ================= */
+.pf3-head{position:relative;display:flex;align-items:center;gap:14px;border-radius:22px;padding:16px;margin:2px 0 14px;color:#fff;overflow:hidden;
+ background:linear-gradient(150deg,#0a0a0a 35%,#223000);--pf-acc:#ccff00}
+.pf3-head::before{content:"";position:absolute;inset:0;background:radial-gradient(240px 160px at 100% -20%,rgba(204,255,0,.30),transparent 65%);pointer-events:none}
+.pf3-head>*{position:relative}
+.pf3-tennis{background:linear-gradient(150deg,#c24d00,#ff9a4d);--pf-acc:#fff3d6}
+.pf3-tennis::before{background:radial-gradient(240px 160px at 100% -20%,rgba(255,255,255,.35),transparent 65%)}
+.pf3-avatar{flex:0 0 62px;width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:950;color:#0a0a0a;background:var(--pf-acc);border:3px solid var(--pf-acc);box-shadow:0 0 0 4px rgba(255,255,255,.14);cursor:pointer}
+.pf3-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.pf3-id{flex:1;min-width:0}
+.pf3-name{font-weight:950;font-size:18px;line-height:1.15;text-transform:uppercase;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pf3-sub{margin-top:2px;font-size:12.5px;font-weight:800;color:var(--pf-acc);line-height:1.25}
+.pf3-bio{margin-top:5px;font-size:11.5px;opacity:.85;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pf3-addbio{margin-top:6px;border:1px dashed rgba(255,255,255,.5);background:transparent;color:#fff;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:800;cursor:pointer}
+.pf3-tools{display:flex;flex-direction:column;gap:6px}
+.pf3-tools .pf2-ico{width:32px;height:32px;font-size:14px}
+.pf3-match{position:relative;border-radius:20px;background:var(--paper);border:1px solid var(--line);padding:16px 16px 14px;margin:0 0 12px;box-shadow:0 10px 24px -18px rgba(0,0,0,.45)}
+.pf3-match.is-next{border:0;border-top:5px solid var(--tennis);box-shadow:0 16px 32px -20px rgba(0,0,0,.55)}
+body.tennis-theme .pf3-match.is-next{border-top-color:#e8600a}
+body.admin-mode .pf3-match.is-next{border-top-color:var(--admin)}
+.pf3-mtop{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.pf3-eyebrow{font-size:11px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.pf3-match.is-next .pf3-eyebrow{background:var(--tennis);color:#0a0a0a;border-radius:999px;padding:4px 10px;letter-spacing:.03em;font-size:10.5px}
+body.tennis-theme .pf3-match.is-next .pf3-eyebrow{background:#e8600a;color:#fff}
+body.admin-mode .pf3-match.is-next .pf3-eyebrow{background:var(--admin);color:#fff}
+.pf3-round{font-weight:950;font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:2px 7px}
+.pf3-vs{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;font-size:19px;line-height:1.2}
+.pf3-vs b{font-weight:950}
+.pf3-vs i{font-style:normal;font-size:13px;font-weight:800;color:var(--muted)}
+.pf3-match .pf-next-when{margin-top:10px}
+.pf3-btn{display:flex;align-items:center;gap:12px;width:100%;margin-top:14px;padding:8px 14px 8px 8px;min-height:52px;border:0;border-radius:16px;background:#0a0a0a;color:#ccff00;font-weight:950;font-size:15.5px;letter-spacing:.01em;cursor:pointer;text-align:left;box-shadow:0 10px 20px -10px rgba(0,0,0,.6);transition:transform .12s,box-shadow .12s}
+.pf3-btn:active{transform:scale(.98)}
+.pf3-btn-ic{flex:0 0 36px;width:36px;height:36px;border-radius:12px;background:#ccff00;color:#0a0a0a;display:flex;align-items:center;justify-content:center;font-size:18px}
+.pf3-btn-tx{flex:1;white-space:nowrap;font-size:14.5px;letter-spacing:0}
+.pf3-btn-ar{font-size:26px;line-height:1;opacity:.9}
+body.tennis-theme .pf3-btn{background:#e8600a;color:#fff}
+body.tennis-theme .pf3-btn-ic{background:#fff;color:#e8600a}
+body.admin-mode .pf3-btn{background:var(--admin);color:#fff}
+body.admin-mode .pf3-btn-ic{background:#fff;color:var(--admin)}
+html.dark .pf3-btn{background:#ccff00;color:#0a0a0a}
+html.dark .pf3-btn-ic{background:#0a0a0a;color:#ccff00}
+html.dark body.tennis-theme .pf3-btn,html.dark.tennis-theme .pf3-btn{background:#e8600a;color:#fff}
+html.dark body.admin-mode .pf3-btn{background:var(--admin);color:#fff}
+.pf3-morebtn{display:block;width:100%;margin:2px 0 12px;padding:12px;border-radius:14px;border:1px dashed var(--line);background:transparent;color:var(--text2);font-weight:850;cursor:pointer}
+.pf3-wait{margin-top:14px;padding:11px 14px;border-radius:14px;background:var(--soft);font-size:13px;font-weight:800;color:var(--text2);text-align:center}
+.pf3-wait-in{background:#fff4d6;color:#7a5200}
+html.dark .pf3-wait-in{background:#3a2d08;color:#ffd77a}
+@media(max-width:380px){.pf3-vs{font-size:17px}.pf3-name{font-size:16px}}
 </style>
 </head>
 <body>
@@ -1201,7 +1306,7 @@ html.dark .pf-change.up{background:#12301f;color:#7be0a4}html.dark .pf-change.do
  <button data-view="inicio" class="active"><span class="bn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="bn-stroke" d="M3 11.5 12 4l9 7.5"/><path class="bn-stroke" d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/><path class="bn-accent" d="M10 20v-5h4v5"/></svg></span><span class="bn-label">Inicio</span></button>
  <button data-view="standings"><span class="bn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="bn-stroke" d="M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path class="bn-stroke" d="M7 5H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4M17 5h3a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4"/><path class="bn-accent" d="M8 21h8M12 17v4"/></svg></span><span class="bn-label">Liga</span></button>
  <button data-view="amistosos" class="amistosos-tab"><span class="bn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle class="bn-stroke" cx="10.5" cy="10.5" r="6.5"/><path class="bn-accent" d="M15.3 15.3 20 20"/></svg></span><span class="bn-label">Jugar</span></button>
- <button data-view="profile"><span class="bn-icon-wrap" id="bnProfileIcon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle class="bn-stroke" cx="12" cy="8" r="4"/><path class="bn-accent" d="M4 21c.6-4.2 3.8-6.5 8-6.5s7.4 2.3 8 6.5"/></svg></span><span class="bn-label">Perfil</span></button>
+ <button data-view="profile"><span class="bn-icon-wrap" id="bnProfileIcon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle class="bn-stroke" cx="12" cy="8" r="4"/><path class="bn-accent" d="M4 21c.6-4.2 3.8-6.5 8-6.5s7.4 2.3 8 6.5"/></svg></span><span class="bn-label" id="bnProfileLbl">Perfil</span></button>
 </nav>
 
 <div id="modal" class="modal" onclick="if(event.target===this)closeModal()"><div class="modal-card" id="modalCard"></div></div>
@@ -1589,7 +1694,7 @@ function updateProfileFab(){
   if(!fab||!icon||!label) return;
   fab.classList.toggle("active",currentView==="profile");
   fab.classList.toggle("logged-in",!!playerSession);
-  fab.title=playerSession?`${playerSession.name} · Mi perfil`:"Iniciar sesión";
+  fab.title=playerSession?`${playerSession.name} · Mis partidos`:"Iniciar sesión";
   if(playerSession&&myProfile&&myProfile.avatar){ icon.innerHTML=`<img src="${esc(myProfile.avatar)}" alt="">`; icon.classList.add("has-img"); }
   else { icon.classList.remove("has-img"); icon.textContent=playerSession?initialsOf(playerSession.name):"👤"; }
   icon.style.fontSize=playerSession?"12px":"13px";
@@ -1863,7 +1968,7 @@ function renderMatches(L){
   <div class="match-team${res?(homeWin?" is-winner":" is-loser"):""}"><span class="match-avatar">${esc(initialsOf(m.home))}</span><span class="match-team-name">${teamLinkHTML(k,m.home)}</span></div>
   <div class="match-score ${res?"played":"pending"}">${res?score:"VS"}</div>
   <div class="match-team match-team-away${res?(awayWin?" is-winner":" is-loser"):""}"><span class="match-team-name">${teamLinkHTML(k,m.away)}</span><span class="match-avatar">${esc(initialsOf(m.away))}</span></div>
-  </div>${res?`<div class="match-actions"><button class="match-share" onclick="shareMatch('${k}',${r},${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>Compartir</button></div>`:""}<div class="admin-edit"><button onclick="editMatch(${r},${i})">${res?"Editar resultado":"Añadir resultado"}</button>${res?`<button onclick="deleteResult(${r},${i})">Borrar</button>`:""}</div></div>`
+  </div>${res?`<div class="match-actions"><button class="match-share" onclick="shareMatch('${k}',${r},${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>Compartir</button></div>`:""}<div class="admin-edit"><button onclick="editMatch(${r},${i})">${res?"Editar resultado":"Añadir resultado"}</button>${res?`<button onclick="deleteResult(${r},${i})">Borrar</button>`:""}${si&&(si.date||si.time||si.court)?`<button class="danger" onclick="clearMatchSchedule(${r},${i})">🗑 Quitar horario</button>`:""}</div></div>`
  }).join("")}</div>`).join("")}</div>`;
 }
 function adminScheduleImportBox(){
@@ -2230,18 +2335,28 @@ function renderInfo(){
 let galItems=null;
 async function loadGallery(){
  const box=document.getElementById("galBox"); if(!box) return;
- try{ const r=await cloudWrite({action:"gallery"}); galItems=r.items||[]; }
+ try{ const r=await cloudWrite({action:"gallery"}); galItems=r.items||[]; galPending=[];
+  if(admin){ try{ const q=await cloudWrite({action:"adminPendingPhotos",password:adminPassword}); galPending=q.items||[]; }catch(_){} } }
  catch(e){ box.innerHTML=`<div class="muted">No se han podido cargar las fotos.</div>`; return; }
  drawGallery();
 }
+let galPending=[];
 function drawGallery(){
  const box=document.getElementById("galBox"); if(!box) return;
- const adm=admin?`<div class="gal-admin"><label class="file-btn">📷 Subir foto<input type="file" accept="image/*" onchange="uploadPhoto(this)"></label><input id="gal_caption" class="user-search" style="max-width:320px;margin:0" placeholder="Pie de foto (opcional)"></div>`:"";
- box.innerHTML=adm+((galItems||[]).length?`<div class="gal-grid">${galItems.map((it,i)=>`<button class="gal-item" onclick="openPhoto(${i})"><img loading="lazy" src="${esc(it.image)}" alt="${esc(it.caption||"Foto de la liga")}">${it.caption?`<span>${esc(it.caption)}</span>`:""}</button>`).join("")}</div>`:`<div class="muted">Todavía no hay fotos. ¡Pronto subiremos las de las primeras jornadas!</div>`);
+ let up="";
+ if(admin) up=`<div class="gal-admin"><label class="file-btn">📷 Subir foto<input type="file" accept="image/*" onchange="uploadPhoto(this)"></label><input id="gal_caption" class="user-search" style="max-width:320px;margin:0" placeholder="Pie de foto (opcional)"></div>`;
+ else if(playerSession&&playerSession.status!=="pending") up=`<div class="gal-admin"><label class="file-btn">📷 Subir mi foto<input type="file" accept="image/*" onchange="uploadPhoto(this)"></label><input id="gal_caption" class="user-search" style="max-width:320px;margin:0" placeholder="Pie de foto (opcional)"><div class="muted" style="flex-basis:100%;font-size:12px">La organizadora la revisará antes de que se publique.</div></div>`;
+ else up=`<div class="muted" style="margin-bottom:10px;font-size:12.5px">Inicia sesión en <b>Mis partidos</b> para subir tus fotos de la liga.</div>`;
+ const pend=admin&&galPending.length?`<div class="gal-pending"><h4>📥 Fotos pendientes de aprobar (${galPending.length})</h4>${galPending.map((it,i)=>`<div class="gal-pcard"><img src="${esc(it.image)}" alt="" onclick="openPendingPhoto(${i})"><div class="gal-pinfo"><b>${esc(it.author||"")}</b><span>${esc(it.caption||"Sin pie de foto")}</span><div class="gal-pend-actions"><button onclick="reviewPhoto('${esc(it.id)}','approve')">✓ Aprobar</button><button class="danger" onclick="reviewPhoto('${esc(it.id)}','reject')">✕ Rechazar</button></div></div></div>`).join("")}</div>`:"";
+ box.innerHTML=up+pend+((galItems||[]).length?`<div class="gal-grid">${galItems.map((it,i)=>`<button class="gal-item" onclick="openPhoto(${i})"><img loading="lazy" src="${esc(it.image)}" alt="${esc(it.caption||"Foto de la liga")}">${it.caption||it.author?`<span>${esc(it.caption||"")}${it.author?` <em>📷 ${esc(it.author)}</em>`:""}</span>`:""}</button>`).join("")}</div>`:`<div class="muted">Todavía no hay fotos. ¡Pronto subiremos las de las primeras jornadas!</div>`);
+}
+function openPendingPhoto(i){const it=galPending[i]; if(!it) return; openModal(`<img class="gal-big" src="${esc(it.image)}" alt=""><p style="margin:10px 0">${esc(it.author||"")}${it.caption?" · "+esc(it.caption):""}</p><div class="admin-round-actions"><button onclick="reviewPhoto('${esc(it.id)}','approve')">Aprobar</button><button class="danger" onclick="reviewPhoto('${esc(it.id)}','reject')">Rechazar</button><button class="secondary" onclick="closeModal()">Cerrar</button></div>`)}
+async function reviewPhoto(id,decision){
+ try{ await cloudWrite({action:"adminReviewPhoto",password:adminPassword,id,decision}); closeModal(); showToast(decision==="approve"?"Foto publicada":"Foto rechazada"); loadGallery(); }catch(e){alert(e.message)}
 }
 function openPhoto(i){
  const it=(galItems||[])[i]; if(!it) return;
- openModal(`<img class="gal-big" src="${esc(it.image)}" alt=""><p style="margin:10px 0">${esc(it.caption||"")}</p><div class="admin-round-actions">${admin?`<button class="danger" onclick="deletePhoto('${esc(it.id)}')">Eliminar</button>`:""}<button class="secondary" onclick="closeModal()">Cerrar</button></div>`);
+ openModal(`<img class="gal-big" src="${esc(it.image)}" alt=""><p style="margin:10px 0">${esc(it.caption||"")}${it.author?` <span class="muted">· 📷 ${esc(it.author)}</span>`:""}</p><div class="admin-round-actions">${admin?`<button class="danger" onclick="deletePhoto('${esc(it.id)}')">Eliminar</button>`:""}<button class="secondary" onclick="closeModal()">Cerrar</button></div>`);
 }
 function uploadPhoto(input){
  const f=input.files&&input.files[0]; if(!f) return;
@@ -2255,8 +2370,14 @@ function uploadPhoto(input){
    let q=0.72,out=cv.toDataURL("image/jpeg",q);
    while(out.length>300000&&q>0.35){q-=0.1;out=cv.toDataURL("image/jpeg",q)}
    try{
-    await cloudWrite({action:"adminAddPhoto",password:adminPassword,image:out,caption:v("gal_caption")});
-    showToast("Foto subida"); loadGallery();
+    if(admin){
+     await cloudWrite({action:"adminAddPhoto",password:adminPassword,image:out,caption:v("gal_caption")});
+     showToast("Foto subida"); 
+    }else{
+     await cloudWrite({action:"userAddPhoto",username:playerSession.username,token:playerSession.token,image:out,caption:v("gal_caption")});
+     showToast("¡Gracias! Tu foto se publicará cuando la revise la organizadora",5000);
+    }
+    loadGallery();
    }catch(e){alert(e.message)}
   };
   img.src=rd.result;
@@ -2293,6 +2414,17 @@ async function saveResult(r,i){
  }catch(e){setSync(false,"Error al guardar");alert(e.message)}
 }
 function v(id){return document.getElementById(id).value}
+async function clearMatchSchedule(r,i){
+ const L=db.leagues[currentLeague]; if(!L||!L.schedule||!L.schedule[r]) return;
+ const m=L.schedule[r][i]; if(!m) return;
+ const si=getMatchSchedule(currentLeague,m.home,m.away);
+ const txt=si?[si.date,si.time,si.court].filter(Boolean).join(" · "):"";
+ if(!confirm(`¿Quitar el horario de ${m.home} vs ${m.away}${txt?` (${txt})`:""}? El partido seguirá en el calendario, sin día ni hora.`)) return;
+ try{
+  await cloudWrite({action:"adminClearMatchSchedule",password:adminPassword,league:currentLeague,home:m.home,away:m.away});
+  await loadCloudResults(); showToast("Horario quitado");
+ }catch(e){alert(e.message)}
+}
 async function deleteResult(r,i){
  if(!confirm("¿Borrar este resultado?")) return;
 
@@ -2342,7 +2474,7 @@ function loadProfilePage(){
 }
 function renderProfile(){
  const c=document.getElementById("content");
- document.getElementById("panelTitle").textContent="Mi perfil";
+ document.getElementById("panelTitle").textContent=playerSession?"Mis partidos":"Mi perfil";
  document.getElementById("panelSub").textContent=playerSession?`${playerSession.name} · ${playerSession.team}`:"Acceso de jugadores";
  if(!playerSession){
    playerLoginPage();
@@ -2448,7 +2580,10 @@ async function playerDashboard(){
   const past=all.filter(m=>m.played).sort((a,b)=>b.round-a.round);
   const upcoming=all.filter(m=>!m.played).sort(cmpByMatch);
   const current=upcoming[0]||null;
-  const stRow=calcStandings(L).find(x=>x.team===playerSession.team)||{pj:0,pg:0,pp:0};
+  const hasLeague=!!L&&!!L.teams;
+  const standingsNow=hasLeague?calcStandings(L):[];
+  const stRow=standingsNow.find(x=>x.team===playerSession.team)||{pj:0,pg:0,pp:0};
+  const posIdx=standingsNow.findIndex(x=>x.team===playerSession.team);
   const pfWhenChip=(when)=>{
     if(!when||!when.date) return `<span class="pf-chip pf-chip-muted">Fecha por confirmar</span>`;
     const parts=[relativeDayLabel(when.date)]; if(when.time) parts.push(when.time); if(when.court) parts.push(when.court);
@@ -2473,30 +2608,53 @@ async function playerDashboard(){
   const nextEyebrow=current&&current.when&&current.when.date
     ?(matchLiveStatus(current.when.date,current.when.time)==="live"?"🔴 Tu partido · En juego":`Tu partido · ${relativeDayLabel(current.when.date)}`)
     :"Tu próximo partido";
-  const nextMatchHTML=current
-    ?`<div class="pf-next has-match"><div class="pf-next-eyebrow">${esc(nextEyebrow)}</div><div class="pf-next-vs">${teamLinkHTML(k,playerSession.team)} <span>vs</span> ${teamLinkHTML(k,current.opponent)}</div><div class="pf-next-when">${pfWhenChip(current.when)} ${icsButton(k,current.home,current.away)}</div></div>`
-    :`<div class="pf-next"><div class="pf-next-eyebrow">Sin partidos pendientes</div><div class="muted">No tienes ningún partido asignado todavía.</div></div>`;
+  const keyOf=(h,a)=>stableMatchKey(h,a);
+  const waitingMine=new Set(mine.filter(x=>x.status==="pending").map(x=>keyOf(x.home,x.away)));
+  const waitingIn=new Set(incoming.map(x=>keyOf(x.home,x.away)));
+  const matchCard=(m,idx)=>{
+    const isNext=idx===0;
+    const mk=keyOf(m.home,m.away);
+    const eyebrow=isNext?nextEyebrow:`Jornada ${m.round}`;
+    const action=waitingIn.has(mk)
+      ?`<div class="pf3-wait pf3-wait-in">👆 Te han propuesto un resultado: confírmalo o recházalo arriba</div>`
+      :waitingMine.has(mk)
+        ?`<div class="pf3-wait">⏳ Resultado enviado · esperando a la otra pareja</div>`
+        :`<button class="pf3-btn" onclick="openPlayerProposal('${esc(m.key)}')"><span class="pf3-btn-ic">📝</span><span class="pf3-btn-tx">Proponer resultado</span><span class="pf3-btn-ar">›</span></button>`;
+    return `<div class="pf3-match${isNext?" is-next":""}">
+     <div class="pf3-mtop"><span class="pf3-eyebrow">${esc(eyebrow)}</span><span class="pf3-round">J${m.round}</span></div>
+     <div class="pf3-vs"><b>${teamLinkHTML(k,playerSession.team)}</b><i>vs</i><b>${teamLinkHTML(k,m.opponent)}</b></div>
+     <div class="pf-next-when">${pfWhenChip(m.when)} ${icsButton(k,m.home,m.away)}</div>
+     ${action}
+    </div>`;
+  };
   c.innerHTML=`<div class="card"><div class="card-b">
-   <div class="pf-hero">
-    <div class="pf-avatar" onclick="openAvatarBig(myProfile&&myProfile.avatar,playerSession.name,true)" title="Ver foto" style="cursor:pointer">${myProfile&&myProfile.avatar?`<img src="${esc(myProfile.avatar)}" alt="">`:esc(initialsOf(playerSession.name))}<span class="pf-avatar-cam">📷</span></div>
-    <div class="pf-hero-info"><h3>${esc(playerSession.name)}</h3><div class="pf-hero-team">${esc(playerSession.team)}</div><span class="pf-hero-league">${esc(L?.name||k)}</span>${myProfile&&myProfile.bio?`<div class="pf-bio">${esc(myProfile.bio)}</div>`:""}</div>
-    <div class="pf-hero-actions"><button onclick="openEditProfile()">Editar perfil</button><button onclick="openPlayerProposal()">Proponer resultado</button><button class="secondary" onclick="playerDashboard()">Actualizar</button><button class="secondary" onclick="playerLogout()">Cerrar sesión</button></div>
+   <div class="pf3-head ${k==="tenis"?"pf3-tennis":""}">
+    <div class="pf3-avatar" onclick="openAvatarBig(myProfile&&myProfile.avatar,playerSession.name,true)" title="Ver foto">${myProfile&&myProfile.avatar?`<img src="${esc(myProfile.avatar)}" alt="">`:esc(initialsOf(playerSession.name))}</div>
+    <div class="pf3-id">
+     <div class="pf3-name">${esc(playerSession.name)}</div>
+     <div class="pf3-sub">${playerSession.team?esc(playerSession.team)+" · ":""}${esc(L?.name||(k==="amistosos"?"Solo amistosos":k))}</div>
+     ${myProfile&&myProfile.bio?`<div class="pf3-bio">“${esc(myProfile.bio)}”</div>`:`<button class="pf3-addbio" onclick="openEditProfile()">＋ Foto y descripción</button>`}
+    </div>
+    <div class="pf3-tools">
+     <button class="pf2-ico" onclick="openEditProfile()" title="Editar perfil" aria-label="Editar perfil">✏️</button>
+     <button class="pf2-ico" onclick="playerDashboard()" title="Actualizar" aria-label="Actualizar">⟳</button>
+     <button class="pf2-ico" onclick="playerLogout()" title="Cerrar sesión" aria-label="Cerrar sesión">⎋</button>
+    </div>
    </div>
-   <div class="profile-stats">
-    <div class="profile-stat"><strong>${stRow.pj}</strong><span>Jugados</span></div>
-    <div class="profile-stat"><strong>${stRow.pg}</strong><span>Ganados</span></div>
-    <div class="profile-stat"><strong>${stRow.pp}</strong><span>Perdidos</span></div>
-    <div class="profile-stat"><strong>${upcoming.length}</strong><span>Por jugar</span></div>
-   </div>
+   ${hasLeague?`<div class="pf2-stats">
+    <div class="pf2-stat"><strong data-cu="1">${posIdx>=0?(posIdx+1)+"º":"—"}</strong><span>Posición</span></div>
+    <div class="pf2-stat"><strong>${stRow.pj}</strong><span>Jugados</span></div>
+    <div class="pf2-stat win"><strong>${stRow.pg}</strong><span>Ganados</span></div>
+    <div class="pf2-stat"><strong>${upcoming.length}</strong><span>Por jugar</span></div>
+   </div>`:""}
+   ${incoming.length?`<div class="pending-box"><b>${incoming.length} resultado(s) esperando tu confirmación</b></div>${incoming.map(proposalHtml).join("")}`:""}
    ${reminderHTML(current)}
    ${changesHTML(k,L)}
-   ${nextMatchHTML}
+   <div class="profile-section"><h4>Próximos partidos</h4>${upcoming.length?upcoming.slice(0,3).map(matchCard).join("")+(upcoming.length>3?`<div id="pf3More" hidden>${upcoming.slice(3).map((m,i)=>matchCard(m,i+3)).join("")}</div><button class="pf3-morebtn" onclick="document.getElementById('pf3More').hidden=false;this.remove()">Ver los ${upcoming.length-3} partidos restantes ▾</button>`:""):`<p class="muted">${hasLeague?"No tienes partidos pendientes.":"Tu cuenta es solo de amistosos: aquí verás tus invitaciones. Los partidos de liga son para quienes están inscritos."}</p>`}</div>
    ${badgesHTML(computeBadges(past.map(m=>({m:{home:m.home,away:m.away},res:m.result})),playerSession.team))}
-   <div class="profile-section"><h4>Próximos partidos</h4>${upcoming.length?`<div class="pf-match-list">${upcoming.slice(0,5).map(m=>matchRow(m,false)).join("")}</div>`:`<p class="muted">No tienes partidos pendientes.</p>`}</div>
    <div class="profile-section"><h4>Partidos anteriores</h4>${past.length?`<div class="pf-match-list">${past.map(m=>matchRow(m,true)).join("")}</div>`:`<p class="muted">Todavía no tienes partidos con resultado confirmado.</p>`}</div>
-   ${incoming.length?`<div class="pending-box" style="margin-top:18px"><b>${incoming.length} resultado(s) esperando tu confirmación</b></div>${incoming.map(proposalHtml).join("")}`:""}
    ${invitesSectionHTML()}
-   <div class="contact-search-box"><div><h4>📱 Contactos de rivales</h4><p class="muted">Busca una pareja solo cuando necesites su contacto.</p></div><button onclick="openContactFinder()">Buscar pareja</button></div>
+   ${hasLeague?`<div class="contact-search-box"><div><h4>📱 Contactos de rivales</h4><p class="muted">Busca una pareja solo cuando necesites su contacto.</p></div><button onclick="openContactFinder()">Buscar pareja</button></div>`:""}
    <div id="contactFinderResult"></div>
    ${mine.length?`<div class="profile-section"><h4>Mis propuestas de resultado</h4>${mine.map(p=>`<div class="proposal-card"><b>${esc(p.home)} vs ${esc(p.away)}</b><br><span class="muted">${esc(p.score)} · ${esc(({pending:"pendiente",confirmed:"confirmado",rejected:"rechazado"})[p.status]||p.status)}</span>${p.status==="pending"?autoConfirmNote(p,true):""}</div>`).join("")}</div>`:""}
   </div></div>`;
@@ -2790,14 +2948,14 @@ function autoConfirmNote(p,mineSide){
 }
 function proposalHtml(p){return `<div class="proposal-card"><b>${esc(p.home)} vs ${esc(p.away)}</b><br><span>${esc(p.score)}</span>${autoConfirmNote(p,false)}<div class="actions"><button onclick="confirmProposal('${esc(p.id)}','confirm')">Confirmar</button><button class="danger" onclick="confirmProposal('${esc(p.id)}','reject')">Rechazar</button></div></div>`}
 async function confirmProposal(id,decision){try{await cloudWrite({action:"confirmProposal",username:playerSession.username,token:playerSession.token,id,decision});if(decision==="confirm")await loadCloudResults();closeModal();currentView="profile";render()}catch(e){alert(e.message)}}
-function openPlayerProposal(){
+function openPlayerProposal(preKey){
  const ms=myLocalMatches().filter(m=>!m.played);
  if(!ms.length){
   openModal(`<h3>Proponer resultado</h3><p class="muted">No tienes partidos pendientes disponibles.</p><div class="proposal-actions"><button class="secondary" onclick="closeModal();currentView='profile';render()">Volver</button></div>`);
   return
  }
  window._playerMatches=ms;
- openModal(`<h3>Proponer resultado</h3><p class="muted">Puedes subir un resultado de cualquier jornada pendiente, aunque los partidos no se hayan jugado en orden. Si la otra pareja no lo confirma ni lo rechaza en 48 h, se da por bueno automáticamente.</p><div class="result-proposal-form"><div class="proposal-match-select"><label>PARTIDO</label><select id="pmatch">${ms.map((m,i)=>`<option value="${i}">${esc(m.label)}</option>`).join("")}</select></div><div class="sets-grid"><div class="set-box"><div class="set-box-title">SET 1</div><div class="set-score-row"><input id="ps10" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps11" type="number" min="0" inputmode="numeric"></div></div><div class="set-box"><div class="set-box-title">SET 2</div><div class="set-score-row"><input id="ps20" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps21" type="number" min="0" inputmode="numeric"></div></div><div class="set-box"><div class="set-box-title">SET 3</div><div class="set-score-row"><input id="ps30" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps31" type="number" min="0" inputmode="numeric"></div></div></div><div class="proposal-actions"><button onclick="submitPlayerProposal()">Enviar propuesta</button><button class="secondary" onclick="closeModal();currentView='profile';render()">Volver</button></div></div>`)
+ openModal(`<h3>Proponer resultado</h3><p class="muted">Puedes subir un resultado de cualquier jornada pendiente, aunque los partidos no se hayan jugado en orden. Si la otra pareja no lo confirma ni lo rechaza en 48 h, se da por bueno automáticamente.</p><div class="result-proposal-form"><div class="proposal-match-select"><label>PARTIDO</label><select id="pmatch">${ms.map((m,i)=>`<option value="${i}"${preKey&&m.key===preKey?" selected":""}>${esc(m.label)}</option>`).join("")}</select></div><div class="sets-grid"><div class="set-box"><div class="set-box-title">SET 1</div><div class="set-score-row"><input id="ps10" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps11" type="number" min="0" inputmode="numeric"></div></div><div class="set-box"><div class="set-box-title">SET 2</div><div class="set-score-row"><input id="ps20" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps21" type="number" min="0" inputmode="numeric"></div></div><div class="set-box"><div class="set-box-title">SET 3</div><div class="set-score-row"><input id="ps30" type="number" min="0" inputmode="numeric"><span>–</span><input id="ps31" type="number" min="0" inputmode="numeric"></div></div></div><div class="proposal-actions"><button onclick="submitPlayerProposal()">Enviar propuesta</button><button class="secondary" onclick="closeModal();currentView='profile';render()">Volver</button></div></div>`)
 }
 async function submitPlayerProposal(){const m=window._playerMatches[+v("pmatch")];const sets=[[v("ps10"),v("ps11")],[v("ps20"),v("ps21")],[v("ps30"),v("ps31")]].filter(x=>x[0]!==""&&x[1]!=="").map(x=>x.map(Number));if(sets.length<2){alert("Introduce al menos dos sets.");return}try{await cloudWrite({action:"proposeResult",username:playerSession.username,token:playerSession.token,league:m.league,key:m.key,home:m.home,away:m.away,sets});alert("Resultado propuesto. Solo será oficial cuando lo confirme un usuario verificado de la pareja rival.");closeModal();currentView="profile";render()}catch(e){alert(e.message)}}
 async function renderAdminProposals(){
@@ -3230,6 +3388,7 @@ function updateBottomProfile(){
   if(!w.dataset.svg) w.dataset.svg=w.innerHTML;
   if(playerSession&&myProfile&&myProfile.avatar){ w.innerHTML=`<img class="bn-av" src="${esc(myProfile.avatar)}" alt="">`; }
   else if(w.dataset.svg&&!w.querySelector("svg")){ w.innerHTML=w.dataset.svg; }
+  const lb=document.getElementById("bnProfileLbl"); if(lb) lb.textContent=playerSession?"Mis partidos":"Perfil";
   w.classList.toggle("has-notif",!!(playerSession&&pendingInviteCount>0));
 }
 
