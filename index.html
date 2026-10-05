@@ -983,6 +983,7 @@ html.dark .new-badge{background:#12301f;color:#7be0a4;border-color:#1f5a38}
 html.dark .match-score.pending{background:var(--soft)}
 html.dark img.logo-inv{filter:invert(1)}
 .theme-toggle{border:1.5px solid rgba(255,255,255,.5);background:rgba(255,255,255,.14);color:#fff;border-radius:999px;width:38px;height:38px;font-size:16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:transform .25s ease,background .2s}
+.brand-tools .theme-toggle{width:auto;min-width:38px;padding:0 12px;font-size:13px;font-weight:800;gap:4px}
 .theme-toggle:hover{background:rgba(255,255,255,.26)}.theme-toggle:active{transform:rotate(25deg) scale(.92)}
 
 /* ================= TRANSICIONES / MOVIMIENTO ================= */
@@ -1066,7 +1067,7 @@ html.dark .br-svg .box.win{fill:#33400a}
 .bn-av{width:26px;height:26px;border-radius:50%;object-fit:cover;display:block}
 .bn-icon-wrap.has-notif{position:relative}
 .bn-icon-wrap.has-notif::after{content:"";position:absolute;top:0;right:-2px;width:9px;height:9px;border-radius:50%;background:#ef4444;border:2px solid var(--paper)}
-@media(max-width:700px){body:not(.admin-mode) #profileFab{display:none}.theme-toggle{width:34px;height:34px;font-size:15px}}
+@media(max-width:700px){body:not(.admin-mode) #profileFab{display:none}.theme-toggle{height:34px;font-size:13px}}
 
 /* tintes pastel -> versión oscura (autogenerado) */
 html.dark .notice,
@@ -1110,7 +1111,7 @@ html.dark body.tennis-theme .theme-toggle,html.dark body.admin-mode .theme-toggl
 
 /* ---- avisos, insignias, calendario, galería ---- */
 .auto-note{font-size:12px;color:var(--muted);margin-top:6px}
-.cal-btn{border:1px solid var(--line);background:var(--soft);border-radius:8px;padding:3px 8px;font-size:13px;cursor:pointer;margin-left:6px;color:var(--text)}
+.cal-btn{border:1px solid var(--line);background:var(--soft);border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:800;white-space:nowrap;cursor:pointer;margin-left:6px;color:var(--text)}
 .next-hero .cal-btn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25);color:#fff}
 .pf-remind{background:#fff4d8;border:1px solid #ead28d;color:#5a3d00;border-radius:12px;padding:12px 14px;margin:0 0 12px;font-size:14px}
 .pf-change{border-radius:12px;padding:10px 14px;margin:0 0 12px;font-size:13.5px;font-weight:700}
@@ -1221,7 +1222,7 @@ body.admin-mode .pf2-cta{background:var(--admin);color:#fff}
 @media(max-width:560px){.pf2-name{font-size:22px}.pf2-stat strong{font-size:21px}.pf2-hero{padding:22px 14px 18px}}
 
 /* ================= MIS PARTIDOS (perfil compacto + tarjetas de partido) ================= */
-.pf3-head{position:relative;display:flex;align-items:center;gap:14px;border-radius:22px;padding:16px;margin:2px 0 14px;color:#fff;overflow:hidden;
+.pf3-head{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:14px;border-radius:22px;padding:16px;margin:2px 0 14px;color:#fff;overflow:hidden;
  background:linear-gradient(150deg,#0a0a0a 35%,#223000);--pf-acc:#ccff00}
 .pf3-head::before{content:"";position:absolute;inset:0;background:radial-gradient(240px 160px at 100% -20%,rgba(204,255,0,.30),transparent 65%);pointer-events:none}
 .pf3-head>*{position:relative}
@@ -1234,8 +1235,9 @@ body.admin-mode .pf2-cta{background:var(--admin);color:#fff}
 .pf3-sub{margin-top:2px;font-size:12.5px;font-weight:800;color:var(--pf-acc);line-height:1.25}
 .pf3-bio{margin-top:5px;font-size:11.5px;opacity:.85;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pf3-addbio{margin-top:6px;border:1px dashed rgba(255,255,255,.5);background:transparent;color:#fff;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:800;cursor:pointer}
-.pf3-tools{display:flex;flex-direction:column;gap:6px}
-.pf3-tools .pf2-ico{width:32px;height:32px;font-size:14px}
+.pf3-tools{flex:1 1 100%;display:flex;gap:6px;flex-wrap:wrap}
+.pf3-tbtn{flex:1;white-space:nowrap;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800;cursor:pointer}
+.pf3-tbtn:hover{background:rgba(255,255,255,.25)}
 .pf3-match{position:relative;border-radius:20px;background:var(--paper);border:1px solid var(--line);padding:16px 16px 14px;margin:0 0 12px;box-shadow:0 10px 24px -18px rgba(0,0,0,.45)}
 .pf3-match.is-next{border:0;border-top:5px solid var(--tennis);box-shadow:0 16px 32px -20px rgba(0,0,0,.55)}
 body.tennis-theme .pf3-match.is-next{border-top-color:#e8600a}
@@ -1276,12 +1278,12 @@ html.dark .pf3-wait-in{background:#3a2d08;color:#ffd77a}
 <div id="nameSuggestions"></div>
 <header>
  <div class="wrap">
-  <div class="brand"><div class="brand-left"><div><h1>LIGA PÁDEL<br>ETSII</h1><p>Partidos · clasificación · cruces · copa</p></div></div><div class="brand-right"><div class="badge">CD INDUSTRIALES · 2026/27</div><div class="brand-tools"><button class="theme-toggle" id="infoBtn" onclick="currentView='info';render()" title="Información de la liga" aria-label="Información">ⓘ</button><button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambiar a modo oscuro" aria-label="Modo oscuro">🌙</button><button id="profileFab" class="profile-fab" onclick="currentView='profile';render()"><span id="profileFabIcon" class="profile-fab-avatar">👤</span><span id="profileFabLabel">Iniciar sesión</span></button></div></div></div>
+  <div class="brand"><div class="brand-left"><div><h1>LIGA PÁDEL<br>ETSII</h1><p>Partidos · clasificación · cruces · copa</p></div></div><div class="brand-right"><div class="badge">CD INDUSTRIALES · 2026/27</div><div class="brand-tools"><button class="theme-toggle" id="infoBtn" onclick="currentView='info';render()" title="Información de la liga" aria-label="Información">ⓘ Info</button><button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambiar a modo oscuro" aria-label="Modo oscuro">🌙 Oscuro</button><button id="profileFab" class="profile-fab" onclick="currentView='profile';render()"><span id="profileFabIcon" class="profile-fab-avatar">👤</span><span id="profileFabLabel">Iniciar sesión</span></button></div></div></div>
   <nav id="nav">
    <button data-view="adminProposals" class="admin-nav-only">Resultados propuestos</button>
    <button data-view="inicio" class="active">Inicio</button>
    <button data-view="standings">Liga</button>
-   <button data-view="amistosos" class="amistosos-tab">🤝 Jugar</button>
+   <button data-view="amistosos" class="amistosos-tab">🤝 Buscar amistosos</button>
    <button data-view="users" class="admin-nav-only">Usuarios</button>
   </nav>
  </div>
@@ -1305,7 +1307,7 @@ html.dark .pf3-wait-in{background:#3a2d08;color:#ffd77a}
 <nav id="bottomNav" class="bottom-nav">
  <button data-view="inicio" class="active"><span class="bn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="bn-stroke" d="M3 11.5 12 4l9 7.5"/><path class="bn-stroke" d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/><path class="bn-accent" d="M10 20v-5h4v5"/></svg></span><span class="bn-label">Inicio</span></button>
  <button data-view="standings"><span class="bn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="bn-stroke" d="M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path class="bn-stroke" d="M7 5H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4M17 5h3a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4"/><path class="bn-accent" d="M8 21h8M12 17v4"/></svg></span><span class="bn-label">Liga</span></button>
- <button data-view="amistosos" class="amistosos-tab"><span class="bn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle class="bn-stroke" cx="10.5" cy="10.5" r="6.5"/><path class="bn-accent" d="M15.3 15.3 20 20"/></svg></span><span class="bn-label">Jugar</span></button>
+ <button data-view="amistosos" class="amistosos-tab"><span class="bn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle class="bn-stroke" cx="10.5" cy="10.5" r="6.5"/><path class="bn-accent" d="M15.3 15.3 20 20"/></svg></span><span class="bn-label">Buscar amistosos</span></button>
  <button data-view="profile"><span class="bn-icon-wrap" id="bnProfileIcon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle class="bn-stroke" cx="12" cy="8" r="4"/><path class="bn-accent" d="M4 21c.6-4.2 3.8-6.5 8-6.5s7.4 2.3 8 6.5"/></svg></span><span class="bn-label" id="bnProfileLbl">Perfil</span></button>
 </nav>
 
@@ -2183,7 +2185,7 @@ function showTeam(k,name){
 }
 function icsButton(k,home,away){
  const si=getMatchSchedule(k,home,away); if(!si||!si.date||!si.time) return "";
- return `<button type="button" class="cal-btn" data-league="${esc(k)}" data-home="${esc(home)}" data-away="${esc(away)}" title="Añadir al calendario">📅</button>`;
+ return `<button type="button" class="cal-btn" data-league="${esc(k)}" data-home="${esc(home)}" data-away="${esc(away)}" title="Añadir este partido a tu calendario">📅 Añadir a calendario</button>`;
 }
 function downloadICS(k,home,away){
  const si=getMatchSchedule(k,home,away); if(!si||!si.date||!si.time) return;
@@ -2636,9 +2638,9 @@ async function playerDashboard(){
      ${myProfile&&myProfile.bio?`<div class="pf3-bio">“${esc(myProfile.bio)}”</div>`:`<button class="pf3-addbio" onclick="openEditProfile()">＋ Foto y descripción</button>`}
     </div>
     <div class="pf3-tools">
-     <button class="pf2-ico" onclick="openEditProfile()" title="Editar perfil" aria-label="Editar perfil">✏️</button>
-     <button class="pf2-ico" onclick="playerDashboard()" title="Actualizar" aria-label="Actualizar">⟳</button>
-     <button class="pf2-ico" onclick="playerLogout()" title="Cerrar sesión" aria-label="Cerrar sesión">⎋</button>
+     <button class="pf3-tbtn" onclick="openEditProfile()">✏️ Editar perfil</button>
+     <button class="pf3-tbtn" onclick="playerDashboard()">⟳ Actualizar</button>
+     <button class="pf3-tbtn" onclick="playerLogout()">⎋ Cerrar sesión</button>
     </div>
    </div>
    ${hasLeague?`<div class="pf2-stats">
@@ -3244,7 +3246,7 @@ function isDark(){return document.documentElement.classList.contains("dark")}
 function applyTheme(dark){
   document.documentElement.classList.toggle("dark",dark);
   const t=document.getElementById("themeToggle");
-  if(t){t.textContent=dark?"☀️":"🌙";t.title=dark?"Cambiar a modo claro":"Cambiar a modo oscuro"}
+  if(t){t.textContent=dark?"☀️ Claro":"🌙 Oscuro";t.title=dark?"Cambiar a modo claro":"Cambiar a modo oscuro"}
   const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content",dark?"#000000":"#0a0a0a");
 }
 function toggleTheme(){
