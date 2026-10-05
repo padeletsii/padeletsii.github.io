@@ -1270,6 +1270,62 @@ html.dark body.admin-mode .pf3-btn{background:var(--admin);color:#fff}
 .pf3-wait-in{background:#fff4d6;color:#7a5200}
 html.dark .pf3-wait-in{background:#3a2d08;color:#ffd77a}
 @media(max-width:380px){.pf3-vs{font-size:17px}.pf3-name{font-size:16px}}
+
+/* ================= PERFIL / MIS PARTIDOS v4 (sin recuadro exterior, avisos arriba, pestañas) ================= */
+.panel.panel-bare{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important}
+.panel.panel-bare .panel-head{border:0!important;background:transparent!important;padding:6px 4px 0!important}
+.panel.panel-bare .content{padding:6px 0 0!important}
+.panel.panel-nohead .panel-head{display:none!important}
+.pf4{--pf-acc:var(--tennis);--pf-on:#1f2a14;--pf-soft:rgba(204,255,0,.22)}
+body.tennis-theme .pf4{--pf-acc:#e8600a;--pf-on:#fff;--pf-soft:rgba(232,96,10,.14)}
+body.admin-mode .pf4{--pf-acc:var(--admin);--pf-on:#fff;--pf-soft:rgba(13,148,136,.14)}
+.pf4-top{display:flex;align-items:center;gap:12px;margin:2px 0 14px}
+.pf4-av{flex:0 0 50px;width:50px;height:50px;border-radius:50%;background:var(--pf-acc);color:var(--pf-on);display:flex;align-items:center;justify-content:center;font-weight:950;font-size:18px;cursor:pointer;overflow:hidden}
+.pf4-av img,.pf4-bigav img{width:100%;height:100%;object-fit:cover;display:block}
+.pf4-id{flex:1;min-width:0}.pf4-id h2{margin:0;font-size:22px;text-transform:uppercase;letter-spacing:-.01em;line-height:1.05;color:var(--text)}
+.pf4-sub{margin-top:3px;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pf4-refresh{border:1px solid var(--line);background:var(--paper);color:var(--text);width:38px;height:38px;border-radius:50%;font-size:17px;cursor:pointer}
+.pf4-alert{background:#fff8d6;border:2px solid #f2c200;border-radius:20px;padding:14px 16px;margin:0 0 12px;color:#3d3000}
+.pf4-al-top{display:flex;align-items:center;gap:9px;font-size:15px;flex-wrap:wrap}
+.pf4-dot{flex:0 0 10px;width:10px;height:10px;border-radius:50%;background:#e8a400;box-shadow:0 0 0 5px rgba(232,164,0,.25);animation:pf4pulse 1.8s infinite}
+@keyframes pf4pulse{50%{box-shadow:0 0 0 8px rgba(232,164,0,.08)}}
+.pf4-al-score{margin:8px 0 4px;font-size:15.5px;line-height:1.45}.pf4-al-score span{color:#6b5400;font-size:13.5px;font-weight:800}
+.pf4-alert .auto-note{color:#7a5a00;font-weight:700;margin:2px 0 10px;font-size:12px}
+.pf4-al-btns{display:flex;gap:8px;margin-top:10px}
+.pf4-al-btns button{flex:1;border-radius:14px;padding:12px 6px;font-size:14px;font-weight:900;cursor:pointer;border:2px solid transparent}
+.pf4-ok{background:#17803d;color:#fff}.pf4-no{background:#fff;color:#1f2a14;border-color:#d9d6cb!important}
+html.dark .pf4-alert{background:#3a2d08;border-color:#b8860b;color:#ffe9a8}
+html.dark .pf4-al-score span,html.dark .pf4-alert .auto-note{color:#ffd77a}
+html.dark .pf4-no{background:#1c1f22;color:#fff;border-color:#4a4f55!important}
+.pf4-tabs{display:flex;background:var(--soft);border-radius:16px;padding:4px;margin:2px 0 16px;gap:2px}
+.pf4-tab{flex:1;border:0;background:transparent;border-radius:12px;padding:11px 4px;font-size:13px;font-weight:850;color:var(--muted);cursor:pointer;white-space:nowrap}
+.pf4-tab.on{background:var(--paper);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.pf4-tab em{font-style:normal;background:var(--pf-acc);color:var(--pf-on);border-radius:999px;font-size:10.5px;padding:1px 7px;margin-left:3px}
+.pf4-tab em.hot{background:#e0392b;color:#fff}
+.pf4-wk{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:18px 2px 10px}
+.pf4-row{display:flex;gap:10px;margin-bottom:12px}
+.pf4-date{flex:0 0 42px;text-align:center;padding-top:4px}.pf4-date span{display:block;font-size:11px;font-weight:900;color:var(--muted)}.pf4-date b{font-size:20px;color:var(--text)}
+.pf4-line{flex:0 0 3px;border-radius:3px;background:var(--pf-acc)}
+.pf4-card{flex:1;min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:13px 14px;box-shadow:0 10px 24px -20px rgba(0,0,0,.5)}
+.pf4-eb{font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pf4-vs{font-size:17px;line-height:1.25;margin:4px 0 8px}.pf4-vs i{font-style:normal;font-size:12.5px;font-weight:800;color:var(--muted)}
+.pf4-card .pf-next-when{margin:0}
+.pf4-btn{display:block;width:100%;margin-top:10px;border:0;border-radius:14px;padding:13px;font-size:15px;font-weight:950;background:var(--pf-acc);color:var(--pf-on);cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.16);transition:transform .1s,box-shadow .1s}
+.pf4-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.16)}
+.pf4-wait{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--soft);font-size:12.5px;font-weight:800;color:var(--text2);text-align:center}
+.pf4-wait-in{background:#fff4d6;color:#7a5200}html.dark .pf4-wait-in{background:#3a2d08;color:#ffd77a}
+.pf4-card .cal-btn{background:transparent;border:0;padding:4px 2px;margin-left:2px;font-size:12.5px;text-decoration:underline;color:var(--text);border-radius:0}
+.pf4-plain{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin-bottom:8px}.pf4-plain b{display:block;font-size:14.5px}.pf4-plain span{font-size:12.5px;color:var(--muted)}
+.pf4-me{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:20px 16px;text-align:center;margin-bottom:12px}
+.pf4-bigav{width:92px;height:92px;border-radius:50%;margin:0 auto 10px;background:var(--pf-acc);color:var(--pf-on);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:950;box-shadow:0 0 0 6px var(--pf-soft);cursor:pointer;overflow:hidden}
+.pf4-name{font-size:21px;font-weight:950;text-transform:uppercase;color:var(--text)}.pf4-sub2{font-size:13px;color:var(--muted);margin-top:2px}
+.pf4-bio{margin-top:10px;font-size:13.5px;font-style:italic;color:var(--text2)}
+.pf4-stats{display:flex;margin-top:16px;border-top:1px solid var(--line);padding-top:14px}.pf4-stats div{flex:1;font-size:10.5px;font-weight:850;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}.pf4-stats b{display:block;font-size:22px;color:var(--text);letter-spacing:-.02em}
+.pf4-menu{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:2px 14px;margin:12px 0}
+.pf4-menu button{display:flex;align-items:center;gap:12px;width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--text);padding:15px 2px;font-size:14.5px;font-weight:800;cursor:pointer;text-align:left;border-radius:0}
+.pf4-menu button:last-child{border:0}.pf4-menu button span{font-size:18px}.pf4-menu button i{margin-left:auto;font-style:normal;color:var(--muted);font-size:20px}
+.pf4-menu button.out{color:#c0392b}
+@media(max-width:380px){.pf4-tab{font-size:12px;padding:10px 2px}}
 </style>
 </head>
 <body>
@@ -2531,6 +2587,7 @@ async function playerLoginPageDo(){
  }catch(e){alert(e.message)}
 }
 function playerLogout(){
+ window._pfTab="partidos";
  playerSession=null;
  contactsCache=null; myProfile=null; invitesCache=null; dirCache=null;
  try{localStorage.removeItem("liga_etsii_player_session")}catch(_){}
@@ -2613,53 +2670,85 @@ async function playerDashboard(){
   const keyOf=(h,a)=>stableMatchKey(h,a);
   const waitingMine=new Set(mine.filter(x=>x.status==="pending").map(x=>keyOf(x.home,x.away)));
   const waitingIn=new Set(incoming.map(x=>keyOf(x.home,x.away)));
-  const matchCard=(m,idx)=>{
-    const isNext=idx===0;
-    const mk=keyOf(m.home,m.away);
-    const eyebrow=isNext?nextEyebrow:`Jornada ${m.round}`;
-    const action=waitingIn.has(mk)
-      ?`<div class="pf3-wait pf3-wait-in">👆 Te han propuesto un resultado: confírmalo o recházalo arriba</div>`
-      :waitingMine.has(mk)
-        ?`<div class="pf3-wait">⏳ Resultado enviado · esperando a la otra pareja</div>`
-        :`<button class="pf3-btn" onclick="openPlayerProposal('${esc(m.key)}')"><span class="pf3-btn-ic">📝</span><span class="pf3-btn-tx">Proponer resultado</span><span class="pf3-btn-ar">›</span></button>`;
-    return `<div class="pf3-match${isNext?" is-next":""}">
-     <div class="pf3-mtop"><span class="pf3-eyebrow">${esc(eyebrow)}</span><span class="pf3-round">J${m.round}</span></div>
-     <div class="pf3-vs"><b>${teamLinkHTML(k,playerSession.team)}</b><i>vs</i><b>${teamLinkHTML(k,m.opponent)}</b></div>
-     <div class="pf-next-when">${pfWhenChip(m.when)} ${icsButton(k,m.home,m.away)}</div>
-     ${action}
-    </div>`;
+  const DOW=["DOM","LUN","MAR","MIÉ","JUE","VIE","SÁB"];
+  const dayBlock=(m)=>{
+    const d=m.when&&m.when.date, mm=String(d||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(!mm) return `<span>J${m.round}</span>`;
+    const dt=new Date(+mm[1],+mm[2]-1,+mm[3]);
+    return `<span>${DOW[dt.getDay()]}</span><b>${dt.getDate()}</b>`;
   };
-  c.innerHTML=`<div class="card"><div class="card-b">
-   <div class="pf3-head ${k==="tenis"?"pf3-tennis":""}">
-    <div class="pf3-avatar" onclick="openAvatarBig(myProfile&&myProfile.avatar,playerSession.name,true)" title="Ver foto">${myProfile&&myProfile.avatar?`<img src="${esc(myProfile.avatar)}" alt="">`:esc(initialsOf(playerSession.name))}</div>
-    <div class="pf3-id">
-     <div class="pf3-name">${esc(playerSession.name)}</div>
-     <div class="pf3-sub">${playerSession.team?esc(playerSession.team)+" · ":""}${esc(L?.name||(k==="amistosos"?"Solo amistosos":k))}</div>
-     ${myProfile&&myProfile.bio?`<div class="pf3-bio">“${esc(myProfile.bio)}”</div>`:`<button class="pf3-addbio" onclick="openEditProfile()">＋ Foto y descripción</button>`}
-    </div>
-    <div class="pf3-tools">
-     <button class="pf3-tbtn" onclick="openEditProfile()">✏️ Editar perfil</button>
-     <button class="pf3-tbtn" onclick="playerDashboard()">⟳ Actualizar</button>
-     <button class="pf3-tbtn" onclick="playerLogout()">⎋ Cerrar sesión</button>
-    </div>
+  const matchCard=(m)=>{
+    const mk=keyOf(m.home,m.away);
+    const live=m.when&&m.when.date&&matchLiveStatus(m.when.date,m.when.time)==="live";
+    const today=m.when&&m.when.date&&daysDiffFromToday(m.when.date)===0;
+    const eyebrow=`Jornada ${m.round}${live?" · 🔴 En juego":today?" · Hoy":""}`;
+    const action=waitingIn.has(mk)
+      ?`<div class="pf4-wait pf4-wait-in">👆 Te han propuesto un resultado: confírmalo arriba</div>`
+      :waitingMine.has(mk)
+        ?`<div class="pf4-wait">⏳ Resultado enviado · esperando a la otra pareja</div>`
+        :`<button class="pf4-btn" onclick="openPlayerProposal('${esc(m.key)}')">📝 Proponer resultado</button>`;
+    return `<div class="pf4-row"><div class="pf4-date">${dayBlock(m)}</div><div class="pf4-line"></div>
+     <div class="pf4-card"><div class="pf4-eb">${esc(eyebrow)}</div>
+      <div class="pf4-vs"><b>${teamLinkHTML(k,playerSession.team)}</b> <i>vs</i> <b>${teamLinkHTML(k,m.opponent)}</b></div>
+      <div class="pf-next-when">${pfWhenChip(m.when)} ${icsButton(k,m.home,m.away)}</div>
+      ${action}</div></div>`;
+  };
+  const weekGroup=(m)=>{const d=m.when&&m.when.date; if(!d) return 2; return daysDiffFromToday(d)<=7?0:1;};
+  const groupTitles=["Esta semana","Más adelante","Sin fecha todavía"];
+  const agendaHTML=upcoming.length
+    ?[0,1,2].map(g=>{const ms=upcoming.filter(m=>weekGroup(m)===g); return ms.length?`<div class="pf4-wk">${groupTitles[g]}</div>${ms.map(matchCard).join("")}`:""}).join("")
+    :`<p class="muted" style="padding:6px 4px">${hasLeague?"No tienes partidos pendientes.":"Tu cuenta es solo de amistosos: aquí verás tus invitaciones. Los partidos de liga son para quienes están inscritos."}</p>`;
+  const resultAlerts=incoming.map(x=>{
+    const opp=x.home===playerSession.team?x.away:x.home;
+    return `<div class="pf4-alert"><div class="pf4-al-top"><span class="pf4-dot"></span><b>${esc(opp)} te propone un resultado</b></div>
+     <div class="pf4-al-score">${esc(x.home)} vs ${esc(x.away)}<br><span>${esc(x.score)}</span></div>${autoConfirmNote(x,false)}
+     <div class="pf4-al-btns"><button class="pf4-ok" onclick="confirmProposal('${esc(x.id)}','confirm')">✓ Es correcto</button><button class="pf4-no" onclick="confirmProposal('${esc(x.id)}','reject')">✕ No es correcto</button></div></div>`;
+  }).join("");
+  const inviteAlerts=(invitesCache||[]).filter(i=>i.direction==="received"&&i.status==="pending").slice(0,3).map(i=>
+    `<div class="pf4-alert"><div class="pf4-al-top"><span class="pf4-dot"></span><b>${esc(i.otherName)} te invita a jugar</b>${i.sport?` <span class="chip-mini">${esc(i.sport)}</span>`:""}</div>
+     <div class="pf4-al-score"><span>“${esc(i.message)}”</span></div>
+     <div class="pf4-al-btns"><button class="pf4-ok" onclick="respondInvite('${esc(i.id)}','accept')">✓ Aceptar</button><button class="pf4-no" onclick="respondInvite('${esc(i.id)}','decline')">✕ Rechazar</button></div></div>`).join("");
+  const tab=window._pfTab||"partidos";
+  const avatarInner=myProfile&&myProfile.avatar?`<img src="${esc(myProfile.avatar)}" alt="">`:esc(initialsOf(playerSession.name));
+  const leagueName=esc(L?.name||(k==="amistosos"?"Solo amistosos":k));
+  c.innerHTML=`<div class="pf4">
+   <div class="pf4-top"><div class="pf4-av" onclick="pfTab('perfil')">${avatarInner}</div><div class="pf4-id"><h2>Mis partidos</h2><div class="pf4-sub">${esc(playerSession.name)}${playerSession.team?" · "+esc(playerSession.team):""}${posIdx>=0&&stRow.pj>0?" · "+(posIdx+1)+"º":""}</div></div><button class="pf4-refresh" onclick="playerDashboard()" title="Actualizar">⟳</button></div>
+   ${resultAlerts}${inviteAlerts}
+   <div class="pf4-tabs">
+    <button class="pf4-tab ${tab==="partidos"?"on":""}" data-tab="partidos" onclick="pfTab('partidos')">Partidos${upcoming.length?` <em>${upcoming.length}</em>`:""}</button>
+    <button class="pf4-tab ${tab==="resultados"?"on":""}" data-tab="resultados" onclick="pfTab('resultados')">Resultados${past.length||mine.length?` <em>${past.length+mine.filter(x=>x.status==="pending").length}</em>`:""}</button>
+    <button class="pf4-tab ${tab==="perfil"?"on":""}" data-tab="perfil" onclick="pfTab('perfil')">Mi perfil${pendingInviteCount?` <em class="hot">${pendingInviteCount}</em>`:""}</button>
    </div>
-   ${hasLeague?`<div class="pf2-stats">
-    <div class="pf2-stat"><strong data-cu="1">${posIdx>=0?(posIdx+1)+"º":"—"}</strong><span>Posición</span></div>
-    <div class="pf2-stat"><strong>${stRow.pj}</strong><span>Jugados</span></div>
-    <div class="pf2-stat win"><strong>${stRow.pg}</strong><span>Ganados</span></div>
-    <div class="pf2-stat"><strong>${upcoming.length}</strong><span>Por jugar</span></div>
-   </div>`:""}
-   ${incoming.length?`<div class="pending-box"><b>${incoming.length} resultado(s) esperando tu confirmación</b></div>${incoming.map(proposalHtml).join("")}`:""}
-   ${reminderHTML(current)}
-   ${changesHTML(k,L)}
-   <div class="profile-section"><h4>Próximos partidos</h4>${upcoming.length?upcoming.slice(0,3).map(matchCard).join("")+(upcoming.length>3?`<div id="pf3More" hidden>${upcoming.slice(3).map((m,i)=>matchCard(m,i+3)).join("")}</div><button class="pf3-morebtn" onclick="document.getElementById('pf3More').hidden=false;this.remove()">Ver los ${upcoming.length-3} partidos restantes ▾</button>`:""):`<p class="muted">${hasLeague?"No tienes partidos pendientes.":"Tu cuenta es solo de amistosos: aquí verás tus invitaciones. Los partidos de liga son para quienes están inscritos."}</p>`}</div>
-   ${badgesHTML(computeBadges(past.map(m=>({m:{home:m.home,away:m.away},res:m.result})),playerSession.team))}
-   <div class="profile-section"><h4>Partidos anteriores</h4>${past.length?`<div class="pf-match-list">${past.map(m=>matchRow(m,true)).join("")}</div>`:`<p class="muted">Todavía no tienes partidos con resultado confirmado.</p>`}</div>
-   ${invitesSectionHTML()}
-   ${hasLeague?`<div class="contact-search-box"><div><h4>📱 Contactos de rivales</h4><p class="muted">Busca una pareja solo cuando necesites su contacto.</p></div><button onclick="openContactFinder()">Buscar pareja</button></div>`:""}
-   <div id="contactFinderResult"></div>
-   ${mine.length?`<div class="profile-section"><h4>Mis propuestas de resultado</h4>${mine.map(p=>`<div class="proposal-card"><b>${esc(p.home)} vs ${esc(p.away)}</b><br><span class="muted">${esc(p.score)} · ${esc(({pending:"pendiente",confirmed:"confirmado",rejected:"rechazado"})[p.status]||p.status)}</span>${p.status==="pending"?autoConfirmNote(p,true):""}</div>`).join("")}</div>`:""}
-  </div></div>`;
+   <div class="pf4-pane" data-tab="partidos" ${tab==="partidos"?"":"hidden"}>
+    ${reminderHTML(current)}${changesHTML(k,L)}
+    ${agendaHTML}
+   </div>
+   <div class="pf4-pane" data-tab="resultados" ${tab==="resultados"?"":"hidden"}>
+    ${mine.length?`<div class="pf4-wk">Resultados que has enviado</div>${mine.map(x=>`<div class="pf4-plain"><b>${esc(x.home)} vs ${esc(x.away)}</b><span>${esc(x.score)} · ${esc(({pending:"pendiente de confirmar",confirmed:"confirmado",rejected:"rechazado"})[x.status]||x.status)}</span>${x.status==="pending"?autoConfirmNote(x,true):""}</div>`).join("")}`:""}
+    <div class="pf4-wk">Partidos jugados</div>
+    ${past.length?`<div class="pf-match-list">${past.map(m=>matchRow(m,true)).join("")}</div>`:`<p class="muted" style="padding:6px 4px">Todavía no tienes partidos con resultado confirmado.</p>`}
+   </div>
+   <div class="pf4-pane" data-tab="perfil" ${tab==="perfil"?"":"hidden"}>
+    <div class="pf4-me">
+     <div class="pf4-bigav" onclick="openAvatarBig(myProfile&&myProfile.avatar,playerSession.name,true)">${avatarInner}</div>
+     <div class="pf4-name">${esc(playerSession.name)}</div>
+     <div class="pf4-sub2">${playerSession.team?esc(playerSession.team)+" · ":""}${leagueName}</div>
+     ${myProfile&&myProfile.bio?`<div class="pf4-bio">“${esc(myProfile.bio)}”</div>`:""}
+     ${hasLeague?`<div class="pf4-stats"><div><b>${posIdx>=0?(posIdx+1)+"º":"—"}</b>Posición</div><div><b>${stRow.pj}</b>Jugados</div><div><b>${stRow.pg}</b>Ganados</div><div><b>${upcoming.length}</b>Por jugar</div></div>`:""}
+    </div>
+    ${badgesHTML(computeBadges(past.map(m=>({m:{home:m.home,away:m.away},res:m.result})),playerSession.team))}
+    <div class="pf4-menu">
+     <button onclick="openEditProfile()"><span>✏️</span>Editar mi perfil<i>›</i></button>
+     <button onclick="currentView='info';render()"><span>📸</span>Subir foto a la galería<i>›</i></button>
+     <button onclick="openPlayersView()"><span>👥</span>Buscar jugadores<i>›</i></button>
+     ${hasLeague?`<button onclick="openContactFinder()"><span>📱</span>Contacto de otras parejas<i>›</i></button>`:""}
+     <button class="out" onclick="playerLogout()"><span>⎋</span>Cerrar sesión<i>›</i></button>
+    </div>
+    <div id="contactFinderResult"></div>
+    ${invitesSectionHTML()}
+   </div>
+  </div>`;
+  try{ const ps=document.getElementById("panelSection"); if(ps){ ps.classList.add("panel-bare","panel-nohead"); } }catch(_){}
  }catch(e){
   if(/sesión no válida/i.test(e.message||"")){
    // El token guardado ya no es válido (sesión iniciada en otro sitio, cuenta
@@ -2950,6 +3039,11 @@ function autoConfirmNote(p,mineSide){
 }
 function proposalHtml(p){return `<div class="proposal-card"><b>${esc(p.home)} vs ${esc(p.away)}</b><br><span>${esc(p.score)}</span>${autoConfirmNote(p,false)}<div class="actions"><button onclick="confirmProposal('${esc(p.id)}','confirm')">Confirmar</button><button class="danger" onclick="confirmProposal('${esc(p.id)}','reject')">Rechazar</button></div></div>`}
 async function confirmProposal(id,decision){try{await cloudWrite({action:"confirmProposal",username:playerSession.username,token:playerSession.token,id,decision});if(decision==="confirm")await loadCloudResults();closeModal();currentView="profile";render()}catch(e){alert(e.message)}}
+function pfTab(t){
+ window._pfTab=t;
+ document.querySelectorAll(".pf4-pane").forEach(p=>{p.hidden=p.dataset.tab!==t});
+ document.querySelectorAll(".pf4-tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));
+}
 function openPlayerProposal(preKey){
  const ms=myLocalMatches().filter(m=>!m.played);
  if(!ms.length){
@@ -3282,6 +3376,7 @@ function render(){
   lastView=currentView; lastLeague=currentLeague;
 }
 function afterRender(snap,pv,pl){
+  try{ const ps=document.getElementById("panelSection"); if(ps){ ps.classList.toggle("panel-bare",currentView==="profile"); ps.classList.toggle("panel-nohead",currentView==="profile"&&!!playerSession&&!!document.querySelector(".pf4")); } }catch(_){}
   const viewChanged=pv!==null&&pv!==currentView, leagueChanged=pl!==null&&pl!==currentLeague&&LIGA_VIEWS.includes(currentView);
   const fresh=viewChanged||leagueChanged||pv===null;
   if(!REDUCED&&(viewChanged||leagueChanged)){
