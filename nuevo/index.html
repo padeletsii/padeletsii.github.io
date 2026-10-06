@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="assets/mix.webp">
+<link rel="apple-touch-icon" href="assets/mix.webp">
+<title>Liga ETSII</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: mobile-first app column (max 560px) with a bottom tab bar; the emblem is a small mark that rebuilds itself when the category changes, and every surface takes the category colours. Dark-first like the real site. */
+@property --c1 { syntax: '<color>'; inherits: true; initial-value: #6A2EF0; }
+@property --c2 { syntax: '<color>'; inherits: true; initial-value: #DCF23A; }
+@property --c3 { syntax: '<color>'; inherits: true; initial-value: #3510A0; }
+
+:root {
+  --c1: #6A2EF0; --c2: #DCF23A; --c3: #3510A0;
+  --bg: #0a0a0b; --surface: #141419; --surface-2: #1c1b23; --line: #2a2933;
+  --fg: #F5F3EC; --muted: #9b98a8; --acc-text: var(--c2); --tabbar: rgb(16 16 20 / .82);
+  --display: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+  --body: 'Figtree', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-in: cubic-bezier(.7, 0, .84, 0);
+  color-scheme: dark;
+  transition: --c1 .9s var(--ease-out), --c2 .9s var(--ease-out), --c3 .9s var(--ease-out);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F3F2EE; --surface: #FFFFFF; --surface-2: #EFEEE9; --line: #DEDCD4;
+    --fg: #17151F; --muted: #67646f; --acc-text: var(--c1); --tabbar: rgb(255 255 255 / .86); color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F3F2EE; --surface: #FFFFFF; --surface-2: #EFEEE9; --line: #DEDCD4;
+  --fg: #17151F; --muted: #67646f; --acc-text: var(--c1); --tabbar: rgb(255 255 255 / .86); color-scheme: light;
+}
+:root[data-cat="fem"]   { --c1: #E81E7C; --c2: #F98BBE; --c3: #7E0C45; }
+:root[data-cat="mix"]   { --c1: #6A2EF0; --c2: #DCF23A; --c3: #3510A0; }
+:root[data-cat="masc"]  { --c1: #1F6BEA; --c2: #3FDED6; --c3: #0A3BA8; }
+:root[data-cat="gen"]   { --c1: #1E5BD8; --c2: #F2B82E; --c3: #0C2A6B; }
+:root[data-cat="tenis"] { --c1: #5B22E0; --c2: #C9E13A; --c3: #24106B; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--fg); font: 400 15px/1.5 var(--body); overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--acc-text); outline-offset: 2px; border-radius: 8px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+
+/* ambient: one soft glow in the category colours, top of the screen */
+.ambient { position: fixed; inset: 0 0 auto 0; height: 420px; pointer-events: none; z-index: 0; overflow: hidden; }
+.ambient::before { content: ""; position: absolute; width: 640px; height: 640px; left: 50%; top: -420px; margin-left: -320px; border-radius: 50%; background: conic-gradient(from 0deg, var(--c1), var(--c3), var(--c2), var(--c1)); filter: blur(80px); opacity: .32; animation: spin 40s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.flood { position: fixed; inset: 0; z-index: 60; pointer-events: none; background: var(--c1); opacity: 0; }
+.flood.go { animation: flood .7s var(--ease-out) forwards; }
+@keyframes flood { 0% { clip-path: circle(0 at var(--fx) var(--fy)); opacity: .5; } 100% { clip-path: circle(140vmax at var(--fx) var(--fy)); opacity: 0; } }
+
+/* app column */
+.app { position: relative; z-index: 1; max-width: 560px; margin: 0 auto; padding-inline: 16px; padding-block: 0 calc(96px + env(safe-area-inset-bottom, 0px)); }
+
+/* top bar */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; display: flex; align-items: center; gap: 10px; margin-inline: -16px; padding: 10px 16px; background: color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.mark { width: 32px; height: 32px; position: relative; flex-shrink: 0; }
+.mark img { position: absolute; inset: 0; width: 100%; height: 100%; transition: opacity .5s, transform .7s var(--ease-out); }
+.mark img.leaving { opacity: 0; transform: rotate(-50deg) scale(.5); }
+.top-title { min-width: 0; flex: 1; }
+.top-title b { display: block; font: 700 15px/1.15 var(--display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.top-title span { font: 600 10px/1.3 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; cursor: pointer; flex-shrink: 0; position: relative; }
+.icon-btn svg { width: 18px; height: 18px; }
+.icon-btn .badge { position: absolute; top: 6px; right: 7px; width: 8px; height: 8px; border-radius: 50%; background: var(--c1); box-shadow: 0 0 0 2px var(--surface); }
+
+/* category chips */
+.cats-wrap { margin-inline: -16px; padding: 4px 16px 6px; overflow-x: auto; scrollbar-width: none; }
+.cats-wrap::-webkit-scrollbar { display: none; }
+.cats { position: relative; display: inline-flex; gap: 2px; padding: 4px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); }
+.cats button { position: relative; z-index: 1; border: 0; background: none; padding: 8px 13px; border-radius: 999px; cursor: pointer; font: 600 13px/1 var(--display); color: var(--muted); white-space: nowrap; display: flex; align-items: center; gap: 7px; transition: color .3s; }
+.cats .dot { width: 9px; height: 9px; border-radius: 50%; background: linear-gradient(135deg, var(--d1) 50%, var(--d2) 50%); }
+.cats button[aria-selected="true"] { color: #fff; }
+.pill { position: absolute; top: 4px; bottom: 4px; border-radius: 999px; background: linear-gradient(120deg, var(--c3), var(--c1)); box-shadow: 0 6px 20px -8px var(--c1); transition: left .5s var(--ease-out), width .5s var(--ease-out); }
+
+/* views */
+.view { display: grid; gap: 22px; padding-top: 14px; }
+.view.enter { animation: viewIn .45s var(--ease-out); }
+@keyframes viewIn { from { opacity: 0; transform: translateY(10px); } }
+.sec { display: grid; gap: 10px; }
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.sec-head h2 { font-size: 17px; font-weight: 700; }
+.sec-head a, .link { color: var(--acc-text); font: 600 13px/1 var(--display); text-decoration: none; }
+.tag { font: 500 10px/1 var(--mono); color: var(--muted); border: 1px dashed var(--line); padding: 4px 6px; border-radius: 6px; white-space: nowrap; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px; min-width: 0; }
+
+/* season banner: small emblem + text */
+.banner { position: relative; overflow: hidden; display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 14px; align-items: center; padding: 14px; border-radius: 22px; background: linear-gradient(135deg, color-mix(in srgb, var(--c3) 55%, var(--surface)), var(--surface) 70%); border: 1px solid color-mix(in srgb, var(--c1) 30%, var(--line)); }
+.banner svg.court-lines { position: absolute; right: -70px; top: -34px; width: 230px; opacity: .13; pointer-events: none; transform: rotate(180deg); }
+.court-lines path { fill: none; stroke: var(--fg); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.court-lines .net { stroke: var(--c2); stroke-width: 2.5; }
+.banner .eyebrow { font: 700 10px/1 var(--display); letter-spacing: .16em; text-transform: uppercase; color: var(--acc-text); }
+.banner h1 { font-size: 21px; font-weight: 800; line-height: 1.1; margin-top: 6px; }
+.banner p { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+.banner .meter { margin-top: 10px; height: 6px; border-radius: 6px; background: color-mix(in srgb, var(--fg) 10%, transparent); overflow: hidden; }
+.banner .meter i { display: block; height: 100%; width: var(--p); border-radius: inherit; background: linear-gradient(90deg, var(--c1), var(--c2)); transition: width 1s var(--ease-out); }
+
+/* emblem built from slices */
+.emblem { position: relative; width: 100%; aspect-ratio: 1; cursor: pointer; }
+.slice { position: absolute; inset: 0; }
+.slice i { position: absolute; inset: 0; background-size: 100% 100%; clip-path: var(--clip); transition: transform .8s var(--ease-out), opacity .55s var(--ease-out), filter .55s; transition-delay: var(--delay, 0ms); }
+.emblem.scatter .slice i { transform: translate(var(--tx), var(--ty)) rotate(var(--r)) scale(.9); opacity: 0; filter: blur(3px); }
+.emblem.exit .slice i { transition-timing-function: var(--ease-in); transition-duration: .4s; transition-delay: calc(var(--delay) * .3); transform: translate(calc(var(--tx) * -.5), calc(var(--ty) * -.5)) rotate(calc(var(--r) * -1)) scale(1.05); opacity: 0; filter: blur(3px); }
+.emblem.instant .slice i { transition: none; }
+.ball { position: absolute; z-index: 3; left: calc(var(--bx) - 7.02%); top: calc(var(--by) - 7.02%); width: 14.04%; height: 14.04%; }
+.ball img { width: 100%; height: 100%; display: block; }
+.ball.drop { animation: drop 1s var(--ease-out) both; }
+.ball.gone { opacity: 0; }
+@keyframes drop {
+  0% { transform: translateY(-300%) rotate(-220deg); opacity: 0; animation-timing-function: cubic-bezier(.5, 0, 1, .6); }
+  12% { opacity: 1; }
+  45% { transform: translateY(0) scale(1.08, .88); animation-timing-function: cubic-bezier(0, .5, .4, 1); }
+  66% { transform: translateY(-45%) rotate(20deg); animation-timing-function: cubic-bezier(.6, 0, 1, .7); }
+  82% { transform: translateY(0) scale(1.04, .95); }
+  91% { transform: translateY(-10%); }
+  100% { transform: none; opacity: 1; }
+}
+
+/* matches */
+.match { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.match + .match { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; }
+.date { text-align: center; border-radius: 12px; padding: 7px 0; background: color-mix(in srgb, var(--c1) 18%, transparent); }
+.date b { display: block; font: 800 19px/1 var(--display); }
+.date span { display: block; font: 700 9px/1.6 var(--display); letter-spacing: .14em; color: var(--acc-text); }
+.teams { display: grid; gap: 2px; min-width: 0; }
+.teams b { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.teams b.me { color: var(--acc-text); }
+.teams small { color: var(--muted); font-size: 12px; }
+.chev { color: var(--muted); }
+
+/* pending result with 48h timer */
+.pending { position: relative; overflow: hidden; border-color: color-mix(in srgb, var(--c1) 45%, var(--line)); }
+.pending .score { display: flex; gap: 6px; margin: 10px 0; }
+.pending .score span { font: 700 15px/1 var(--mono); padding: 8px 10px; border-radius: 10px; background: var(--surface-2); }
+.pending .score span.w { background: color-mix(in srgb, var(--c1) 25%, transparent); }
+.timer { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); }
+.timer .bar { flex: 1; height: 4px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+.timer .bar i { display: block; height: 100%; width: 62%; background: linear-gradient(90deg, var(--c1), var(--c2)); }
+.row-btns { display: flex; gap: 8px; margin-top: 12px; }
+.btn { flex: 1; display: inline-flex; justify-content: center; align-items: center; gap: 8px; padding: 12px 16px; border-radius: 14px; font: 700 14px/1 var(--display); cursor: pointer; border: 1px solid transparent; text-decoration: none; transition: transform .15s var(--ease-out); }
+.btn:active { transform: scale(.97); }
+.btn-primary { background: linear-gradient(120deg, var(--c3), var(--c1)); color: #fff; box-shadow: 0 10px 24px -12px var(--c1); }
+.btn-ghost { background: var(--surface-2); border-color: var(--line); color: var(--fg); }
+
+/* standings */
+.table-wrap { overflow-x: auto; margin-inline: -4px; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th { text-align: left; font: 700 9px/1 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding: 0 6px 8px; }
+td { padding: 10px 6px; border-top: 1px solid var(--line); white-space: nowrap; }
+.num { text-align: right; font-family: var(--mono); font-size: 13px; }
+td.pts { font: 800 15px/1 var(--display); text-align: right; }
+.pos { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font: 800 11px/1 var(--display); background: var(--surface-2); }
+tr.lead .pos { background: linear-gradient(135deg, var(--c1), var(--c3)); color: #fff; }
+tr.promo .pos { box-shadow: inset 0 0 0 2px var(--c1); }
+tr.me td { background: color-mix(in srgb, var(--c1) 10%, transparent); }
+tr.me td:nth-child(2) { color: var(--acc-text); font-weight: 700; }
+td.team { font-weight: 600; max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+
+/* bracket */
+.bracket { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; align-items: center; }
+.bm { border-radius: 12px; background: var(--surface-2); padding: 8px 10px; font-size: 13px; display: grid; gap: 4px; position: relative; }
+.bm div { display: flex; justify-content: space-between; gap: 8px; }
+.bm div span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bm .w { font-weight: 700; color: var(--acc-text); }
+.bm-final { grid-column: 2; grid-row: 1 / span 2; border: 1px solid color-mix(in srgb, var(--c1) 50%, transparent); }
+.bm-final::before { content: "Final"; position: absolute; top: -18px; left: 2px; font: 700 9px/1 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+
+/* amistosos */
+.offer { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.offer + .offer { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font: 800 14px/1 var(--display); color: #fff; background: linear-gradient(135deg, var(--c1), var(--c3)); flex-shrink: 0; }
+.avatar.alt { background: linear-gradient(135deg, var(--c3), color-mix(in srgb, var(--c2) 60%, var(--c3))); }
+.chip { display: inline-flex; align-items: center; gap: 5px; font: 600 11px/1 var(--display); padding: 5px 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+.chip.c { background: color-mix(in srgb, var(--c1) 20%, transparent); color: var(--fg); }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.small-btn { border: 1px solid color-mix(in srgb, var(--c1) 60%, var(--line)); background: none; border-radius: 12px; padding: 9px 12px; font: 700 12px/1 var(--display); cursor: pointer; color: var(--fg); }
+.fab-row { display: flex; gap: 8px; }
+
+/* usuarios */
+.search { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
+.search input { flex: 1; border: 0; background: none; outline: none; min-width: 0; font-size: 15px; }
+.search svg { width: 18px; height: 18px; color: var(--muted); }
+.people { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.person { display: grid; justify-items: center; text-align: center; gap: 6px; padding: 16px 10px; }
+.person .avatar { width: 54px; height: 54px; font-size: 16px; }
+.person b { font-size: 14px; }
+.person small { color: var(--muted); font-size: 12px; }
+
+/* perfil */
+.cover { position: relative; height: 150px; margin-inline: -16px; overflow: hidden; background: linear-gradient(140deg, var(--c3), var(--c1) 70%, color-mix(in srgb, var(--c2) 70%, var(--c1))); }
+.cover img { position: absolute; width: 330px; right: -70px; top: -60px; opacity: .55; mix-blend-mode: soft-light; transform: rotate(-12deg); transition: opacity .6s; }
+.cover::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, var(--bg)); }
+.cover svg.court-lines { position: absolute; left: -40px; bottom: -20px; width: 300px; opacity: .25; }
+.cover svg.court-lines path { stroke: #fff; }
+.who { margin-top: -54px; position: relative; z-index: 2; display: grid; gap: 10px; }
+.who .avatar { width: 88px; height: 88px; font-size: 28px; box-shadow: 0 0 0 4px var(--bg), 0 0 0 6px var(--c2); }
+.who h1 { font-size: 24px; font-weight: 800; }
+.who p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.stat { padding: 12px 8px; text-align: center; align-content: center; display: grid; }
+.stat b { display: block; font: 800 clamp(16px, 4.6vw, 20px)/1.1 var(--display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stat span { font-size: 11px; color: var(--muted); }
+.ring { --v: 65; width: 100%; aspect-ratio: 1; max-width: 72px; margin: 0 auto 4px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--c1) calc(var(--v) * 1%), color-mix(in srgb, var(--fg) 10%, transparent) 0); -webkit-mask: radial-gradient(farthest-side, transparent 72%, #000 73%); mask: radial-gradient(farthest-side, transparent 72%, #000 73%); }
+.ring-wrap { position: relative; }
+.ring-wrap b { position: absolute; inset: 0 0 auto 0; height: 72px; display: grid; place-items: center; font: 800 17px/1 var(--display); }
+.duo { display: grid; grid-template-columns: 6px minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.duo + .duo { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; }
+.duo .sw { width: 6px; height: 38px; border-radius: 3px; background: linear-gradient(180deg, var(--d1), var(--d2)); }
+.duo b { font-weight: 600; display: block; }
+.duo small { color: var(--muted); font-size: 12px; }
+.duo .place { font: 800 18px/1 var(--display); }
+.setting { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.setting + .setting { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; }
+.setting span small { display: block; color: var(--muted); font-size: 12px; }
+.seg { display: inline-flex; padding: 3px; border-radius: 10px; background: var(--surface-2); }
+.seg button { border: 0; background: none; padding: 7px 10px; border-radius: 8px; font: 600 12px/1 var(--display); color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 4px rgb(0 0 0 / .2); }
+.switch { width: 46px; height: 28px; border-radius: 999px; border: 0; background: var(--surface-2); position: relative; cursor: pointer; transition: background .3s; flex-shrink: 0; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .3s var(--ease-out); box-shadow: 0 1px 3px rgb(0 0 0 / .3); }
+.switch[aria-checked="true"] { background: var(--c1); }
+.switch[aria-checked="true"]::after { transform: translateX(18px); }
+.admin { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.admin button { text-align: left; padding: 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface-2); cursor: pointer; display: grid; gap: 6px; }
+.admin button svg { width: 20px; height: 20px; color: var(--acc-text); }
+.admin button b { font: 700 13px/1.2 var(--display); }
+
+
+/* next match hero */
+.eyebrow { font: 700 10px/1 var(--display); letter-spacing: .16em; text-transform: uppercase; color: var(--acc-text); }
+.next { position: relative; overflow: hidden; padding: 16px; border-radius: 22px; background: linear-gradient(150deg, color-mix(in srgb, var(--c3) 60%, var(--surface)), var(--surface) 75%); border-color: color-mix(in srgb, var(--c1) 35%, var(--line)); }
+.next-emblem { position: absolute !important; width: 124px !important; right: -30px; top: -30px; }
+.next-body { position: relative; display: grid; gap: 12px; }
+.cd { display: flex; gap: 10px; align-items: baseline; font: 600 13px/1 var(--display); color: var(--muted); }
+.cd b { font: 800 34px/1 var(--display); color: var(--fg); margin-right: 2px; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.versus { position: relative; z-index: 4; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; padding: 10px; border-radius: 16px; background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.side { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.side:last-child { flex-direction: row-reverse; text-align: right; }
+.side b { font-size: 13px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.avatar.sm { width: 34px; height: 34px; font-size: 12px; }
+.vs-mark { font: 800 11px/1 var(--display); letter-spacing: .1em; color: var(--acc-text); text-transform: uppercase; }
+.next .row-btns { margin-top: 0; }
+/* week strip */
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.day { display: grid; justify-items: center; gap: 4px; padding: 8px 0 7px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
+.day span { font: 700 9px/1 var(--display); letter-spacing: .12em; color: var(--muted); }
+.day b { font: 800 15px/1 var(--display); }
+.day i { width: 6px; height: 6px; border-radius: 50%; }
+.day i.me { background: var(--acc-text); }
+.day i.x { background: var(--muted); opacity: .6; }
+.day.on { background: linear-gradient(160deg, var(--c3), var(--c1)); border-color: transparent; color: #fff; }
+.day.on span { color: rgb(255 255 255 / .75); }
+.day.on i.me { background: #fff; }
+/* featured + porra */
+.feature { display: grid; gap: 10px; }
+.f-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.f-top small, .f-n { color: var(--muted); font-size: 12px; }
+.f-teams { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; align-items: center; font: 800 17px/1.15 var(--display); }
+.f-teams b:last-child { text-align: right; }
+.f-teams span { font: 700 11px/1 var(--display); color: var(--muted); text-transform: uppercase; }
+.f-q { margin: 2px 0 0; font: 700 13px/1 var(--display); }
+.porra { display: grid; gap: 6px; }
+.pb { position: relative; overflow: hidden; display: flex; justify-content: space-between; gap: 10px; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); cursor: pointer; font-size: 13px; font-weight: 600; text-align: left; }
+.pb::before { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--w); background: color-mix(in srgb, var(--c1) 28%, transparent); transition: width .9s var(--ease-out); }
+.pb span, .pb b { position: relative; }
+.pb span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pb b { font-family: var(--mono); font-weight: 500; }
+.pb.mine { border-color: var(--c1); }
+.pb.mine::before { background: linear-gradient(90deg, var(--c3), var(--c1)); opacity: .6; }
+/* results */
+.res { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.res + .res { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; }
+.teams b.lost { color: var(--muted); font-weight: 500; }
+.sets { display: flex; gap: 4px; }
+.sets i { font: 500 12px/1 var(--mono); font-style: normal; padding: 6px 7px; border-radius: 8px; background: var(--surface-2); }
+/* standings extras */
+.mv { font: 700 10px/1 var(--display); color: var(--muted); margin-left: 4px; }
+.mv.up { color: var(--acc-text); }
+.mv.down { color: #e5484d; }
+.form { display: inline-flex; gap: 3px; }
+.form i { width: 7px; height: 7px; border-radius: 50%; background: color-mix(in srgb, var(--fg) 15%, transparent); }
+.form i.w { background: var(--acc-text); }
+.legend { margin-top: 10px; font-size: 11px; color: var(--muted); display: flex; gap: 12px; }
+.legend .pos-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--c1); margin-right: 6px; vertical-align: -1px; }
+.records { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.rec { display: grid; gap: 2px; }
+.rec-ic { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--c1) 20%, transparent); color: var(--acc-text); margin-bottom: 6px; }
+.rec-ic svg { width: 18px; height: 18px; }
+.rec b { font: 800 22px/1.1 var(--display); }
+.rec small { color: var(--muted); font-size: 12px; }
+.rec em { font-style: normal; font-weight: 600; font-size: 12px; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* court slots */
+.slots-card { overflow-x: auto; }
+.slots { display: grid; grid-template-columns: 52px repeat(var(--n), minmax(0, 1fr)); gap: 6px; align-items: center; }
+.sh { font: 600 11px/1 var(--mono); color: var(--muted); text-align: center; }
+.cn { font: 700 12px/1.1 var(--display); }
+.slot { border: 1px solid color-mix(in srgb, var(--c1) 55%, transparent); background: color-mix(in srgb, var(--c1) 16%, transparent); border-radius: 10px; padding: 9px 0; font: 700 11px/1 var(--display); text-align: center; cursor: pointer; color: var(--fg); }
+.slot.busy { border-color: transparent; background: var(--surface-2); color: var(--muted); font-weight: 500; cursor: default; }
+.sub { display: block; color: var(--muted); font-size: 12px; }
+.lvl { font: 500 11px/1 var(--mono); color: var(--acc-text); }
+/* level sparkline */
+.level { display: grid; gap: 6px; }
+.lv-head { display: flex; align-items: baseline; gap: 10px; }
+.lv-head b { font: 800 28px/1 var(--display); }
+.spark { width: 100%; height: auto; display: block; }
+.spark .grid { stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 4; }
+.spark-line { stroke-dasharray: 600; stroke-dashoffset: 600; animation: draw 1.4s var(--ease-out) .2s forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.lv-axis { display: flex; justify-content: space-between; font: 500 11px/1 var(--mono); color: var(--muted); }
+/* badges */
+.badges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.badge-c { display: grid; justify-items: center; gap: 8px; padding: 14px 6px 12px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; }
+.badge-c .b-ic { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: conic-gradient(from 210deg, var(--c3), var(--c1), var(--c2), var(--c3)); box-shadow: 0 6px 18px -8px var(--c1); }
+.badge-c .b-ic svg { width: 22px; height: 22px; }
+.badge-c b { font: 700 12px/1.1 var(--display); text-align: center; }
+.badge-c.locked .b-ic { background: var(--surface-2); color: var(--muted); box-shadow: none; }
+.badge-c.locked b { color: var(--muted); }
+
+/* bottom tab bar */
+.tabbar { position: fixed; z-index: 40; left: 0; right: 0; bottom: 0; padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px)); background: var(--tabbar); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-top: 1px solid var(--line); }
+.tabbar nav { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); position: relative; }
+.tabbar a { display: grid; justify-items: center; gap: 3px; padding: 6px 0; color: var(--muted); text-decoration: none; font: 600 10px/1 var(--display); position: relative; z-index: 1; transition: color .25s; }
+.tabbar a svg { width: 22px; height: 22px; transition: transform .35s var(--ease-out); }
+.tabbar a[aria-current="page"] { color: var(--fg); }
+.tabbar a[aria-current="page"] svg { transform: translateY(-1px); color: var(--acc-text); }
+.tab-ind { position: absolute; top: -9px; height: 3px; width: 28px; border-radius: 0 0 3px 3px; background: linear-gradient(90deg, var(--c1), var(--c2)); transition: left .45s var(--ease-out); }
+
+.toast { position: fixed; z-index: 70; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); opacity: 0; padding: 10px 14px; border-radius: 12px; background: var(--fg); color: var(--bg); font: 600 13px/1.3 var(--body); transition: .35s var(--ease-out); pointer-events: none; max-width: calc(100% - 32px); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.note { color: var(--muted); font-size: 12px; text-align: center; }
+
+@media (min-width: 720px) {
+  .banner { grid-template-columns: 128px minmax(0, 1fr); }
+  .people { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.side-brand { display: none; }
+.col { display: contents; }
+@media (min-width: 1000px) {
+  .tabbar { top: 0; right: auto; width: 248px; padding: 24px 16px; border-top: 0; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 28px; }
+  .side-brand { display: flex; align-items: center; gap: 12px; padding: 0 8px; }
+  .side-mark { width: 48px; height: 48px; flex-shrink: 0; }
+  .side-mark img { width: 100%; height: 100%; transition: opacity .25s; }
+  .side-brand b { display: block; font: 800 16px/1.1 var(--display); }
+  .side-brand span { font: 600 10px/1.4 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .tabbar nav { grid-template-columns: 1fr; gap: 4px; margin: 0; max-width: none; }
+  .tabbar a { display: flex; align-items: center; gap: 12px; justify-items: start; padding: 12px 14px; border-radius: 12px; font: 600 14px/1 var(--display); }
+  .tabbar a:hover { background: color-mix(in srgb, var(--c1) 10%, transparent); color: var(--fg); }
+  .tabbar a[aria-current="page"] { background: color-mix(in srgb, var(--c1) 18%, transparent); }
+  .tab-ind { top: 0; left: -16px; width: 3px; height: 40px; border-radius: 0 3px 3px 0; background: linear-gradient(180deg, var(--c1), var(--c2)); transition: top .45s var(--ease-out); }
+  .app { max-width: 1240px; margin-left: 248px; margin-right: auto; padding-inline: 40px; padding-block: 0 48px; }
+  @media (min-width: 1560px) { .app { margin-left: calc(248px + (100vw - 248px - 1240px) / 2); } }
+  .top { margin-inline: -40px; padding: 16px 40px; }
+  .top .mark { display: none; }
+  .top-title b { font-size: 20px; }
+  .cats-wrap { margin-inline: -40px; padding-inline: 40px; }
+  .ambient { left: 248px; }
+  .toast { bottom: 28px; left: calc(50% + 124px); }
+  .view { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 24px 28px; align-items: start; padding-top: 20px; }
+  .view > * { min-width: 0; }
+  .view > .a-full, .view > .a-tabla.solo { grid-column: 1 / -1; }
+  /* partidos */
+  .a-next { grid-column: 1; grid-row: 1; padding: 24px; }
+  .a-week { grid-column: 1 / -1; grid-row: 2; }
+  .a-pend { grid-column: 2; grid-row: 1; }
+  .a-feat { grid-column: 1; grid-row: 3; }
+  .a-res { grid-column: 2; grid-row: 3; }
+  .a-next .next-emblem { width: 200px !important; right: -40px; top: -44px; }
+  .a-next .cd b { font-size: 48px; }
+  .a-next .versus { max-width: 72%; }
+  .a-next .row-btns { max-width: 72%; }
+  /* liga */
+  .a-tabla { grid-column: 1; grid-row: 1 / span 2; }
+  .a-rec { grid-column: 2; grid-row: 1; }
+  .a-copa { grid-column: 2; grid-row: 2; }
+  /* amistosos */
+  .a-slots { grid-column: 1; grid-row: 1; }
+  .a-fab { grid-column: 1; grid-row: 2; }
+  .a-offers { grid-column: 2; grid-row: 1 / span 2; }
+  /* usuarios */
+  .people { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  /* perfil */
+  .cover { margin-inline: 0; height: 210px; border-radius: 24px; }
+  .cover img { width: 460px; right: -60px; top: -110px; }
+  .cover::after { background: linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--bg) 70%, transparent)); }
+  .who { margin-top: -70px; padding-left: 28px; grid-template-columns: auto minmax(0, 1fr); align-items: end; gap: 20px; }
+  .who .avatar { width: 112px; height: 112px; font-size: 36px; }
+  .who h1 { font-size: 30px; }
+  .col { display: grid; gap: 24px; align-content: start; min-width: 0; }
+  .badges { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; transition-delay: 0ms !important; }
+}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px)}body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+
+
+<div class="ambient" aria-hidden="true"></div>
+<div class="flood" id="flood" aria-hidden="true"></div>
+
+<div class="app">
+  <header class="top">
+    <span class="mark" id="mark"><img alt="" src="assets/mix.webp"></span>
+    <div class="top-title"><b id="topName">Liga Pádel ETSII</b><span id="topSub">Partidos</span></div>
+    <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+    </button>
+    <button class="icon-btn" id="bellBtn" aria-label="Avisos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9Z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
+      <span class="badge"></span>
+    </button>
+  </header>
+
+  <div class="cats-wrap">
+    <div class="cats" role="tablist" aria-label="Categoría" id="cats">
+      <span class="pill" id="pill" aria-hidden="true"></span>
+      <button role="tab" id="tab-fem" data-cat="fem" style="--d1:#E81E7C;--d2:#F98BBE"><span class="dot"></span>Femenina</button>
+      <button role="tab" id="tab-mix" data-cat="mix" style="--d1:#6A2EF0;--d2:#DCF23A"><span class="dot"></span>Mixta</button>
+      <button role="tab" id="tab-masc" data-cat="masc" style="--d1:#1F6BEA;--d2:#3FDED6"><span class="dot"></span>Masculina</button>
+      <button role="tab" id="tab-tenis" data-cat="tenis" style="--d1:#5B22E0;--d2:#C9E13A"><span class="dot"></span>Tenis</button>
+      <button role="tab" id="tab-gen" data-cat="gen" style="--d1:#1E5BD8;--d2:#F2B82E"><span class="dot"></span>Todas</button>
+    </div>
+  </div>
+
+  <main id="view" class="view"></main>
+</div>
+
+<div class="tabbar">
+  <div class="side-brand"><span class="side-mark"><img alt="" id="sideMark" src="assets/mix.webp"></span><div><b>Ligas ETSII</b><span>Temporada 26/27</span></div></div>
+  <nav aria-label="Secciones" id="tabs">
+    <span class="tab-ind" id="tabInd" aria-hidden="true"></span>
+    <a href="#partidos" data-view="partidos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Partidos</a>
+    <a href="#liga" data-view="liga"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M17 6h3v1a3 3 0 0 1-3 3M7 6H4v1a3 3 0 0 0 3 3"/></svg>Liga</a>
+    <a href="#amistosos" data-view="amistosos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M5 7.5c3.5 2 3.5 7 0 9M19 7.5c-3.5 2-3.5 7 0 9"/></svg>Amistosos</a>
+    <a href="#usuarios" data-view="usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a5.5 5.5 0 0 1 3.5 6"/></svg>Usuarios</a>
+    <a href="#perfil" data-view="perfil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Perfil</a>
+  </nav>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  const CATS = {
+    fem:   { label: 'Femenina',  sport: 'Pádel', name: 'Liga Pádel ETSII', bx: 58.85, by: 30.54, j: [4, 11], pairs: 10 },
+    mix:   { label: 'Mixta',     sport: 'Pádel', name: 'Liga Pádel ETSII', bx: 59.49, by: 30.86, j: [4, 13], pairs: 14 },
+    masc:  { label: 'Masculina', sport: 'Pádel', name: 'Liga Pádel ETSII', bx: 59.73, by: 31.10, j: [4, 17], pairs: 18 },
+    tenis: { label: 'Tenis',     sport: 'Tenis', name: 'Liga Tenis ETSII', bx: 59.55, by: 30.70, j: [3, 11], pairs: 12 },
+    gen:   { label: 'Todas',     sport: 'Pádel y tenis', name: 'Ligas ETSII', bx: 58.77, by: 30.70, j: [4, 17], pairs: 54 },
+  };
+  const VIEWS = { partidos: 'Partidos', liga: 'Clasificación y copa', amistosos: 'Buscar amistosos', usuarios: 'Usuarios', perfil: 'Mi perfil' };
+  const TEAMS = ['poteito potato', 'Manueitor', 'Little Eyes', 'Smash & Chill', 'Bandeja y Vino', 'Los del Taller', 'Globo Sonda', 'Víbora Club'];
+  const MY_TEAM = { fem: 'Little Eyes', mix: 'poteito potato', masc: null, tenis: 'Lucía V.', gen: 'poteito potato' };
+  const PEOPLE = [['Marta G.', 'Femenina · Mixta'], ['Pablo R.', 'Masculina'], ['Irene S.', 'Femenina'], ['Jorge M.', 'Mixta · Tenis'], ['Clara P.', 'Tenis'], ['Diego A.', 'Masculina · Mixta']];
+  const root = document.documentElement;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let cat = 'mix', view = 'partidos', busy = false;
+  Object.keys(CATS).forEach(k => { new Image().src = `assets/${k}.webp`; new Image().src = `assets/${k}-ball.webp`; });
+  try { const s = localStorage.getItem('liga-cat'); if (CATS[s]) cat = s; } catch (e) {}
+
+  const ICON = {
+    flame: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4 0-7-2.7-7-6.5C5 10 9 8 9 3c3 2 4.5 4.5 4.5 7 1-1 1.5-2 1.5-3 2.5 2 4 4.6 4 7.5 0 3.8-3 6.5-7 6.5Z"/></svg>',
+    bagel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/></svg>',
+    comeback: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l5-5 4 4 7-8"/><path d="M15 8h5v5"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg>',
+    handshake: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l4-4 5 2 5-2 4 4-7 7a2 2 0 0 1-3 0L3 11Z"/><path d="M9 13l2 2M12 11l2 2"/></svg>',
+    trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M17 6h3v1a3 3 0 0 1-3 3M7 6H4v1a3 3 0 0 0 3 3"/></svg>',
+    chev: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>',
+    dl: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 20h14"/></svg>',
+    chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>',
+  };
+
+  // ---------- court lines (perspective), padel or tennis ----------
+  function courtSVG(tennis) {
+    const W = tennis ? 5.485 : 5, L = tennis ? 23.77 : 20, net = L / 2;
+    const P = (X, Z) => { const d = 1 / (Z / L * 1.5 + 1); return `${(150 + X / W * 130 * d).toFixed(1)} ${(20 + 140 * d).toFixed(1)}`; };
+    const lines = tennis
+      ? [[-W,0,W,0],[-W,L,W,L],[-W,0,-W,L],[W,0,W,L],[-4.115,0,-4.115,L],[4.115,0,4.115,L],[-4.115,5.485,4.115,5.485],[-4.115,18.285,4.115,18.285],[0,5.485,0,18.285]]
+      : [[-W,0,W,0],[-W,L,W,L],[-W,0,-W,L],[W,0,W,L],[-W,3.05,W,3.05],[-W,16.95,W,16.95],[0,3.05,0,16.95]];
+    return `<svg class="court-lines" viewBox="0 0 300 170" aria-hidden="true">${lines.map(l => `<path d="M${P(l[0], l[1])} L${P(l[2], l[3])}"/>`).join('')}<path class="net" d="M${P(-W * 1.08, net)} L${P(W * 1.08, net)}"/></svg>`;
+  }
+
+  // ---------- emblem from slices ----------
+  function buildEmblem(el) {
+    const N = 10, CX = 49, CY = 51;
+    const pt = (deg, r) => { const a = deg * Math.PI / 180; return `${(CX + r * Math.cos(a)).toFixed(2)}% ${(CY + r * Math.sin(a)).toFixed(2)}%`; };
+    for (let k = 0; k <= N; k++) {
+      const s = document.createElement('div'); s.className = 'slice'; const i = document.createElement('i');
+      let clip, mid = 0;
+      if (k === N) { const p = []; for (let d = 0; d < 360; d += 20) p.push(pt(d, 17)); clip = `polygon(${p.join(',')})`; }
+      else {
+        const a0 = k * 360 / N - 90 - .8, a1 = a0 + 360 / N + 1.6; mid = (a0 + a1) / 2;
+        const outer = [], inner = [];
+        for (let t = 0; t <= 4; t++) outer.push(pt(a0 + (a1 - a0) * t / 4, 80));
+        for (let t = 4; t >= 0; t--) inner.push(pt(a0 + (a1 - a0) * t / 4, 16));
+        clip = `polygon(${[...outer, ...inner].join(',')})`;
+      }
+      const dist = k === N ? 0 : 18 + (k % 3) * 9, rad = mid * Math.PI / 180;
+      i.style.cssText = `--clip:${clip};--tx:${(Math.cos(rad) * dist).toFixed(1)}px;--ty:${(Math.sin(rad) * dist).toFixed(1)}px;--r:${k === N ? 0 : (k % 2 ? 1 : -1) * (12 + (k % 4) * 6)}deg;--delay:${k === N ? 0 : 30 + ((k * 3) % N) * 34}ms;background-image:url(assets/${cat}.webp)`;
+      s.appendChild(i); el.insertBefore(s, el.firstChild);
+    }
+    el.style.setProperty('--bx', CATS[cat].bx + '%'); el.style.setProperty('--by', CATS[cat].by + '%');
+  }
+  function assemble(el, swap) {
+    const ball = el.querySelector('.ball');
+    const go = () => {
+      el.classList.add('instant'); el.classList.remove('exit'); el.classList.add('scatter');
+      if (swap) {
+        el.querySelectorAll('.slice i').forEach(i => i.style.backgroundImage = `url(assets/${cat}.webp)`);
+        el.style.setProperty('--bx', CATS[cat].bx + '%'); el.style.setProperty('--by', CATS[cat].by + '%');
+        ball.querySelector('img').src = `assets/${cat}-ball.webp`;
+      }
+      void el.offsetWidth; el.classList.remove('instant');
+      requestAnimationFrame(() => el.classList.remove('scatter'));
+      setTimeout(() => { ball.className = 'ball drop'; }, reduce ? 0 : 520);
+    };
+    ball.className = 'ball gone';
+    if (swap && !reduce) { el.classList.add('exit'); setTimeout(go, 430); } else go();
+  }
+
+  // ---------- views ----------
+  const t = () => { const s = Object.keys(CATS).indexOf(cat); return TEAMS.map((_, i) => TEAMS[(i + s) % TEAMS.length]); };
+  const mine = n => n === MY_TEAM[cat];
+  const isTenis = () => cat === 'tenis';
+
+  // ---------- shared bits ----------
+  const ini = s => s.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ ]/g, '').split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+  const NEXT_AT = Date.now() + ((2 * 24 + 5) * 60 + 12) * 60000;
+  function countdown() {
+    const m = Math.max(0, Math.round((NEXT_AT - Date.now()) / 60000));
+    const d = Math.floor(m / 1440), h = Math.floor(m % 1440 / 60), mi = m % 60;
+    return `<span><b>${d}</b>d</span><span><b>${String(h).padStart(2, '0')}</b>h</span><span><b>${String(mi).padStart(2, '0')}</b>min</span>`;
+  }
+  setInterval(() => { const el = document.getElementById('cd'); if (el) el.innerHTML = countdown(); }, 30000);
+  const porra = { a: 58, b: 42, voted: null };
+
+  function vPartidos() {
+    const n = t(), my = MY_TEAM[cat] || n[0], rival = n[4];
+    const week = [['L', 6], ['M', 7], ['X', 8], ['J', 9, 'me'], ['V', 10, 'x'], ['S', 11], ['D', 12, 'x']];
+    const recent = [[n[1], n[6], '6-3 6-4'], [n[2], n[5], '4-6 7-5 10-8'], [n[0], n[7], '6-0 6-1']];
+    return `
+    <section class="next card a-next" aria-label="Tu próximo partido">
+      <div class="emblem scatter instant next-emblem" id="emblem" role="img" aria-label="Logo ${CATS[cat].name}"><div class="ball gone"><img alt="" src="assets/${cat}-ball.webp"></div></div>
+      <div class="next-body">
+        <div class="eyebrow">Tu próximo partido</div>
+        <div class="cd" id="cd">${countdown()}</div>
+        <div class="versus">
+          <div class="side"><span class="avatar sm">${ini(my)}</span><b>${my}</b></div>
+          <span class="vs-mark">vs</span>
+          <div class="side"><span class="avatar sm alt">${ini(rival)}</span><b>${rival}</b></div>
+        </div>
+        <div class="chips"><span class="chip c">Jue 9 oct · 19:30</span><span class="chip">${isTenis() ? 'Pista de tenis' : 'Pista 2'}</span><span class="chip">Cara a cara 1-1</span></div>
+        <div class="row-btns"><button class="btn btn-ghost" data-toast="Añadido a tu calendario">Al calendario</button><button class="btn btn-primary" data-toast="Aquí se abriría el chat con ${rival}">Escribir al rival</button></div>
+      </div>
+    </section>
+
+    <div class="week a-week" role="list" aria-label="Esta semana">
+      ${week.map(w => `<div class="day ${w[2] === 'me' ? 'on' : ''}" role="listitem"><span>${w[0]}</span><b>${w[1]}</b><i class="${w[2] || ''}"></i></div>`).join('')}
+    </div>
+
+    <section class="sec a-pend">
+      <div class="sec-head"><h2>Resultado por confirmar</h2><span class="tag">ejemplo</span></div>
+      <div class="card pending">
+        <div class="teams"><b class="me">${my}</b><b>${n[3]}</b><small>Lo ha propuesto la pareja rival</small></div>
+        <div class="score"><span class="w">6-4</span><span>3-6</span><span class="w">${isTenis() ? '7-5' : '6-2'}</span></div>
+        <div class="timer"><div class="bar"><i></i></div><span>Se confirma solo en 30 h</span></div>
+        <div class="row-btns"><button class="btn btn-ghost" data-toast="Has marcado el resultado como incorrecto">No es correcto</button><button class="btn btn-primary" data-toast="Resultado confirmado">Confirmar</button></div>
+      </div>
+    </section>
+
+    <section class="sec a-feat">
+      <div class="sec-head"><h2>Partido destacado</h2><span class="tag">ejemplo</span></div>
+      <div class="card feature">
+        <div class="f-top"><span class="chip c">1.º contra 2.º</span><small>Vie 10 oct · 14:00</small></div>
+        <div class="f-teams"><b>${n[0]}</b><span>vs</span><b>${n[1]}</b></div>
+        <p class="f-q">¿Quién gana?</p>
+        <div class="porra" id="porra">
+          <button class="pb ${porra.voted === 'a' ? 'mine' : ''}" data-vote="a" style="--w:${porra.a}%"><span>${n[0]}</span><b>${porra.a}%</b></button>
+          <button class="pb ${porra.voted === 'b' ? 'mine' : ''}" data-vote="b" style="--w:${porra.b}%"><span>${n[1]}</span><b>${porra.b}%</b></button>
+        </div>
+        <small class="f-n">${porra.voted ? 'Has votado · ' : ''}${porra.voted ? 39 : 38} votos</small>
+      </div>
+    </section>
+
+    <section class="sec a-res">
+      <div class="sec-head"><h2>Últimos resultados</h2><span class="tag">ejemplo</span></div>
+      <div class="card">${recent.map(r => `
+        <div class="res"><div class="teams"><b>${r[0]}</b><b class="lost">${r[1]}</b></div><span class="sets">${r[2].split(' ').map(s => `<i>${s}</i>`).join('')}</span></div>`).join('')}
+      </div>
+    </section>`;
+  }
+
+  function vLiga() {
+    const n = t();
+    const rows = [[6, 6, '12-2', 18, 0, 'wwwww'], [6, 5, '10-4', 15, 1, 'wlwww'], [5, 4, '9-3', 12, -1, 'wwlwl'], [6, 3, '7-7', 9, 2, 'lwwlw'], [5, 2, '5-6', 6, 0, 'llwlw'], [6, 2, '5-8', 6, -2, 'wllll'], [6, 1, '3-10', 3, 0, 'lllwl'], [5, 0, '1-10', 0, 0, 'lllll']];
+    const mv = v => v > 0 ? `<span class="mv up">▲${v}</span>` : v < 0 ? `<span class="mv down">▼${-v}</span>` : `<span class="mv">–</span>`;
+    return `
+    <section class="sec a-tabla" style="padding-top:4px">
+      <div class="sec-head"><h2>Clasificación</h2><span class="tag">ejemplo</span></div>
+      <div class="card"><div class="table-wrap"><table>
+        <thead><tr><th></th><th>${isTenis() ? 'Jugador' : 'Pareja'}</th><th>Forma</th><th class="num">Sets</th><th class="num">Pts</th></tr></thead>
+        <tbody>${rows.map((r, i) => `<tr class="${i === 0 ? 'lead' : i < 4 ? 'promo' : ''} ${mine(n[i]) ? 'me' : ''}"><td><span class="pos">${i + 1}</span></td><td class="team">${n[i]} ${mv(r[4])}</td><td><span class="form">${[...r[5]].map(c => `<i class="${c}"></i>`).join('')}</span></td><td class="num">${r[2]}</td><td class="pts">${r[3]}</td></tr>`).join('')}</tbody>
+      </table></div>
+      <div class="legend"><span><i class="pos-dot"></i>Pasan a la copa</span></div></div>
+    </section>
+
+    <section class="sec a-rec">
+      <div class="sec-head"><h2>Récords de la temporada</h2><span class="tag">ejemplo</span></div>
+      <div class="records">
+        <div class="card rec"><span class="rec-ic">${ICON.flame}</span><b>5</b><small>victorias seguidas</small><em>${n[0]}</em></div>
+        <div class="card rec"><span class="rec-ic">${ICON.bagel}</span><b>6-0</b><small>rosco más reciente</small><em>${n[0]}</em></div>
+        <div class="card rec"><span class="rec-ic">${ICON.comeback}</span><b>3</b><small>remontadas</small><em>${n[2]}</em></div>
+        <div class="card rec"><span class="rec-ic">${ICON.clock}</span><b>2 h 14</b><small>partido más largo</small><em>${n[1]} – ${n[3]}</em></div>
+      </div>
+    </section>
+
+    <section class="sec a-copa">
+      <div class="sec-head"><h2>Copa · semifinales</h2><span class="tag">ejemplo</span></div>
+      <div class="card"><div class="bracket" style="padding-top:16px">
+        <div class="bm"><div class="w"><span>${n[0]}</span><span>2</span></div><div><span>${n[3]}</span><span>0</span></div></div>
+        <div class="bm bm-final"><div class="w"><span>${n[0]}</span><span>–</span></div><div><span>Por decidir</span><span>–</span></div></div>
+        <div class="bm"><div><span>${n[1]}</span><span>1</span></div><div><span>${n[2]}</span><span>1</span></div></div>
+      </div></div>
+    </section>`;
+  }
+
+  function vAmistosos() {
+    const slots = ['18:00', '19:00', '20:00', '21:00'];
+    const courts = isTenis() ? [['Tenis', [0, 0, 1, 1]]] : [['Pista 1', [1, 0, 1, 0]], ['Pista 2', [1, 1, 0, 1]], ['Pista 3', [0, 1, 1, 1]]];
+    const offers = [['Marta G.', 'Busca pareja', ['Hoy 19:00', 'Nivel 3,5']], ['Pablo R.', 'Faltan 2 para partido', ['Mañana 13:30', 'Nivel 3']], ['Clara P.', 'Peloteo tranquilo', ['Sáb 11:00', 'Cualquier nivel']]];
+    return `
+    <section class="sec a-slots" style="padding-top:4px">
+      <div class="sec-head"><h2>Pistas libres hoy</h2><span class="tag">ejemplo</span></div>
+      <div class="card slots-card">
+        <div class="slots" style="--n:${slots.length}">
+          <span></span>${slots.map(s => `<span class="sh">${s}</span>`).join('')}
+          ${courts.map(c => `<span class="cn">${c[0]}</span>${c[1].map((f, j) => f ? `<button class="slot" data-toast="${c[0]} a las ${slots[j]}: se abriría para crear un amistoso">Libre</button>` : `<span class="slot busy">Ocupada</span>`).join('')}`).join('')}
+        </div>
+      </div>
+    </section>
+    <section class="sec a-offers">
+      <div class="sec-head"><h2>Buscan partido</h2><span class="tag">ejemplo</span></div>
+      <div class="card">${offers.map((o, i) => `
+        <div class="offer"><span class="avatar ${i % 2 ? 'alt' : ''}">${ini(o[0])}</span>
+          <div style="min-width:0"><b>${o[0]}</b><small class="sub">${o[1]}</small><div class="chips">${o[2].map((c, j) => `<span class="chip ${j === 0 ? 'c' : ''}">${c}</span>`).join('')}</div></div>
+          <button class="small-btn" data-toast="Te has apuntado al amistoso de ${o[0]}">Unirme</button></div>`).join('')}
+      </div>
+    </section>
+    <div class="fab-row a-fab"><button class="btn btn-primary" data-toast="Aquí se abriría el formulario para publicar un amistoso">Publicar un amistoso</button></div>`;
+  }
+
+  function vUsuarios() {
+    return `<div class="search a-full" style="margin-top:4px">${ICON.search}<input id="q" type="search" placeholder="Buscar jugador o pareja" aria-label="Buscar jugador o pareja"></div>
+    <section class="sec a-full"><div class="sec-head"><h2>Jugadores</h2><span class="tag">ejemplo</span></div>
+      <div class="people" id="people">${PEOPLE.map((p, i) => `<div class="card person"><span class="avatar ${i % 2 ? 'alt' : ''}">${ini(p[0])}</span><b>${p[0]}</b><small>${p[1]}</small><span class="lvl">Nivel ${(3 + (i * 0.17) % 1).toFixed(2).replace('.', ',')}</span></div>`).join('')}</div>
+    </section>`;
+  }
+
+  function spark() {
+    const v = [3.10, 3.18, 3.15, 3.27, 3.31, 3.29, 3.40, 3.46, 3.44, 3.55, 3.62];
+    const W = 300, H = 90, lo = 3.0, hi = 3.7;
+    const pts = v.map((y, i) => [i * W / (v.length - 1), H - (y - lo) / (hi - lo) * H]);
+    const line = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
+    const last = pts[pts.length - 1];
+    return `<svg class="spark" viewBox="-6 -10 ${W + 12} ${H + 22}" aria-label="Evolución del nivel de 3,10 a 3,62">
+      <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--c1)" stop-opacity=".45"/><stop offset="1" stop-color="var(--c1)" stop-opacity="0"/></linearGradient></defs>
+      ${[0, 1, 2].map(k => `<line x1="0" x2="${W}" y1="${k * H / 2}" y2="${k * H / 2}" class="grid"/>`).join('')}
+      <path d="${line} L${W} ${H} L0 ${H} Z" fill="url(#sg)"/>
+      <path d="${line}" fill="none" stroke="var(--c1)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" class="spark-line"/>
+      <circle cx="${last[0]}" cy="${last[1]}" r="5" fill="var(--acc-text)" stroke="var(--surface)" stroke-width="2"/>
+    </svg>`;
+  }
+
+  function vPerfil() {
+    const duos = [['Little Eyes', 'Femenina', '3.º de 10', '#E81E7C', '#F98BBE', '3.º'], ['poteito potato', 'Mixta', '1.º de 14', '#6A2EF0', '#DCF23A', '1.º'], ['Individual', 'Tenis', '5.º de 12', '#5B22E0', '#C9E13A', '5.º']];
+    const badges = [[ICON.flame, 'En racha', '3 victorias seguidas', 1], [ICON.bagel, 'Rosco', 'Ganar un set 6-0', 1], [ICON.comeback, 'Remontada', 'Ganar tras perder el 1.er set', 1], [ICON.handshake, 'Sociable', '10 amistosos jugados', 0], [ICON.trophy, 'Campeona', 'Ganar una liga', 0], [ICON.clock, 'Maratón', 'Partido de más de 2 h', 1]];
+    return `<div class="cover a-full"><img alt="" src="assets/${cat}.webp" id="coverImg">${courtSVG(isTenis())}</div>
+    <section class="who a-full">
+      <span class="avatar">LV</span>
+      <div><h1>Lucía Velasco López</h1><p>Administradora · juega desde 2024</p>
+        <div class="chips"><span class="chip c">Femenina</span><span class="chip c">Mixta</span><span class="chip c">Tenis</span></div></div>
+    </section>
+    <div class="col col-a">
+    <section class="sec a-stats"><div class="sec-head"><h2>Esta temporada</h2><span class="tag">ejemplo</span></div>
+      <div class="stats">
+        <div class="card stat ring-wrap"><div class="ring" style="--v:65"></div><b>65%</b><span>victorias</span></div>
+        <div class="card stat"><b>23</b><span>partidos</span></div>
+        <div class="card stat"><b>34-19</b><span>sets</span></div>
+        <div class="card stat"><b style="color:var(--acc-text)">3</b><span>seguidas</span></div>
+      </div>
+    </section>
+    <section class="sec a-logros"><div class="sec-head"><h2>Logros</h2><span class="link">4 de 6</span></div>
+      <div class="badges">${badges.map(b => `<button class="badge-c ${b[3] ? '' : 'locked'}" data-toast="${b[1]}: ${b[2]}${b[3] ? '' : ' (pendiente)'}"><span class="b-ic">${b[0]}</span><b>${b[1]}</b></button>`).join('')}</div>
+    </section>
+    <section class="sec a-ligas"><div class="sec-head"><h2>Mis ligas</h2></div>
+      <div class="card">${duos.map(d => `<div class="duo" style="--d1:${d[3]};--d2:${d[4]}"><span class="sw"></span><div style="min-width:0"><b>${d[0]}</b><small>${d[1]} · ${d[2]}</small></div><span class="place">${d[5]}</span></div>`).join('')}</div>
+    </section>
+    </div>
+    <div class="col col-b">
+    <section class="sec a-nivel"><div class="sec-head"><h2>Tu nivel</h2><span class="tag">ejemplo</span></div>
+      <div class="card level"><div class="lv-head"><b>3,62</b><span class="mv up">▲0,52 desde septiembre</span></div>${spark()}<div class="lv-axis"><span>sep</span><span>oct</span></div></div>
+    </section>
+    <section class="sec a-ajustes"><div class="sec-head"><h2>Ajustes</h2></div>
+      <div class="card">
+        <div class="setting"><span>Tema<small>Claro, oscuro o el del móvil</small></span><div class="seg" id="themeSeg"><button data-t="light">Claro</button><button data-t="dark">Oscuro</button><button data-t="">Auto</button></div></div>
+        <div class="setting"><span>Avisos de partidos<small>Recordatorio el día antes</small></span><button class="switch" role="switch" aria-checked="true" aria-label="Avisos de partidos"></button></div>
+        <div class="setting"><span>Resultados propuestos<small>Aviso cuando el rival propone uno</small></span><button class="switch" role="switch" aria-checked="true" aria-label="Avisos de resultados"></button></div>
+      </div>
+    </section>
+    <section class="sec a-admin"><div class="sec-head"><h2>Administración</h2></div>
+      <div class="admin">
+        <button data-toast="Exportaría las estadísticas de la temporada">${ICON.chart}<b>Exportar estadísticas</b></button>
+        <button data-toast="Descargaría la clasificación de la categoría">${ICON.dl}<b>Descargar clasificación</b></button>
+      </div>
+    </section>
+    </div>
+    <p class="note a-full">Previsualización de la identidad visual · no conectada a la web real</p>`;
+  }
+
+  const RENDER = { partidos: vPartidos, liga: vLiga, amistosos: vAmistosos, usuarios: vUsuarios, perfil: vPerfil };
+
+  const main = document.getElementById('view');
+  function render(animate) {
+    main.innerHTML = RENDER[view]();
+    if (animate) { main.classList.remove('enter'); void main.offsetWidth; main.classList.add('enter'); }
+    const em = document.getElementById('emblem');
+    if (em) { buildEmblem(em); assemble(em, false); em.addEventListener('click', () => assemble(em, false)); }
+    syncThemeSeg();
+  }
+
+  // ---------- chrome ----------
+  const pill = document.getElementById('pill');
+  const movePill = () => { const b = document.getElementById('tab-' + cat); pill.style.left = b.offsetLeft + 'px'; pill.style.width = b.offsetWidth + 'px'; };
+  const DESK = matchMedia('(min-width: 1000px)');
+  const moveInd = () => { const a = document.querySelector(`.tabbar a[data-view="${view}"]`); const ind = document.getElementById('tabInd'); if (DESK.matches) { ind.style.left = ''; ind.style.top = a.offsetTop + 'px'; ind.style.height = a.offsetHeight + 'px'; } else { ind.style.top = ''; ind.style.height = ''; ind.style.left = (a.offsetLeft + a.offsetWidth / 2 - 14) + 'px'; } };
+  DESK.addEventListener?.('change', () => moveInd());
+  function setTop() {
+    document.getElementById('topName').textContent = CATS[cat].name;
+    document.getElementById('topSub').textContent = VIEWS[view];
+  }
+  function swapMark(first) {
+    const sm = document.getElementById('sideMark'); if (sm) { sm.style.opacity = 0; setTimeout(() => { sm.src = `assets/${cat}.webp`; sm.style.opacity = 1; }, first ? 0 : 250); }
+    const mark = document.getElementById('mark'); const old = mark.querySelector('img:last-child');
+    const ni = new Image(); ni.alt = ''; ni.src = `assets/${cat}.webp`; ni.style.opacity = 0; mark.appendChild(ni);
+    requestAnimationFrame(() => { ni.style.opacity = 1; if (first) old.remove(); else { old.classList.add('leaving'); setTimeout(() => old.remove(), 700); } });
+  }
+
+  function setCat(next, origin, first) {
+    if (!first && (busy || next === cat)) return;
+    busy = true; cat = next; root.dataset.cat = cat;
+    try { localStorage.setItem('liga-cat', cat); } catch (e) {}
+    document.querySelectorAll('.cats button').forEach(b => b.setAttribute('aria-selected', b.dataset.cat === cat));
+    movePill(); setTop(); swapMark(first);
+    document.getElementById('tab-' + cat).scrollIntoView({ inline: 'center', block: 'nearest', behavior: reduce || first ? 'auto' : 'smooth' });
+    if (origin && !reduce) {
+      const f = document.getElementById('flood'), r = origin.getBoundingClientRect();
+      f.style.setProperty('--fx', (r.left + r.width / 2) + 'px'); f.style.setProperty('--fy', (r.top + r.height / 2) + 'px');
+      f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+    }
+    const em = document.getElementById('emblem');
+    if (first) { render(false); busy = false; return; }
+    if (em) {
+      // keep the page, rebuild only the emblem, then refresh content under it
+      assemble(em, true);
+      setTimeout(() => {
+        const keep = em; render(false);
+        const fresh = document.getElementById('emblem');
+        if (fresh) { fresh.replaceWith(keep); keep.addEventListener('click', () => assemble(keep, false)); }
+        busy = false;
+      }, reduce ? 0 : 440);
+    } else {
+      const img = document.getElementById('coverImg'); if (img) img.style.opacity = 0;
+      setTimeout(() => { render(false); busy = false; }, reduce ? 0 : 250);
+    }
+  }
+  function setView(next, first) {
+    if (!VIEWS[next]) next = 'partidos';
+    view = next;
+    document.querySelectorAll('.tabbar a').forEach(a => { if (a.dataset.view === view) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    moveInd(); setTop();
+    if (!first) { render(true); window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); }
+  }
+
+  // theme
+  function syncThemeSeg() {
+    const seg = document.getElementById('themeSeg'); if (!seg) return;
+    const cur = root.dataset.theme || '';
+    seg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.t === cur));
+  }
+  function setTheme(v) { if (v) root.dataset.theme = v; else delete root.dataset.theme; try { localStorage.setItem('liga-theme', v); } catch (e) {} syncThemeSeg(); }
+  try { const th = localStorage.getItem('liga-theme'); if (th) root.dataset.theme = th; } catch (e) {}
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    setTheme(dark ? 'light' : 'dark');
+  });
+
+  // toast
+  let tt; function toast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), 2200); }
+
+  // events
+  document.getElementById('cats').addEventListener('click', e => { const b = e.target.closest('button[data-cat]'); if (b) setCat(b.dataset.cat, b); });
+  document.getElementById('tabs').addEventListener('click', e => { const a = e.target.closest('a[data-view]'); if (!a) return; e.preventDefault(); if (a.dataset.view !== view) { setView(a.dataset.view); try { history.replaceState(null, '', '#' + a.dataset.view); } catch (er) {} } });
+  document.getElementById('bellBtn').addEventListener('click', () => toast('Tienes un resultado por confirmar'));
+  main.addEventListener('click', e => {
+    const tb = e.target.closest('[data-toast]'); if (tb) toast(tb.dataset.toast);
+    const sw = e.target.closest('.switch'); if (sw) sw.setAttribute('aria-checked', sw.getAttribute('aria-checked') !== 'true');
+    const th = e.target.closest('#themeSeg button'); if (th) setTheme(th.dataset.t);
+    const v = e.target.closest('[data-vote]');
+    if (v && !porra.voted) {
+      porra.voted = v.dataset.vote; if (porra.voted === 'a') { porra.a = 59; porra.b = 41; } else { porra.a = 56; porra.b = 44; }
+      document.querySelectorAll('#porra .pb').forEach(b => { const k = b.dataset.vote; b.style.setProperty('--w', porra[k] + '%'); b.querySelector('b').textContent = porra[k] + '%'; b.classList.toggle('mine', k === porra.voted); });
+      const fn = document.querySelector('.f-n'); if (fn) fn.textContent = 'Has votado · 39 votos';
+    }
+  });
+  main.addEventListener('input', e => {
+    if (e.target.id !== 'q') return; const q = e.target.value.toLowerCase();
+    document.querySelectorAll('#people .person').forEach(p => p.hidden = !p.textContent.toLowerCase().includes(q));
+  });
+  addEventListener('resize', () => { movePill(); moveInd(); });
+
+  const h = (location.hash || '').slice(1);
+  setView(VIEWS[h] ? h : 'partidos', true);
+  setCat(cat, null, true);
+  document.fonts?.ready.then(() => { movePill(); moveInd(); });
+})();
+</script>
+
+</body>
+</html>
