@@ -1119,6 +1119,8 @@ html.dark body.tennis-theme .theme-toggle,html.dark body.admin-mode .theme-toggl
 
 /* ---- avisos, insignias, calendario, galería ---- */
 .auto-note{font-size:12px;color:var(--muted);margin-top:6px}
+.home-alerts{margin:14px 0 4px}
+.home-alerts-h{font-size:12px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 2px 8px}
 .cal-btn{border:1px solid var(--line);background:var(--soft);border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:800;white-space:nowrap;cursor:pointer;margin-left:6px;color:var(--text)}
 .next-hero .cal-btn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25);color:#fff}
 .pf-remind{background:#fff4d8;border:1px solid #ead28d;color:#5a3d00;border-radius:12px;padding:12px 14px;margin:0 0 12px;font-size:14px}
@@ -1847,7 +1849,7 @@ html[data-cat] body .ag-t .livenow-vs { margin: 0 6px; font-size: 11.5px; color:
 </head>
 <body>
 <div id="promoBanner"></div>
-<div id="adminbar" class="adminbar"><div class="wrap"><b>MODO ADMINISTRADOR</b><div><button class="secondary" onclick="openPromoBannerAdmin()">Publicidad</button> <button class="secondary" onclick="showAnalytics()">Estadísticas</button> <details class="admin-dl"><summary class="secondary">⬇ Descargas</summary><div class="admin-dl-menu"><button onclick="this.closest('details').open=false;exportAllStandings()">🏆 Clasificaciones (imágenes)</button><button onclick="this.closest('details').open=false;downloadUpdatedSite()">🌐 Web actualizada</button><button onclick="this.closest('details').open=false;exportData()">💾 Copia de seguridad</button></div></details> <button class="danger" onclick="toggleAdmin(false)">Salir</button></div></div></div>
+<div id="adminbar" class="adminbar"><div class="wrap"><b>MODO ADMINISTRADOR</b><div><button class="secondary" onclick="openPromoBannerAdmin()">Publicidad</button> <button class="secondary" onclick="showAnalytics()">Estadísticas</button> <details class="admin-dl"><summary class="secondary">⬇ Descargas</summary><div class="admin-dl-menu"><button onclick="this.closest('details').open=false;exportAllStandings()">🏆 Clasificaciones (imágenes)</button><button onclick="this.closest('details').open=false;openRoundExport()">📸 Resultados de una jornada</button><button onclick="this.closest('details').open=false;downloadUpdatedSite()">🌐 Web actualizada</button><button onclick="this.closest('details').open=false;exportData()">💾 Copia de seguridad</button></div></details> <button class="danger" onclick="toggleAdmin(false)">Salir</button></div></div></div>
 <div id="nameSuggestions"></div>
 <header>
  <div class="wrap">
@@ -1863,6 +1865,7 @@ html[data-cat] body .ag-t .livenow-vs { margin: 0 6px; font-size: 11.5px; color:
 </header>
 <main class="wrap">
  <div id="homePanel">
+  <div id="homeAlerts"></div>
   <div id="liveNow"></div>
  </div>
  <div id="leagueTabs" class="league-tabs"></div>
@@ -2438,7 +2441,7 @@ function _render(){
   document.getElementById("homePanel").style.display=isHome?"":"none";
   const panelSection=document.getElementById("panelSection");
   if(panelSection) panelSection.style.display=isHome?"none":"";
-  if(isHome) return;
+  if(isHome){ renderHomeAlerts(); return; }
   if(isPlayers){ renderPlayersDirectory(); return; }
   if(isAmistosos){
     document.getElementById("panelTitle").textContent="Amistosos";
@@ -2954,11 +2957,16 @@ function allLeaguePlayed(L){
 }
 function renderCup(L){
  const c=document.getElementById("content"),k=leagueKeyFromObject(L);
- if(currentLeague==="pro"||currentLeague==="media"||currentLeague==="fem"){
+ if(L&&L.teams&&L.teams.length){
    const done=allLeaguePlayed(L);
    const top=calcStandings(L).slice(0,8);
-   const cupLabel=currentLeague==="fem"?"Copa femenina":"Copa masculina";
-   const cupScope=currentLeague==="fem"?"será única para la categoría femenina.":"será única para las categorías masculinas.";
+   const CUP_TXT={
+     pro:["Copa masculina","será única para las categorías masculinas."],
+     media:["Copa masculina","será única para las categorías masculinas."],
+     fem:["Copa femenina","será única para la categoría femenina."],
+     mixta:["Copa mixta","será única para la categoría mixta."],
+     tenis:["Copa de tenis","la jugarán los 8 primeros de la liga de tenis."]};
+   const [cupLabel,cupScope]=CUP_TXT[currentLeague]||["Copa "+L.name.toLowerCase(),"con las 8 primeras posiciones."];
    const QF=[[0,7],[3,4],[2,5],[1,6]];
    const nm=i=>top[i]?esc(top[i].team):"Por definir";
    c.innerHTML=`<div class="cup-mini">
@@ -3093,7 +3101,7 @@ function drawGallery(){
  const box=document.getElementById("galBox"); if(!box) return;
  let up="";
  if(admin) up=`<div class="gal-admin"><label class="file-btn">📷 Subir foto<input type="file" accept="image/*" onchange="uploadPhoto(this)"></label><input id="gal_caption" class="user-search" style="max-width:320px;margin:0" placeholder="Pie de foto (opcional)"></div>`;
- else if(playerSession&&playerSession.status!=="pending") up=`<div class="gal-admin"><label class="file-btn">📷 Subir mi foto<input type="file" accept="image/*" onchange="uploadPhoto(this)"></label><input id="gal_caption" class="user-search" style="max-width:320px;margin:0" placeholder="Pie de foto (opcional)"><div class="muted" style="flex-basis:100%;font-size:12px">La organizadora la revisará antes de que se publique.</div></div>`;
+ else if(playerSession) up=`<div class="gal-admin"><label class="file-btn">📷 Subir mi foto<input type="file" accept="image/*" onchange="uploadPhoto(this)"></label><input id="gal_caption" class="user-search" style="max-width:320px;margin:0" placeholder="Pie de foto (opcional)"><div class="muted" style="flex-basis:100%;font-size:12px">La organizadora la revisará antes de que se publique.</div></div>`;
  else up=`<div class="muted" style="margin-bottom:10px;font-size:12.5px">Inicia sesión en <b>Mis partidos</b> para subir tus fotos de la liga.</div>`;
  const pend=admin&&galPending.length?`<div class="gal-pending"><h4>📥 Fotos pendientes de aprobar (${galPending.length})</h4>${galPending.map((it,i)=>`<div class="gal-pcard"><img src="${esc(it.image)}" alt="" onclick="openPendingPhoto(${i})"><div class="gal-pinfo"><b>${esc(it.author||"")}</b><span>${esc(it.caption||"Sin pie de foto")}</span><div class="gal-pend-actions"><button onclick="reviewPhoto('${esc(it.id)}','approve')">✓ Aprobar</button><button class="danger" onclick="reviewPhoto('${esc(it.id)}','reject')">✕ Rechazar</button></div></div></div>`).join("")}</div>`:"";
  box.innerHTML=up+pend+((galItems||[]).length?`<div class="gal-grid">${galItems.map((it,i)=>`<button class="gal-item" onclick="openPhoto(${i})"><img loading="lazy" src="${esc(it.image)}" alt="${esc(it.caption||"Foto de la liga")}">${it.caption||it.author?`<span>${esc(it.caption||"")}${it.author?` <em>📷 ${esc(it.author)}</em>`:""}</span>`:""}</button>`).join("")}</div>`:`<div class="muted">Todavía no hay fotos. ¡Pronto subiremos las de las primeras jornadas!</div>`);
@@ -3106,12 +3114,30 @@ function openPhoto(i){
  const it=(galItems||[])[i]; if(!it) return;
  openModal(`<img class="gal-big" src="${esc(it.image)}" alt=""><p style="margin:10px 0">${esc(it.caption||"")}${it.author?` <span class="muted">· 📷 ${esc(it.author)}</span>`:""}</p><div class="admin-round-actions">${admin?`<button class="danger" onclick="deletePhoto('${esc(it.id)}')">Eliminar</button>`:""}<button class="secondary" onclick="closeModal()">Cerrar</button></div>`);
 }
+// Lee una foto elegida en el móvil/ordenador y la devuelve lista para dibujar
+// en un canvas. Algunos móviles mandan el archivo sin tipo, o en HEIC: se
+// intenta con <img> y, si falla, con createImageBitmap antes de rendirse.
+function isImageFile(f){return !!f&&(/^image\//.test(f.type||"")||(!f.type&&/\.(jpe?g|png|gif|webp|heic|heif|bmp)$/i.test(f.name||"")));}
+function loadImageFile(f){
+ return new Promise((resolve,reject)=>{
+  const fail=()=>reject(new Error(/hei[cf]/i.test((f.type||"")+(f.name||""))
+   ?"Esta foto está en formato HEIC y este navegador no la puede abrir. Prueba desde Safari, o en el iPhone ve a Ajustes › Cámara › Formatos › «Más compatible», o haz una captura de la foto y sube la captura."
+   :"No se ha podido leer esa imagen. Prueba con otra foto (JPG o PNG)."));
+  const viaBitmap=()=>{ if(window.createImageBitmap) createImageBitmap(f).then(resolve,fail); else fail(); };
+  let url; try{ url=URL.createObjectURL(f); }catch(_){ viaBitmap(); return; }
+  const img=new Image();
+  img.onload=()=>{ URL.revokeObjectURL(url); if(img.width&&img.height) resolve(img); else viaBitmap(); };
+  img.onerror=()=>{ URL.revokeObjectURL(url); viaBitmap(); };
+  img.src=url;
+ });
+}
 function uploadPhoto(input){
  const f=input.files&&input.files[0]; if(!f) return;
- const rd=new FileReader();
- rd.onload=()=>{
-  const img=new Image();
-  img.onload=async()=>{
+ input.value="";
+ if(!isImageFile(f)){alert("Elige una imagen.");return}
+ if(!admin&&!playerSession){alert("Inicia sesión en «Mis partidos» para subir fotos.");return}
+ showToast("Subiendo foto…");
+ loadImageFile(f).then(async img=>{
    const M=800, sc=Math.min(1,M/Math.max(img.width,img.height)), cv=document.createElement("canvas");
    cv.width=Math.round(img.width*sc); cv.height=Math.round(img.height*sc);
    cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
@@ -3126,11 +3152,8 @@ function uploadPhoto(input){
      showToast("¡Gracias! Tu foto se publicará cuando la revise la organizadora",5000);
     }
     loadGallery();
-   }catch(e){alert(e.message)}
-  };
-  img.src=rd.result;
- };
- rd.readAsDataURL(f);
+   }catch(e){alert("No se ha podido subir la foto: "+e.message)}
+ }).catch(e=>alert(e.message));
 }
 async function deletePhoto(id){
  if(!confirm("¿Eliminar esta foto?")) return;
@@ -3478,6 +3501,8 @@ async function refreshMyProfile(silent){
  try{
   const r=await cloudWrite({action:"myProfile",...authPayload()});
   myProfile={...r.profile,hidden:!!r.hidden,createdAt:r.createdAt};
+  const st=r.status||(r.user&&r.user.status);
+  if(st&&playerSession.status!==st){ playerSession.status=st; try{localStorage.setItem("liga_etsii_player_session",JSON.stringify(playerSession))}catch(_){} }
   updateProfileFab();
  }catch(e){ if(!silent) console.warn(e); }
 }
@@ -3507,11 +3532,10 @@ function openEditProfile(){
 }
 function pickAvatar(input){
  const f=input.files&&input.files[0]; if(!f) return;
- if(!/^image\//.test(f.type)){alert("Elige una imagen.");return}
- const reader=new FileReader();
- reader.onload=()=>{
-  const img=new Image();
-  img.onload=()=>{
+ input.value="";
+ if(!isImageFile(f)){alert("Elige una imagen.");return}
+ loadImageFile(f).then(img=>{
+  {
    const min=CROP_V/Math.min(img.width,img.height);
    crop={img,s:min,min,ox:(CROP_V-img.width*min)/2,oy:(CROP_V-img.height*min)/2};
    const st=document.getElementById("avStage"); if(!st) return;
@@ -3520,11 +3544,8 @@ function pickAvatar(input){
     <input type="range" id="cropZoom" min="1" max="4" step="0.01" value="1" aria-label="Zoom">
     <label class="file-btn" style="margin-top:8px">Elegir otra foto<input type="file" accept="image/*" onchange="pickAvatar(this)"></label></div>`;
    initCropEvents(); drawCrop();
-  };
-  img.onerror=()=>alert("No se ha podido leer esa imagen.");
-  img.src=reader.result;
- };
- reader.readAsDataURL(f);
+  }
+ }).catch(e=>alert(e.message));
 }
 function clampCrop(){
  const w=crop.img.width*crop.s,h=crop.img.height*crop.s;
@@ -3571,6 +3592,7 @@ async function saveProfile(){
  if(crop){ const o=exportCrop(); payload.avatar=o.full; payload.avatar_sm=o.sm; }
  else if(pendingAvatar===""){ payload.avatar=""; payload.avatar_sm=""; }
  try{
+  if(crop) showToast("Guardando foto…");
   await cloudWrite(payload);
   closeModal(); dirCache=null; crop=null;
   await refreshMyProfile();
@@ -3736,7 +3758,33 @@ function autoConfirmNote(p,mineSide){
  return `<div class="auto-note">${txt}${mineSide?" si la otra pareja no responde":" si no respondes"}</div>`;
 }
 function proposalHtml(p){return `<div class="proposal-card"><b>${esc(p.home)} vs ${esc(p.away)}</b><br><span>${esc(p.score)}</span>${autoConfirmNote(p,false)}<div class="actions"><button onclick="confirmProposal('${esc(p.id)}','confirm')">Confirmar</button><button class="danger" onclick="confirmProposal('${esc(p.id)}','reject')">Rechazar</button></div></div>`}
-async function confirmProposal(id,decision){try{await cloudWrite({action:"confirmProposal",username:playerSession.username,token:playerSession.token,id,decision});if(decision==="confirm")await loadCloudResults();closeModal();currentView="profile";render()}catch(e){alert(e.message)}}
+async function confirmProposal(id,decision){try{await cloudWrite({action:"confirmProposal",username:playerSession.username,token:playerSession.token,id,decision});_homeAlertsAt=0;if(decision==="confirm")await loadCloudResults();closeModal();if(currentView==="inicio"){showToast(decision==="confirm"?"Resultado confirmado ✓":"Resultado rechazado");renderHomeAlerts(true);}else{currentView="profile";}render()}catch(e){alert(e.message)}}
+// Avisos en Inicio: resultados que la otra pareja ha propuesto y falta
+// confirmar. Así no hace falta entrar en "Mis partidos" para aceptarlos.
+let _homeAlertsAt=0,_homeAlertsHTML="",_homeAlertsBusy=false;
+async function renderHomeAlerts(force){
+  const box=document.getElementById("homeAlerts"); if(!box) return;
+  if(!playerSession||!playerSession.token){_homeAlertsHTML="";box.innerHTML="";return}
+  if(!force&&Date.now()-_homeAlertsAt<60000){box.innerHTML=_homeAlertsHTML;return}
+  if(_homeAlertsBusy) return;
+  _homeAlertsBusy=true; _homeAlertsAt=Date.now();
+  let html="";
+  try{
+    const data=await cloudWrite({action:"playerDashboard",username:playerSession.username,token:playerSession.token});
+    const incoming=data.incoming||[];
+    if(incoming.length){
+      html=`<div class="home-alerts"><div class="home-alerts-h">Resultados pendientes de confirmar</div>${incoming.map(x=>{
+        const opp=x.home===playerSession.team?x.away:x.home;
+        return `<div class="pf4-alert"><div class="pf4-al-top"><span class="pf4-dot"></span><b>${esc(opp)} te propone un resultado</b></div>
+        <div class="pf4-al-score">${esc(x.home)} vs ${esc(x.away)}<br><span>${esc(x.score)}</span></div>${autoConfirmNote(x,false)}
+        <div class="pf4-al-btns"><button class="pf4-no" onclick="confirmProposal('${esc(x.id)}','reject')">No es correcto</button><button class="pf4-ok" onclick="confirmProposal('${esc(x.id)}','confirm')">Confirmar</button></div></div>`;
+      }).join("")}</div>`;
+    }
+  }catch(_){ html=_homeAlertsHTML; }
+  finally{ _homeAlertsBusy=false; }
+  _homeAlertsHTML=html;
+  if(currentView==="inicio") box.innerHTML=html;
+}
 function pfTab(t){
  window._pfTab=t;
  document.querySelectorAll(".pf4-pane").forEach(p=>{p.hidden=p.dataset.tab!==t});
@@ -4223,7 +4271,7 @@ setInterval(()=>{
 /* ---- cuadro visual de la Copa ---- */
 function bracketSVG(top,k,L){
   const short=n=>{n=String(n||"");return n.length>16?n.slice(0,15)+"…":n};
-  const names=Array.from({length:8},(_,i)=>top[i]?top[i].team:"Por definir");
+  const names=Array.from({length:8},(_,i)=>top[i]?(L&&L.sport==="Tenis"?String(top[i].team).split(/\s+/).slice(0,2).join(" "):top[i].team):"Por definir");
   const QF=[[0,7],[3,4],[2,5],[1,6]], qy=i=>28+i*76, c=i=>qy(i)+30;
   const ya=(c(0)+c(1))/2, yb=(c(2)+c(3))/2, s=[];
   s.push(`<text class="lbl" x="6" y="14">CUARTOS</text><text class="lbl" x="215" y="14">SEMIFINALES</text><text class="lbl" x="424" y="14">FINAL</text>`);
@@ -4238,7 +4286,7 @@ function bracketSVG(top,k,L){
   s.push(`<path class="ln" d="M375 ${c(2)} H400 V${yb} H424 M375 ${c(3)} H400"/>`);
   [0,1,2,3].forEach(i=>s.push(`<g class="tm"><rect class="box" rx="9" x="215" y="${c(i)-15}" width="160" height="30"/><text class="tbd" x="225" y="${c(i)+5}">Ganador cuartos ${i+1}</text></g>`));
   s.push(`<g class="tm"><rect class="box" rx="9" x="424" y="${ya-15}" width="160" height="30"/><text class="tbd" x="434" y="${ya+5}">Finalista 1</text><rect class="box" rx="9" x="424" y="${yb-15}" width="160" height="30"/><text class="tbd" x="434" y="${yb+5}">Finalista 2</text></g>`);
-  s.push(`<g class="tm"><text x="215" y="326" style="font-size:15px">🏆 ${k==="fem"?"Campeonas":"Campeones"}: por definir</text></g>`);
+  s.push(`<g class="tm"><text x="215" y="326" style="font-size:15px">🏆 ${k==="fem"?"Campeonas":k==="tenis"?"Campeón":"Campeones"}: por definir</text></g>`);
   return `<svg class="br-svg" viewBox="0 0 590 340" role="img" aria-label="Cuadro de la Copa">${s.join("")}</svg>`;
 }
 function animateBracket(){
@@ -4328,6 +4376,72 @@ async function exportAllStandings(){
     const tk=Object.entries(db.leagues).find(([k,L])=>L.sport==="Tenis");
     if(tk) items.push({name:"clasificacion-tenis.png",title:"Tenis",blob:await buildShareImage(tk[1],tk[0])});
     openModal(`<h3>Clasificaciones exportadas</h3><div class="exp-grid">${items.map(it=>{const u=URL.createObjectURL(it.blob);return `<div class="exp-item"><img src="${u}" alt=""><b>${esc(it.title)}</b><a class="wa-btn" href="${u}" download="${it.name}">⬇ Descargar</a></div>`}).join("")}</div><div class="admin-round-actions" style="margin-top:12px"><button class="secondary" onclick="closeModal()">Cerrar</button></div>`);
+  }catch(e){alert("No se han podido crear las imágenes: "+e.message)}
+}
+// Imagen con todos los partidos de una jornada de una liga (resultados y
+// pendientes). Pensada para pasarla al grupo de WhatsApp.
+async function buildRoundImage(k,r){
+  const L=db.leagues[k]; const round=(L.schedule||[])[r]||[];
+  const cat=SHARE_CAT[k]||"gen", P=SHARE_PAL[cat];
+  try{ await Promise.all([document.fonts.load("800 60px Montserrat"),document.fonts.load("700 30px Inter")]); }catch(_){}
+  const FH="Montserrat, Archivo, Arial, sans-serif", FB="Inter, Arial, sans-serif";
+  const W=1080, top=300, rh=176, H=Math.max(1080, top+round.length*rh+150);
+  const cv=document.createElement("canvas"); cv.width=W; cv.height=H; const x=cv.getContext("2d");
+  const g=x.createLinearGradient(0,0,W*.55,H); g.addColorStop(0,P[0]); g.addColorStop(1,P[1]); x.fillStyle=g; x.fillRect(0,0,W,H);
+  const glow=x.createRadialGradient(W,0,0,W,0,700); glow.addColorStop(0,P[2]+"55"); glow.addColorStop(1,P[2]+"00"); x.fillStyle=glow; x.fillRect(0,0,W,H);
+  const em=await shareLoadImg(`identidad/${cat}.webp`);
+  if(em) x.drawImage(em,80,70,140,140);
+  const tx=em?250:80;
+  x.textAlign="left"; x.fillStyle="#fff"; x.font=`800 44px ${FH}`; x.fillText(L.sport==="Tenis"?"LIGA TENIS ETSII":"LIGA PÁDEL ETSII",tx,130);
+  x.fillStyle=P[2]; x.font=`800 34px ${FH}`; x.fillText((L.name+" · Jornada "+(r+1)).toUpperCase(),tx,182);
+  x.fillStyle="rgba(255,255,255,.7)"; x.font=`700 24px ${FH}`; x.fillText("RESULTADOS",80,top-30);
+  const fit=(t,max,size,w)=>{let f=size; x.font=`${w} ${f}px ${FH}`; while(x.measureText(t).width>max&&f>22){f-=2; x.font=`${w} ${f}px ${FH}`;}};
+  round.forEach((m,i)=>{
+    const y=top+i*rh, res=getResult(L,r,i);
+    const sets=res?(res.sets||[]).filter(s=>s[0]!==""&&s[1]!==""):[];
+    x.fillStyle="rgba(0,0,0,.18)"; rrect(x,60,y,W-120,rh-20,26); x.fill();
+    const scoreW=sets.length?sets.length*78+20:250, nameMax=W-120-60-scoreW;
+    [[m.home,0],[m.away,1]].forEach(([name,side])=>{
+      const ly=y+58+side*62, win=res&&res.winner===name;
+      x.textAlign="left"; x.fillStyle=!res||win?"#fff":"rgba(255,255,255,.6)";
+      fit(name,nameMax,40,win?800:700); x.fillText(name,100,ly);
+      if(win){ x.fillStyle=P[2]; x.beginPath(); x.arc(86,ly-13,6,0,7); x.fill(); }
+      sets.forEach((s,n)=>{ const v=s[side],o=s[1-side], cx=W-100-(sets.length-1-n)*78;
+        x.textAlign="center"; x.fillStyle=Number(v)>Number(o)?"#fff":"rgba(255,255,255,.45)"; x.font=`800 44px ${FH}`; x.fillText(String(v),cx,ly); });
+    });
+    if(!res){
+      const si=getMatchSchedule(k,m.home,m.away);
+      x.textAlign="right"; x.fillStyle=P[2]; x.font=`800 26px ${FH}`; x.fillText("PENDIENTE",W-100,y+62);
+      if(si&&si.date){ x.fillStyle="rgba(255,255,255,.75)"; x.font=`600 22px ${FB}`; x.fillText([formatMatchDate(si.date),si.time,si.court].filter(Boolean).join(" · "),W-100,y+102); }
+    }
+  });
+  if(!round.length){ x.textAlign="left"; x.fillStyle="#fff"; x.font=`700 34px ${FH}`; x.fillText("No hay partidos en esta jornada.",80,top+40); }
+  x.textAlign="left"; x.fillStyle=P[2]; x.font=`800 30px ${FH}`; x.fillText("padeletsii.github.io",80,H-70);
+  x.fillStyle="rgba(255,255,255,.6)"; x.font=`700 24px ${FH}`; x.textAlign="right"; x.fillText("CD INDUSTRIALES · 2026/27",W-80,H-70); x.textAlign="left";
+  return await new Promise((res,rej)=>{ try{ cv.toBlob(b=>b?res(b):rej(new Error("canvas vacío")),"image/png"); }catch(e){ rej(e); } });
+}
+function openRoundExport(){
+  if(!admin){alert("Solo en modo administrador.");return}
+  const maxR=Math.max(0,...Object.values(db.leagues).map(L=>(L.schedule||[]).length));
+  if(!maxR){alert("Todavía no hay jornadas.");return}
+  const leagues=Object.entries(db.leagues).filter(([k,L])=>(L.schedule||[]).length);
+  const cur=currentRounds[currentLeague]||1;
+  openModal(`<h3>Resultados de una jornada</h3><p class="muted" style="font-size:13px">Genera una imagen por liga con todos los partidos de la jornada (jugados y pendientes).</p>
+   <div class="admin-team-form">
+    <label>Jornada<select id="rexp_r">${Array.from({length:maxR},(_,i)=>`<option value="${i}" ${i+1===cur?"selected":""}>Jornada ${i+1}</option>`).join("")}</select></label>
+    <label>Liga<select id="rexp_k"><option value="__all">Todas las ligas</option>${leagues.map(([k,L])=>`<option value="${k}">${esc(L.name)}</option>`).join("")}</select></label>
+   </div>
+   <div class="admin-round-actions" style="margin-top:12px"><button onclick="exportRoundResults(+v('rexp_r'),v('rexp_k'))">Generar imágenes</button><button class="secondary" onclick="closeModal()">Cancelar</button></div>`);
+}
+async function exportRoundResults(r,which){
+  if(!admin) return;
+  showToast("Generando imágenes…");
+  try{
+    const keys=which==="__all"?Object.keys(db.leagues).filter(k=>(db.leagues[k].schedule||[])[r]&&db.leagues[k].schedule[r].length):[which];
+    if(!keys.length){alert("Ninguna liga tiene partidos en la jornada "+(r+1)+".");return}
+    const items=[];
+    for(const k of keys) items.push({name:`resultados-${k}-j${r+1}.png`,title:db.leagues[k].name+" · J"+(r+1),blob:await buildRoundImage(k,r)});
+    openModal(`<h3>Resultados · Jornada ${r+1}</h3><div class="exp-grid">${items.map(it=>{const u=URL.createObjectURL(it.blob);return `<div class="exp-item"><img src="${u}" alt=""><b>${esc(it.title)}</b><a class="wa-btn" href="${u}" download="${it.name}">⬇ Descargar</a></div>`}).join("")}</div><div class="admin-round-actions" style="margin-top:12px"><button class="secondary" onclick="openRoundExport()">Otra jornada</button><button class="secondary" onclick="closeModal()">Cerrar</button></div>`);
   }catch(e){alert("No se han podido crear las imágenes: "+e.message)}
 }
 async function shareStandings(){
