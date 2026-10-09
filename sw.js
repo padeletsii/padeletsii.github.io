@@ -1,4 +1,4 @@
-const CACHE_NAME = "liga-etsii-v3";
+const CACHE_NAME = "liga-etsii-v4";
 const APP_SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (event) => {
@@ -26,6 +26,18 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
+
+  // La página (HTML) va primero a la red: así al subir una versión nueva se ve
+  // al momento. Solo si no hay conexión se usa la copia guardada.
+  if (req.mode === "navigate" || url.pathname.endsWith(".html") || url.pathname.endsWith("/")) {
+    event.respondWith(
+      fetch(req).then((res) => {
+        if (res && res.ok) { const clone = res.clone(); caches.open(CACHE_NAME).then((c) => c.put(req, clone)); }
+        return res;
+      }).catch(() => caches.match(req).then((c) => c || caches.match("./index.html")))
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(req).then((cached) => {

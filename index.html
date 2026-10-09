@@ -427,7 +427,7 @@ body.admin-mode .admin-nav-only{display:inline-flex!important}
 
 .admin-round-box{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;margin-bottom:16px;border:1px solid var(--line);border-radius:14px;background:var(--paper)}
 .admin-round-box span{display:block;margin-top:3px;color:var(--muted);font-size:11px}
-.admin-round-actions{display:flex;gap:8px;align-items:center}
+.admin-round-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .admin-round-actions select{min-height:42px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--paper);font:inherit}
 .admin-team-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;width:100%}
 .admin-team-form label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.02em}
@@ -2533,7 +2533,7 @@ function adminRoundControl(k,L){
   if(!admin)return "";
   const rounds=scheduleForLeague(L);
   const cur=Math.min(currentRoundFor(k),Math.max(1,rounds.length));
-  return `<div class="admin-round-box"><div><b>Jornada actual</b><span>La que verán los jugadores de ${esc(L.name)} en su perfil.</span></div><div class="admin-round-actions"><select id="adminCurrentRound">${Array.from({length:Math.max(1,rounds.length)},(_,i)=>`<option value="${i+1}" ${i+1===cur?"selected":""}>Jornada ${i+1}</option>`).join("")}</select><button onclick="saveCurrentRound('${k}')">Guardar jornada</button></div></div>`;
+  return `<div class="admin-round-box"><div><b>Jornada actual</b><span>La que verán los jugadores de ${esc(L.name)} en su perfil.</span></div><div class="admin-round-actions"><select id="adminCurrentRound">${Array.from({length:Math.max(1,rounds.length)},(_,i)=>`<option value="${i+1}" ${i+1===cur?"selected":""}>Jornada ${i+1}</option>`).join("")}</select><button onclick="saveCurrentRound('${k}')">Guardar jornada</button><button class="secondary" onclick="exportRoundResults(+v('adminCurrentRound')-1,'${k}')">📸 Exportar resultados</button><button class="secondary" onclick="exportRoundResults(+v('adminCurrentRound')-1,'__all')">📸 Todas las ligas</button></div></div>`;
 }
 async function saveCurrentRound(k){
   if(!admin)return;
