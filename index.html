@@ -123,6 +123,13 @@ tr:last-child td{border-bottom:0}
 .adminbar{display:none;background:var(--admin);color:#fff;padding:13px 18px}
 .adminbar.on{display:block}
 .adminbar .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.adminbar .wrap>div{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px}
+.admin-dl{position:relative;display:inline-block}
+.admin-dl>summary{list-style:none;display:inline-block;border-radius:10px;padding:10px 13px;font-weight:800;cursor:pointer;user-select:none}
+.admin-dl>summary::-webkit-details-marker{display:none}
+.admin-dl-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:50;min-width:230px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:6px;display:flex;flex-direction:column}
+.adminbar .admin-dl-menu button{white-space:nowrap;background:transparent;color:#1d1d1f;text-align:left;border-radius:8px;padding:10px 12px;font-weight:700}
+.adminbar .admin-dl-menu button:hover{background:#f0f2f5}
 .name-suggestion-bar{background:#fff6d9;border-bottom:2px solid #ead28d;padding:12px 18px}
 .name-suggestion-bar>b{display:block;margin-bottom:8px;font-size:13px}
 .name-suggestion-list{display:flex;flex-direction:column;gap:8px}
@@ -1840,7 +1847,7 @@ html[data-cat] body .ag-t .livenow-vs { margin: 0 6px; font-size: 11.5px; color:
 </head>
 <body>
 <div id="promoBanner"></div>
-<div id="adminbar" class="adminbar"><div class="wrap"><b>MODO ADMINISTRADOR</b><div><button class="secondary" onclick="openPromoBannerAdmin()">Publicidad</button> <button class="secondary" onclick="showAnalytics()">Estadísticas</button> <button class="secondary" onclick="exportAllStandings()">Exportar clasificaciones</button> <button class="secondary" onclick="downloadUpdatedSite()">Descargar web actualizada</button> <button class="secondary" onclick="exportData()">Exportar copia</button> <button class="danger" onclick="toggleAdmin(false)">Salir</button></div></div></div>
+<div id="adminbar" class="adminbar"><div class="wrap"><b>MODO ADMINISTRADOR</b><div><button class="secondary" onclick="openPromoBannerAdmin()">Publicidad</button> <button class="secondary" onclick="showAnalytics()">Estadísticas</button> <details class="admin-dl"><summary class="secondary">⬇ Descargas</summary><div class="admin-dl-menu"><button onclick="this.closest('details').open=false;exportAllStandings()">🏆 Clasificaciones (imágenes)</button><button onclick="this.closest('details').open=false;downloadUpdatedSite()">🌐 Web actualizada</button><button onclick="this.closest('details').open=false;exportData()">💾 Copia de seguridad</button></div></details> <button class="danger" onclick="toggleAdmin(false)">Salir</button></div></div></div>
 <div id="nameSuggestions"></div>
 <header>
  <div class="wrap">
@@ -2598,9 +2605,88 @@ Pa amb tomàquet - Toca y vuela, ciruela 13:30 P1
   <div class="admin-round-actions"><button onclick="importScheduleFromText()">Importar horario</button></div>
  </div>`;
 }
+// --- Reconocimiento flexible de nombres al importar el horario ---
+// Antes de mandar el texto al servidor, cada "A vs B" se traduce al nombre
+// exacto de la pareja/jugador inscrito. Así vale con escribir "Felix vs
+// Federico" (tenis, sin apellidos), "Vega/Lucia", "Grobmeister" o el nombre
+// de los jugadores de la pareja aunque falle alguna letra.
+const IMPORT_STOP=new Set(["y","e","de","del","la","las","el","los","i","and"]);
+function importNorm(s){return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/ß/g,"ss");}
+function importTokens(s){return importNorm(s).split(/[^a-z0-9]+/).filter(t=>t&&!IMPORT_STOP.has(t));}
+function importTokMatch(a,b){
+  if(a===b) return true;
+  if(a.length>=3&&b.startsWith(a)) return true;           // "fede" -> "federico"
+  if(a.length>=4&&levenshtein(a,b)<=1) return true;      // una letra mal
+  if(a.length>=7&&levenshtein(a,b)<=2) return true;      // dos letras en nombres largos
+  return false;
+}
+function importScoreTeam(raw,t,league,relaxed){
+  const n=normalizeTeamName(raw), tn=normalizeTeamName(t.team);
+  if(!n) return null;
+  if(n===tn) return 0;
+  if(teamAliasOverrides[league+"|"+n]===t.team) return 0;
+  const d=levenshtein(n,tn), thr=(n.length<=4?1:n.length<=8?2:3)+(relaxed?1:0);
+  if(d<=thr) return d+(relaxed?5:0);                                    // errata en el nombre
+  if(n.length>=4&&tn.length>=4&&(tn.includes(n)||n.includes(tn))) return 3; // coincidencia parcial
+  const inT=importTokens(raw);
+  if(inT.length){
+    const candT=[...importTokens(t.team),...importTokens(t.p1),...importTokens(t.p2)];
+    if(inT.every(a=>candT.some(b=>importTokMatch(a,b)))) return 4; // nombres de jugadores
+  }
+  return null;
+}
+// Devuelve {liga: {team, score, amb}} con la mejor coincidencia en cada liga.
+function importCandidates(raw,relaxed){
+  const out={};
+  Object.entries(db.leagues).forEach(([k,L])=>{
+    let best=null;
+    (L.teams||[]).forEach(t=>{
+      const sc=importScoreTeam(raw,t,k,relaxed); if(sc===null) return;
+      if(!best||sc<best.score) best={team:t.team,score:sc,amb:false};
+      else if(sc===best.score&&t.team!==best.team) best.amb=true;
+    });
+    if(best) out[k]=best;
+  });
+  return out;
+}
+function resolveImportPair(a,b,relaxed){
+  const A=importCandidates(a,relaxed), B=importCandidates(b,relaxed);
+  const opts=Object.keys(A).filter(k=>B[k]&&!A[k].amb&&!B[k].amb&&A[k].team!==B[k].team)
+    .map(k=>({k,home:A[k].team,away:B[k].team,score:A[k].score+B[k].score}))
+    .sort((x,y)=>x.score-y.score);
+  // Si no sale, se prueba con algo más de margen: el rival ya delata la liga.
+  if(!opts.length) return relaxed?null:resolveImportPair(a,b,true);
+  if(opts.length>1&&opts[1].score===opts[0].score) return {ambiguous:opts.slice(0,3)};
+  return opts[0];
+}
+function preprocessScheduleText(text){
+  const changes=[], problems=[];
+  const re=/^(.+?)\s+(?:vs\.?|contra|-)\s+(.+?)\s+(\d{1,2}[:.h]\d{2}\b.*)$/i;
+  const lines=text.split(/\r?\n/).map(line=>{
+    const clean=line.replace(/\*/g,"").trim();
+    const m=clean.match(re);
+    if(!m||/^jornada\b/i.test(clean)) return line;
+    const a=m[1].trim(), b=m[2].trim(), rest=m[3].trim();
+    const r=resolveImportPair(a,b);
+    if(!r){problems.push(`No reconozco: ${a} vs ${b}`);return clean;}
+    if(r.ambiguous){problems.push(`Dudoso: ${a} vs ${b} (podría ser ${r.ambiguous.map(o=>o.home+" vs "+o.away+" en "+db.leagues[o.k].name).join(" o ")})`);return clean;}
+    if(r.home!==a||r.away!==b) changes.push(`${a} vs ${b} → ${r.home} vs ${r.away} (${db.leagues[r.k].name})`);
+    return `${r.home} vs ${r.away} ${rest}`;
+  });
+  return {text:lines.join("\n"),changes,problems};
+}
+document.addEventListener("click",e=>{document.querySelectorAll("details.admin-dl[open]").forEach(d=>{if(!d.contains(e.target))d.open=false;});});
 async function importScheduleFromText(){
- const text=v("scheduleImportText");
- if(!text||!text.trim()){alert("Pega primero el texto del calendario.");return}
+ const raw=v("scheduleImportText");
+ if(!raw||!raw.trim()){alert("Pega primero el texto del calendario.");return}
+ const pre=preprocessScheduleText(raw);
+ if(pre.changes.length||pre.problems.length){
+  let msg="";
+  if(pre.changes.length) msg+="He reconocido estos nombres:\n• "+pre.changes.join("\n• ")+"\n\n";
+  if(pre.problems.length) msg+="⚠️ Revisa estos (se importan tal cual):\n• "+pre.problems.join("\n• ")+"\n\n";
+  if(!confirm(msg+"¿Importar el horario?")) return;
+ }
+ const text=pre.text;
  try{
   const data=await cloudWrite({action:"importSchedule",password:adminPassword,text});
   const jornadas=[...new Set((data.entries||[]).map(x=>x.jornada).filter(j=>j>0))];
