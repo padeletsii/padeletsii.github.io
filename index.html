@@ -4188,7 +4188,8 @@ function renderLigaSubTabs(show){
   const box=document.getElementById("ligaSubTabs"); if(!box) return;
   if(!show){ box.innerHTML=""; return; }
   lastLigaView=currentView;
-  box.innerHTML=`<div class="sub-tabs liga-sub">${LIGA_VIEWS.map(v=>`<button class="${v===currentView?"active":""}" onclick="currentView='${v}';render()">${LIGA_LABELS[v]}</button>`).join("")}</div>`;
+  const isTennis=db.leagues[currentLeague]?.sport==="Tenis";
+  box.innerHTML=`<div class="sub-tabs liga-sub">${LIGA_VIEWS.map(v=>`<button class="${v===currentView?"active":""}" onclick="currentView='${v}';render()">${v==="teams"&&isTennis?"Jugadores":LIGA_LABELS[v]}</button>`).join("")}</div>`;
 }
 
 /* ---- modo oscuro ---- */
