@@ -526,6 +526,14 @@ body.admin-mode .admin-nav-only{display:inline-flex!important}
 .mr-cta{background:#6A2EF0;color:#fff;margin-top:2px}
 .mr-empty{font-size:13px;color:var(--muted);padding:4px 6px 10px}
 html.dark .mr-box{background:#241a3d;border-color:#3b2d63}
+.mr-days{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 4px}
+.mr-day{border:1px solid var(--line);border-radius:999px;padding:6px 11px;font:inherit;font-size:13px;font-weight:800;background:var(--paper);color:var(--text);cursor:pointer}
+.mr-days .mr-day.on{background:#DCF23A!important;border-color:#DCF23A!important;color:#15131c!important}
+.mr-count{font-size:11.5px;color:var(--muted);margin-bottom:6px}
+.mr-wa{display:block;text-align:center;background:#25D366;color:#0b2e17;border-radius:12px;padding:11px;font-weight:900;font-size:14px;text-decoration:none;margin-top:8px}
+.mr-alert{background:#fff4d6;border:2px solid #f0b400;color:#5a4200;border-radius:14px;padding:11px 12px;font-size:13.5px;font-weight:800;margin:12px 0 4px}
+.mr-alert span{display:block;font-weight:600;font-size:12.5px;margin-top:3px}
+html.dark .mr-alert{background:#3a2f0b;border-color:#c99a00;color:#ffe7a3}
 .pf-vs-real{display:inline-flex;align-items:flex-end;gap:8px;flex-wrap:wrap}
 .pf-vs-real>i{font-style:normal;font-size:12px;font-weight:800;color:var(--muted);padding-bottom:2px}
 .pf-side{display:inline-flex;flex-direction:column;line-height:1.15}
@@ -3351,54 +3359,83 @@ async function playerRegisterPageDo(){
  }catch(e){alert(e.message)}
 }
 // ---------------------------------------------------------------------------
-// "Buscar rival" (ligas Mixta y Tenis): publicar un hueco para adelantar un partido
-// de otra jornada y que lo acepte cualquier rival contra el que aún no has jugado.
+// "Buscar rival" (ligas Mixta y Tenis): publicar hasta 3 días y una franja de
+// horas en los que os viene bien adelantar un partido de otra jornada. Quien
+// acepta recibe el WhatsApp de los rivales para cerrar día y hora, y se le
+// recuerda que tiene que comunicar el horario a la admin.
+// Para abrirlo en otra liga, añadir su clave a MR_LEAGUES (p. ej. "fem").
 // ---------------------------------------------------------------------------
 const MR_LEAGUES=["mixta","tenis"];
+const MR_MAX_DAYS=3;
+const MR_ADMIN="Lucía Velasco";
 // En tenis se juega individual: los textos van en singular ("jugador", "te"...).
 function mrSolo(){return db.leagues[playerSession.league]?.sport==="Tenis"}
 function mrDayLabel(iso){
-  const mm=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})$/); if(!mm) return iso||"";
+  const mm=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})/); if(!mm) return iso||"";
   const dt=new Date(+mm[1],+mm[2]-1,+mm[3]);
   return ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"][dt.getDay()]+" "+dt.getDate()+"/"+(dt.getMonth()+1);
 }
-function mrChips(r){return `<div class="mr-when"><span class="mr-chip y">${esc(mrDayLabel(r.date))}</span><span class="mr-chip">${esc(r.time)}</span><span class="mr-chip">${r.court?esc(r.court):"Pista a elegir"}</span></div>`}
+// Días de la solicitud: "days" (lista separada por comas) o, en solicitudes
+// antiguas, el único "date".
+function mrDays(r){
+  const d=Array.isArray(r.days)?r.days:String(r.days||"").split(",");
+  const list=d.map(x=>String(x).trim()).filter(Boolean);
+  return list.length?list:(r.date?[r.date]:[]);
+}
+function mrRange(r){return r.from&&r.to?`${r.from} – ${r.to}`:(r.time||"")}
+function mrChips(r){return `<div class="mr-when">${mrDays(r).map(d=>`<span class="mr-chip y">${esc(mrDayLabel(d))}</span>`).join("")}${mrRange(r)?`<span class="mr-chip">🕐 ${esc(mrRange(r))}</span>`:""}</div>`}
 function mrMembers(team){if(mrSolo())return "";const t=(db.leagues[playerSession.league]?.teams||[]).find(x=>x.team===team);return t?[t.p1,t.p2].filter(Boolean).map(n=>String(n).split(" ")[0]).join(" · "):""}
 function matchRequestsHTML(all){
-  const me=playerSession.team, items=window._mrItems||[];
+  const me=playerSession.team, items=window._mrItems||[], solo=mrSolo();
   const pendingOpp=new Set(all.filter(m=>!m.played).map(m=>m.opponent));
   const others=items.filter(r=>r.status==="open"&&r.team!==me&&pendingOpp.has(r.team));
   const mine=items.filter(r=>r.status==="open"&&r.team===me);
   const closed=items.filter(r=>r.status==="closed"&&(r.team===me||r.acceptedTeam===me));
-  const card=(r)=>`<div class="mr-card"><div class="mr-who"><span class="mr-av">${esc(initialsOf(r.team))}</span><div><b>${esc(r.team)} busca rival</b><small>${esc(mrMembers(r.team))}</small></div></div>${mrChips(r)}${r.message?`<div class="mr-msg">“${esc(r.message)}”</div>`:""}<button class="mr-yes" onclick="acceptMatchRequest('${esc(r.id)}')">${mrSolo()?"¡Me va bien!":"¡Nos va bien!"}</button></div>`;
-  const mineCard=(r)=>`<div class="mr-card mr-mine"><div class="mr-who"><span class="mr-av">${esc(initialsOf(me))}</span><div><b>Tu solicitud</b><small>Esperando a que ${mrSolo()?"alguien":"alguna pareja"} acepte</small></div></div>${mrChips(r)}${r.message?`<div class="mr-msg">“${esc(r.message)}”</div>`:""}<button class="mr-no" onclick="cancelMatchRequest('${esc(r.id)}')">Retirar solicitud</button></div>`;
-  const closedCard=(r)=>{const rival=r.team===me?r.acceptedTeam:r.team;return `<div class="mr-card mr-done"><div class="mr-who"><span class="mr-av">${esc(initialsOf(rival))}</span><div><b>✓ Partido cerrado vs ${esc(rival)}</b><small>${esc(r.home)} (local) vs ${esc(r.away)} (visitante)</small></div></div>${mrChips(r)}</div>`};
+  const card=(r)=>`<div class="mr-card"><div class="mr-who"><span class="mr-av">${esc(initialsOf(r.team))}</span><div><b>${esc(r.team)} busca rival</b><small>${esc(mrMembers(r.team))}</small></div></div>${mrChips(r)}${r.message?`<div class="mr-msg">“${esc(r.message)}”</div>`:""}<button class="mr-yes" onclick="acceptMatchRequest('${esc(r.id)}')">${solo?"¡Me va bien!":"¡Nos va bien!"}</button></div>`;
+  const mineCard=(r)=>`<div class="mr-card mr-mine"><div class="mr-who"><span class="mr-av">${esc(initialsOf(me))}</span><div><b>Tu solicitud</b><small>Esperando a que ${solo?"alguien":"alguna pareja"} acepte</small></div></div>${mrChips(r)}${r.message?`<div class="mr-msg">“${esc(r.message)}”</div>`:""}<button class="mr-no" onclick="cancelMatchRequest('${esc(r.id)}')">Retirar solicitud</button></div>`;
+  const closedCard=(r)=>{const rival=r.team===me?r.acceptedTeam:r.team;return `<div class="mr-card mr-done"><div class="mr-who"><span class="mr-av">${esc(initialsOf(rival))}</span><div><b>💬 En contacto con ${esc(rival)}</b><small>Cerrad día y hora y avisad a la admin</small></div></div>${mrChips(r)}<button class="mr-no" onclick="openMrContact('${esc(rival)}')">Ver contacto</button></div>`};
   return `<div class="mr-box">
    <div class="mr-h"><span>🎾 Buscan rival en la ${esc(db.leagues[playerSession.league]?.name||"liga")}</span>${others.length?`<em>${others.length}</em>`:""}</div>
-   <div class="mr-info">ℹ️ ${mrSolo()?"Si el partido de esta jornada no te viene bien, puedes adelantar uno de otra jornada: publica un hueco y el primer jugador que acepte (de los que aún no has jugado) se lo queda.":"Si el partido de esta jornada no os viene bien, podéis adelantar uno de otra jornada: publicad un hueco y la primera pareja que acepte (de las que aún no habéis jugado) se lo queda."} Cuenta igual para la clasificación.</div>
+   <div class="mr-info">ℹ️ ${solo?"Si el partido de esta jornada no te viene bien, puedes adelantar uno de otra jornada: publica qué días y horas te van bien y el primer jugador que acepte (de los que aún no has jugado) te escribirá para cerrarlo.":"Si el partido de esta jornada no os viene bien, podéis adelantar uno de otra jornada: publicad qué días y horas os van bien y la primera pareja que acepte (de las que aún no habéis jugado) os escribirá para cerrarlo."} Cuenta igual para la clasificación.</div>
    ${closed.map(closedCard).join("")}
    ${others.length?others.map(card).join(""):`<div class="mr-empty">Ahora mismo nadie busca rival.</div>`}
    ${mine.map(mineCard).join("")}
-   ${mine.length<2?`<button class="mr-cta" onclick="openMatchRequestForm()">+ Buscar rival para un día</button>`:""}
+   ${mine.length<2?`<button class="mr-cta" onclick="openMatchRequestForm()">+ Buscar rival</button>`:""}
   </div>`;
 }
 function openMatchRequestForm(){
   const days=[];const d0=new Date();
-  for(let i=0;i<14;i++){const d=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()+i);if(d.getDay()===0||d.getDay()===6)continue;const iso=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");days.push(iso)}
-  const hours=[];for(let h=9;h<=20;h++)hours.push(String(h).padStart(2,"0")+":30");
-  openModal(`<h3>Buscar rival</h3><p class="muted" style="font-size:13px">${mrSolo()?"Lo verán los jugadores de tu liga contra los que aún no has jugado. El primero que acepte se queda el partido.":"Lo verán las parejas de tu liga con las que aún no habéis jugado. La primera que acepte se queda el partido."}</p>
+  for(let i=0;i<14;i++){const d=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()+i);if(d.getDay()===0||d.getDay()===6)continue;days.push(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"))}
+  const hours=[];for(let h=9;h<=21;h++){hours.push(String(h).padStart(2,"0")+":00");hours.push(String(h).padStart(2,"0")+":30")}
+  window._mrSel=[];
+  const solo=mrSolo();
+  openModal(`<h3>Buscar rival</h3><p class="muted" style="font-size:13px">${solo?`Marca hasta ${MR_MAX_DAYS} días que te vengan bien y la franja de horas. Lo verán los jugadores contra los que aún no has jugado.`:`Marca hasta ${MR_MAX_DAYS} días que os vengan bien y la franja de horas. Lo verán las parejas con las que aún no habéis jugado.`}</p>
    <div class="admin-team-form">
-    <label>Día<select id="mr_date">${days.map(d=>`<option value="${d}">${esc(mrDayLabel(d))}</option>`).join("")}</select></label>
-    <label>Hora<select id="mr_time">${hours.map(h=>`<option ${h==="13:30"?"selected":""}>${h}</option>`).join("")}</select></label>
-    <label>Pista<select id="mr_court"><option value="">Me da igual</option><option>P1</option><option>P2</option></select></label>
-    <label>Mensaje (opcional)<input id="mr_msg" maxlength="140" placeholder="${mrSolo()?"Ej: si no te va, puedo media hora antes":"Ej: si no os va, podemos media hora antes"}"></label>
+    <label>Días (hasta ${MR_MAX_DAYS})</label>
+    <div class="mr-days">${days.map(d=>`<button type="button" class="mr-day" data-day="${d}" onclick="toggleMrDay(this)">${esc(mrDayLabel(d))}</button>`).join("")}</div>
+    <div class="mr-count" id="mr_count">0 de ${MR_MAX_DAYS} elegidos</div>
+    <label>Desde<select id="mr_from">${hours.map(h=>`<option ${h==="13:30"?"selected":""}>${h}</option>`).join("")}</select></label>
+    <label>Hasta<select id="mr_to">${hours.map(h=>`<option ${h==="17:30"?"selected":""}>${h}</option>`).join("")}</select></label>
+    <label>Mensaje (opcional)<input id="mr_msg" maxlength="140" placeholder="Ej: mejor a partir de las 14:30"></label>
    </div>
    <div class="admin-round-actions" style="margin-top:12px"><button class="primary" onclick="submitMatchRequest()">Publicar</button><button class="secondary" onclick="closeModal()">Cancelar</button></div>
-   <p class="muted" style="font-size:11.5px;margin-top:8px">Como mucho 2 solicitudes abiertas a la vez. Si nadie la acepta, caduca sola al pasar el día.</p>`);
+   <p class="muted" style="font-size:11.5px;margin-top:8px">Como mucho 2 solicitudes abiertas a la vez. Si nadie la acepta, caduca sola al pasar el último día.</p>`);
+}
+function toggleMrDay(btn){
+  const d=btn.dataset.day, sel=window._mrSel||(window._mrSel=[]), i=sel.indexOf(d);
+  if(i>=0) sel.splice(i,1);
+  else{ if(sel.length>=MR_MAX_DAYS){showToast(`Como mucho ${MR_MAX_DAYS} días`);return} sel.push(d); }
+  btn.classList.toggle("on",i<0);
+  const c=document.getElementById("mr_count"); if(c) c.textContent=`${sel.length} de ${MR_MAX_DAYS} elegidos`;
 }
 async function submitMatchRequest(){
+  const days=[...(window._mrSel||[])].sort(), from=v("mr_from"), to=v("mr_to");
+  if(!days.length){alert("Elige al menos un día.");return}
+  if(to<=from){alert("La hora de fin tiene que ser posterior a la de inicio.");return}
   try{
-    await cloudWrite({action:"createMatchRequest",...authPayload(),date:v("mr_date"),time:v("mr_time"),court:v("mr_court"),message:v("mr_msg")});
+    // "date" y "time" se mandan también para que el servidor sepa cuándo caduca
+    // (último día) y para solicitudes que solo entienden un día/hora.
+    await cloudWrite({action:"createMatchRequest",...authPayload(),days:days.join(","),from,to,date:days[days.length-1],time:`${from} – ${to}`,court:"",message:v("mr_msg")});
     closeModal(); showToast(mrSolo()?"Publicado: ya lo ven los jugadores de tu liga":"Publicado: ya lo ven las parejas de tu liga"); playerDashboard();
   }catch(e){alert(e.message)}
 }
@@ -3410,12 +3447,29 @@ async function acceptMatchRequest(id){
   const r=(window._mrItems||[]).find(x=>x.id===id); if(!r) return;
   const m=localMatchesForPlayer().find(x=>!x.played&&x.opponent===r.team);
   if(!m){alert(mrSolo()?"Ya has jugado contra este jugador.":"Ya habéis jugado contra esta pareja.");return}
-  if(!confirm(`¿Jugar contra ${r.team} el ${mrDayLabel(r.date)} a las ${r.time}${r.court?" en "+r.court:""}?\n\n${mrSolo()?"Es tu":"Es vuestro"} partido de la jornada ${m.round}: quedará con esta fecha.`)) return;
+  // Marca la solicitud como aceptada para que no la coja nadie más. No fija la
+  // fecha del partido: eso lo apunta la admin cuando le comunican el horario.
+  try{ await cloudWrite({action:"acceptMatchRequest",...authPayload(),id,mode:"contact"}); }catch(e){}
+  openMrContact(r.team,r);
+  playerDashboard();
+}
+async function openMrContact(team,r){
+  const solo=mrSolo();
+  openModal(`<h3>${solo?"¡Genial! Escríbele":"¡Genial! Escribidles"}</h3><p class="muted" style="font-size:13px">Cerrad por WhatsApp el día y la hora exactos${r?" dentro de su disponibilidad":""}.</p>
+   ${r?mrChips(r):""}
+   <div id="mr_contact"><p class="muted">Buscando contacto de ${esc(team)}…</p></div>
+   <div class="mr-alert">⚠️ ¡Comunica el horario a la admin (${esc(MR_ADMIN)})!<span>Cuando cerréis día y hora, avisadla para que lo apunte en el calendario. Si no, el partido no contará.</span></div>
+   <div class="admin-round-actions" style="margin-top:12px"><button class="secondary" onclick="closeModal()">Cerrar</button></div>`);
+  const box=document.getElementById("mr_contact");
   try{
-    await cloudWrite({action:"acceptMatchRequest",...authPayload(),id,home:m.home,away:m.away,jornada:String(m.round)});
-    showToast(`¡Partido cerrado contra ${r.team}!`,4000);
-    await loadCloudResults(); playerDashboard();
-  }catch(e){alert(e.message); playerDashboard();}
+    if(!contactsCache) contactsCache=await cloudWrite({action:"playerContacts",username:playerSession.username,token:playerSession.token});
+    const c=(contactsCache.contacts||[]).find(x=>x.team===team);
+    const players=(c&&c.players||[]).filter(p=>waNumber(p.phone));
+    const txt=encodeURIComponent(`¡Hola! Soy de ${playerSession.team} (${db.leagues[playerSession.league]?.name||"liga"}). He visto que buscáis rival${r?" ("+mrDays(r).map(mrDayLabel).join(", ")+(mrRange(r)?", "+mrRange(r):"")+")":""}. ¿Qué día y hora os va mejor?`);
+    if(box) box.innerHTML=players.length
+      ?players.map(p=>`<a class="mr-wa" href="https://wa.me/${waNumber(p.phone)}?text=${txt}" target="_blank" rel="noopener">💬 WhatsApp a ${esc(String(p.name).split(" ")[0])}${solo?"":` (${esc(team)})`}</a>`).join("")
+      :`<div class="notice">No hay teléfonos disponibles para ${esc(team)}.</div>`;
+  }catch(e){ if(box) box.innerHTML=`<div class="notice">No se pudo cargar el contacto: ${esc(e.message)}</div>`; }
 }
 async function playerDashboard(){
  const c=document.getElementById("content");
