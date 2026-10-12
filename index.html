@@ -3351,29 +3351,31 @@ async function playerRegisterPageDo(){
  }catch(e){alert(e.message)}
 }
 // ---------------------------------------------------------------------------
-// "Buscar rival" (liga Mixta): publicar un hueco para adelantar un partido de
-// otra jornada y que lo acepte cualquier pareja contra la que aún no has jugado.
+// "Buscar rival" (ligas Mixta y Tenis): publicar un hueco para adelantar un partido
+// de otra jornada y que lo acepte cualquier rival contra el que aún no has jugado.
 // ---------------------------------------------------------------------------
-const MR_LEAGUES=["mixta"];
+const MR_LEAGUES=["mixta","tenis"];
+// En tenis se juega individual: los textos van en singular ("jugador", "te"...).
+function mrSolo(){return db.leagues[playerSession.league]?.sport==="Tenis"}
 function mrDayLabel(iso){
   const mm=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})$/); if(!mm) return iso||"";
   const dt=new Date(+mm[1],+mm[2]-1,+mm[3]);
   return ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"][dt.getDay()]+" "+dt.getDate()+"/"+(dt.getMonth()+1);
 }
 function mrChips(r){return `<div class="mr-when"><span class="mr-chip y">${esc(mrDayLabel(r.date))}</span><span class="mr-chip">${esc(r.time)}</span><span class="mr-chip">${r.court?esc(r.court):"Pista a elegir"}</span></div>`}
-function mrMembers(team){const t=(db.leagues[playerSession.league]?.teams||[]).find(x=>x.team===team);return t?[t.p1,t.p2].filter(Boolean).map(n=>String(n).split(" ")[0]).join(" · "):""}
+function mrMembers(team){if(mrSolo())return "";const t=(db.leagues[playerSession.league]?.teams||[]).find(x=>x.team===team);return t?[t.p1,t.p2].filter(Boolean).map(n=>String(n).split(" ")[0]).join(" · "):""}
 function matchRequestsHTML(all){
   const me=playerSession.team, items=window._mrItems||[];
   const pendingOpp=new Set(all.filter(m=>!m.played).map(m=>m.opponent));
   const others=items.filter(r=>r.status==="open"&&r.team!==me&&pendingOpp.has(r.team));
   const mine=items.filter(r=>r.status==="open"&&r.team===me);
   const closed=items.filter(r=>r.status==="closed"&&(r.team===me||r.acceptedTeam===me));
-  const card=(r)=>`<div class="mr-card"><div class="mr-who"><span class="mr-av">${esc(initialsOf(r.team))}</span><div><b>${esc(r.team)} busca rival</b><small>${esc(mrMembers(r.team))}</small></div></div>${mrChips(r)}${r.message?`<div class="mr-msg">“${esc(r.message)}”</div>`:""}<button class="mr-yes" onclick="acceptMatchRequest('${esc(r.id)}')">¡Nos va bien!</button></div>`;
-  const mineCard=(r)=>`<div class="mr-card mr-mine"><div class="mr-who"><span class="mr-av">${esc(initialsOf(me))}</span><div><b>Tu solicitud</b><small>Esperando a que alguna pareja acepte</small></div></div>${mrChips(r)}${r.message?`<div class="mr-msg">“${esc(r.message)}”</div>`:""}<button class="mr-no" onclick="cancelMatchRequest('${esc(r.id)}')">Retirar solicitud</button></div>`;
+  const card=(r)=>`<div class="mr-card"><div class="mr-who"><span class="mr-av">${esc(initialsOf(r.team))}</span><div><b>${esc(r.team)} busca rival</b><small>${esc(mrMembers(r.team))}</small></div></div>${mrChips(r)}${r.message?`<div class="mr-msg">“${esc(r.message)}”</div>`:""}<button class="mr-yes" onclick="acceptMatchRequest('${esc(r.id)}')">${mrSolo()?"¡Me va bien!":"¡Nos va bien!"}</button></div>`;
+  const mineCard=(r)=>`<div class="mr-card mr-mine"><div class="mr-who"><span class="mr-av">${esc(initialsOf(me))}</span><div><b>Tu solicitud</b><small>Esperando a que ${mrSolo()?"alguien":"alguna pareja"} acepte</small></div></div>${mrChips(r)}${r.message?`<div class="mr-msg">“${esc(r.message)}”</div>`:""}<button class="mr-no" onclick="cancelMatchRequest('${esc(r.id)}')">Retirar solicitud</button></div>`;
   const closedCard=(r)=>{const rival=r.team===me?r.acceptedTeam:r.team;return `<div class="mr-card mr-done"><div class="mr-who"><span class="mr-av">${esc(initialsOf(rival))}</span><div><b>✓ Partido cerrado vs ${esc(rival)}</b><small>${esc(r.home)} (local) vs ${esc(r.away)} (visitante)</small></div></div>${mrChips(r)}</div>`};
   return `<div class="mr-box">
    <div class="mr-h"><span>🎾 Buscan rival en la ${esc(db.leagues[playerSession.league]?.name||"liga")}</span>${others.length?`<em>${others.length}</em>`:""}</div>
-   <div class="mr-info">ℹ️ Si el partido de esta jornada no os viene bien, podéis adelantar uno de otra jornada: publicad un hueco y la primera pareja que acepte (de las que aún no habéis jugado) se lo queda. Cuenta igual para la clasificación.</div>
+   <div class="mr-info">ℹ️ ${mrSolo()?"Si el partido de esta jornada no te viene bien, puedes adelantar uno de otra jornada: publica un hueco y el primer jugador que acepte (de los que aún no has jugado) se lo queda.":"Si el partido de esta jornada no os viene bien, podéis adelantar uno de otra jornada: publicad un hueco y la primera pareja que acepte (de las que aún no habéis jugado) se lo queda."} Cuenta igual para la clasificación.</div>
    ${closed.map(closedCard).join("")}
    ${others.length?others.map(card).join(""):`<div class="mr-empty">Ahora mismo nadie busca rival.</div>`}
    ${mine.map(mineCard).join("")}
@@ -3384,12 +3386,12 @@ function openMatchRequestForm(){
   const days=[];const d0=new Date();
   for(let i=0;i<14;i++){const d=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()+i);if(d.getDay()===0||d.getDay()===6)continue;const iso=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");days.push(iso)}
   const hours=[];for(let h=9;h<=20;h++)hours.push(String(h).padStart(2,"0")+":30");
-  openModal(`<h3>Buscar rival</h3><p class="muted" style="font-size:13px">Lo verán las parejas de tu liga con las que aún no habéis jugado. La primera que acepte se queda el partido.</p>
+  openModal(`<h3>Buscar rival</h3><p class="muted" style="font-size:13px">${mrSolo()?"Lo verán los jugadores de tu liga contra los que aún no has jugado. El primero que acepte se queda el partido.":"Lo verán las parejas de tu liga con las que aún no habéis jugado. La primera que acepte se queda el partido."}</p>
    <div class="admin-team-form">
     <label>Día<select id="mr_date">${days.map(d=>`<option value="${d}">${esc(mrDayLabel(d))}</option>`).join("")}</select></label>
     <label>Hora<select id="mr_time">${hours.map(h=>`<option ${h==="13:30"?"selected":""}>${h}</option>`).join("")}</select></label>
     <label>Pista<select id="mr_court"><option value="">Me da igual</option><option>P1</option><option>P2</option></select></label>
-    <label>Mensaje (opcional)<input id="mr_msg" maxlength="140" placeholder="Ej: si no os va, podemos media hora antes"></label>
+    <label>Mensaje (opcional)<input id="mr_msg" maxlength="140" placeholder="${mrSolo()?"Ej: si no te va, puedo media hora antes":"Ej: si no os va, podemos media hora antes"}"></label>
    </div>
    <div class="admin-round-actions" style="margin-top:12px"><button class="primary" onclick="submitMatchRequest()">Publicar</button><button class="secondary" onclick="closeModal()">Cancelar</button></div>
    <p class="muted" style="font-size:11.5px;margin-top:8px">Como mucho 2 solicitudes abiertas a la vez. Si nadie la acepta, caduca sola al pasar el día.</p>`);
@@ -3397,7 +3399,7 @@ function openMatchRequestForm(){
 async function submitMatchRequest(){
   try{
     await cloudWrite({action:"createMatchRequest",...authPayload(),date:v("mr_date"),time:v("mr_time"),court:v("mr_court"),message:v("mr_msg")});
-    closeModal(); showToast("Publicado: ya lo ven las parejas de tu liga"); playerDashboard();
+    closeModal(); showToast(mrSolo()?"Publicado: ya lo ven los jugadores de tu liga":"Publicado: ya lo ven las parejas de tu liga"); playerDashboard();
   }catch(e){alert(e.message)}
 }
 async function cancelMatchRequest(id){
@@ -3407,8 +3409,8 @@ async function cancelMatchRequest(id){
 async function acceptMatchRequest(id){
   const r=(window._mrItems||[]).find(x=>x.id===id); if(!r) return;
   const m=localMatchesForPlayer().find(x=>!x.played&&x.opponent===r.team);
-  if(!m){alert("Ya habéis jugado contra esta pareja.");return}
-  if(!confirm(`¿Jugar contra ${r.team} el ${mrDayLabel(r.date)} a las ${r.time}${r.court?" en "+r.court:""}?\n\nEs vuestro partido de la jornada ${m.round}: quedará con esta fecha.`)) return;
+  if(!m){alert(mrSolo()?"Ya has jugado contra este jugador.":"Ya habéis jugado contra esta pareja.");return}
+  if(!confirm(`¿Jugar contra ${r.team} el ${mrDayLabel(r.date)} a las ${r.time}${r.court?" en "+r.court:""}?\n\n${mrSolo()?"Es tu":"Es vuestro"} partido de la jornada ${m.round}: quedará con esta fecha.`)) return;
   try{
     await cloudWrite({action:"acceptMatchRequest",...authPayload(),id,home:m.home,away:m.away,jornada:String(m.round)});
     showToast(`¡Partido cerrado contra ${r.team}!`,4000);
