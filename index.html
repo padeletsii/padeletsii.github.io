@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Liga Pádel ETSII</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -506,6 +506,26 @@ body.admin-mode .admin-nav-only{display:inline-flex!important}
 .sets-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .set-box{border:1px solid var(--line);border-radius:13px;padding:11px;background:var(--soft)}
 .set-box-title{font-size:10px;font-weight:950;letter-spacing:1px;color:var(--text);margin-bottom:8px}
+.mr-box{background:#efeaff;border:1px solid #d9cffb;border-radius:20px;padding:12px;margin:0 0 14px}
+.mr-h{display:flex;align-items:center;justify-content:space-between;font-weight:900;font-size:14px;color:#3510A0;margin:2px 4px 4px}
+.mr-h em{font-style:normal;background:#6A2EF0;color:#fff;border-radius:999px;padding:2px 9px;font-size:12px}
+.mr-info{font-size:11.5px;line-height:1.4;color:#8a8794;margin:0 4px 10px}
+.mr-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:8px}
+.mr-card.mr-mine{border:2px dashed #c9c2e6}
+.mr-card.mr-done{border:2px solid #17803d;background:#f2fbf4}
+.mr-who{display:flex;align-items:center;gap:10px}
+.mr-who b{display:block;font-size:14.5px}.mr-who small{color:var(--muted);font-size:12px}
+.mr-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6A2EF0,#3510A0);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex:0 0 auto}
+.mr-when{display:flex;gap:6px;flex-wrap:wrap;margin:9px 0 6px}
+.mr-chip{background:#efeaff;color:#3510A0;border-radius:999px;padding:4px 10px;font-size:12.5px;font-weight:800}
+.mr-chip.y{background:#DCF23A;color:#15131c}
+.mr-msg{font-size:13px;color:#3c3846;margin:2px 0 8px}
+.mr-yes,.mr-no,.mr-cta{width:100%;border-radius:12px;padding:11px;font:inherit;font-weight:900;font-size:14px;cursor:pointer;border:0}
+.mr-yes{background:#17803d;color:#fff}
+.mr-no{background:#fff;border:1px solid var(--line);color:var(--text)}
+.mr-cta{background:#6A2EF0;color:#fff;margin-top:2px}
+.mr-empty{font-size:13px;color:var(--muted);padding:4px 6px 10px}
+html.dark .mr-box{background:#241a3d;border-color:#3b2d63}
 .pf-vs-real{display:inline-flex;align-items:flex-end;gap:8px;flex-wrap:wrap}
 .pf-vs-real>i{font-style:normal;font-size:12px;font-weight:800;color:var(--muted);padding-bottom:2px}
 .pf-side{display:inline-flex;flex-direction:column;line-height:1.15}
@@ -549,9 +569,9 @@ body.admin-mode .admin-nav-only{display:inline-flex!important}
 @media(max-width:700px){
  #nav{display:none}
  body.admin-mode #nav{display:flex}
- body:not(.admin-mode) .bottom-nav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--paper);border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,0,0,.08);padding:3px 4px calc(3px + env(safe-area-inset-bottom));justify-content:space-around}
+ body:not(.admin-mode) .bottom-nav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--paper);border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,0,0,.08);padding:5px 4px max(16px, calc(8px + env(safe-area-inset-bottom)));justify-content:space-around}
  body:not(.admin-mode) .bottom-nav.bn-hide{transform:translateY(100%)}
- body:not(.admin-mode){padding-bottom:54px}
+ body:not(.admin-mode){padding-bottom:calc(72px + env(safe-area-inset-bottom))}
  .bottom-nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;background:none;border:0;padding:4px 2px 3px;font-size:9px;font-weight:800;color:var(--muted);cursor:pointer;border-radius:10px}
  .bn-icon-wrap{display:flex;align-items:center;justify-content:center;width:34px;height:21px;border-radius:9px;transition:background .15s ease,transform .15s ease}
  .bn-icon-wrap svg{width:18px;height:18px;transition:transform .15s ease}
@@ -559,8 +579,8 @@ body.admin-mode .admin-nav-only{display:inline-flex!important}
  .bn-icon-wrap svg .bn-accent{stroke:var(--tennis)}
  .bottom-nav button.active{background:none;color:var(--text)}
  .bottom-nav button.active .bn-icon-wrap{background:rgba(204,255,0,.38);transform:translateY(-1px)}
- body:not(.admin-mode) .admin-btn{bottom:66px}
- body:not(.admin-mode) .sync-status{bottom:66px}
+ body:not(.admin-mode) .admin-btn{bottom:calc(78px + env(safe-area-inset-bottom))}
+ body:not(.admin-mode) .sync-status{bottom:calc(78px + env(safe-area-inset-bottom))}
 }
 
 
@@ -3330,16 +3350,83 @@ async function playerRegisterPageDo(){
   await afterRegister(data);
  }catch(e){alert(e.message)}
 }
+// ---------------------------------------------------------------------------
+// "Buscar rival" (liga Mixta): publicar un hueco para adelantar un partido de
+// otra jornada y que lo acepte cualquier pareja contra la que aún no has jugado.
+// ---------------------------------------------------------------------------
+const MR_LEAGUES=["mixta"];
+function mrDayLabel(iso){
+  const mm=String(iso||"").match(/^(\d{4})-(\d{2})-(\d{2})$/); if(!mm) return iso||"";
+  const dt=new Date(+mm[1],+mm[2]-1,+mm[3]);
+  return ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"][dt.getDay()]+" "+dt.getDate()+"/"+(dt.getMonth()+1);
+}
+function mrChips(r){return `<div class="mr-when"><span class="mr-chip y">${esc(mrDayLabel(r.date))}</span><span class="mr-chip">${esc(r.time)}</span><span class="mr-chip">${r.court?esc(r.court):"Pista a elegir"}</span></div>`}
+function mrMembers(team){const t=(db.leagues[playerSession.league]?.teams||[]).find(x=>x.team===team);return t?[t.p1,t.p2].filter(Boolean).map(n=>String(n).split(" ")[0]).join(" · "):""}
+function matchRequestsHTML(all){
+  const me=playerSession.team, items=window._mrItems||[];
+  const pendingOpp=new Set(all.filter(m=>!m.played).map(m=>m.opponent));
+  const others=items.filter(r=>r.status==="open"&&r.team!==me&&pendingOpp.has(r.team));
+  const mine=items.filter(r=>r.status==="open"&&r.team===me);
+  const closed=items.filter(r=>r.status==="closed"&&(r.team===me||r.acceptedTeam===me));
+  const card=(r)=>`<div class="mr-card"><div class="mr-who"><span class="mr-av">${esc(initialsOf(r.team))}</span><div><b>${esc(r.team)} busca rival</b><small>${esc(mrMembers(r.team))}</small></div></div>${mrChips(r)}${r.message?`<div class="mr-msg">“${esc(r.message)}”</div>`:""}<button class="mr-yes" onclick="acceptMatchRequest('${esc(r.id)}')">¡Nos va bien!</button></div>`;
+  const mineCard=(r)=>`<div class="mr-card mr-mine"><div class="mr-who"><span class="mr-av">${esc(initialsOf(me))}</span><div><b>Tu solicitud</b><small>Esperando a que alguna pareja acepte</small></div></div>${mrChips(r)}${r.message?`<div class="mr-msg">“${esc(r.message)}”</div>`:""}<button class="mr-no" onclick="cancelMatchRequest('${esc(r.id)}')">Retirar solicitud</button></div>`;
+  const closedCard=(r)=>{const rival=r.team===me?r.acceptedTeam:r.team;return `<div class="mr-card mr-done"><div class="mr-who"><span class="mr-av">${esc(initialsOf(rival))}</span><div><b>✓ Partido cerrado vs ${esc(rival)}</b><small>${esc(r.home)} (local) vs ${esc(r.away)} (visitante)</small></div></div>${mrChips(r)}</div>`};
+  return `<div class="mr-box">
+   <div class="mr-h"><span>🎾 Buscan rival en la ${esc(db.leagues[playerSession.league]?.name||"liga")}</span>${others.length?`<em>${others.length}</em>`:""}</div>
+   <div class="mr-info">ℹ️ Si el partido de esta jornada no os viene bien, podéis adelantar uno de otra jornada: publicad un hueco y la primera pareja que acepte (de las que aún no habéis jugado) se lo queda. Cuenta igual para la clasificación.</div>
+   ${closed.map(closedCard).join("")}
+   ${others.length?others.map(card).join(""):`<div class="mr-empty">Ahora mismo nadie busca rival.</div>`}
+   ${mine.map(mineCard).join("")}
+   ${mine.length<2?`<button class="mr-cta" onclick="openMatchRequestForm()">+ Buscar rival para un día</button>`:""}
+  </div>`;
+}
+function openMatchRequestForm(){
+  const days=[];const d0=new Date();
+  for(let i=0;i<14;i++){const d=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()+i);if(d.getDay()===0||d.getDay()===6)continue;const iso=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");days.push(iso)}
+  const hours=[];for(let h=9;h<=20;h++)hours.push(String(h).padStart(2,"0")+":30");
+  openModal(`<h3>Buscar rival</h3><p class="muted" style="font-size:13px">Lo verán las parejas de tu liga con las que aún no habéis jugado. La primera que acepte se queda el partido.</p>
+   <div class="admin-team-form">
+    <label>Día<select id="mr_date">${days.map(d=>`<option value="${d}">${esc(mrDayLabel(d))}</option>`).join("")}</select></label>
+    <label>Hora<select id="mr_time">${hours.map(h=>`<option ${h==="13:30"?"selected":""}>${h}</option>`).join("")}</select></label>
+    <label>Pista<select id="mr_court"><option value="">Me da igual</option><option>P1</option><option>P2</option></select></label>
+    <label>Mensaje (opcional)<input id="mr_msg" maxlength="140" placeholder="Ej: si no os va, podemos media hora antes"></label>
+   </div>
+   <div class="admin-round-actions" style="margin-top:12px"><button class="primary" onclick="submitMatchRequest()">Publicar</button><button class="secondary" onclick="closeModal()">Cancelar</button></div>
+   <p class="muted" style="font-size:11.5px;margin-top:8px">Como mucho 2 solicitudes abiertas a la vez. Si nadie la acepta, caduca sola al pasar el día.</p>`);
+}
+async function submitMatchRequest(){
+  try{
+    await cloudWrite({action:"createMatchRequest",...authPayload(),date:v("mr_date"),time:v("mr_time"),court:v("mr_court"),message:v("mr_msg")});
+    closeModal(); showToast("Publicado: ya lo ven las parejas de tu liga"); playerDashboard();
+  }catch(e){alert(e.message)}
+}
+async function cancelMatchRequest(id){
+  if(!confirm("¿Retirar esta solicitud?")) return;
+  try{ await cloudWrite({action:"cancelMatchRequest",...authPayload(),id}); showToast("Solicitud retirada"); playerDashboard(); }catch(e){alert(e.message)}
+}
+async function acceptMatchRequest(id){
+  const r=(window._mrItems||[]).find(x=>x.id===id); if(!r) return;
+  const m=localMatchesForPlayer().find(x=>!x.played&&x.opponent===r.team);
+  if(!m){alert("Ya habéis jugado contra esta pareja.");return}
+  if(!confirm(`¿Jugar contra ${r.team} el ${mrDayLabel(r.date)} a las ${r.time}${r.court?" en "+r.court:""}?\n\nEs vuestro partido de la jornada ${m.round}: quedará con esta fecha.`)) return;
+  try{
+    await cloudWrite({action:"acceptMatchRequest",...authPayload(),id,home:m.home,away:m.away,jornada:String(m.round)});
+    showToast(`¡Partido cerrado contra ${r.team}!`,4000);
+    await loadCloudResults(); playerDashboard();
+  }catch(e){alert(e.message); playerDashboard();}
+}
 async function playerDashboard(){
  const c=document.getElementById("content");
  if(!playerSession){playerLoginPage();return}
  try{
   const auth={username:playerSession.username,token:playerSession.token};
-  const [data]=await Promise.all([
+  const [data,mrData]=await Promise.all([
    cloudWrite({action:"playerDashboard",...auth}),
+   MR_LEAGUES.includes(playerSession.league)?cloudWrite({action:"listMatchRequests",...auth}).catch(()=>({items:[]})):Promise.resolve({items:[]}),
    refreshMyProfile(true),
    refreshInvites(true),
   ]);
+  window._mrItems=(mrData&&mrData.items)||[];
   const incoming=data.incoming||[],mine=data.mine||[];
   const k=playerSession.league,L=db.leagues[k];
   const all=localMatchesForPlayer();
@@ -3442,6 +3529,7 @@ async function playerDashboard(){
     <button class="pf4-tab ${tab==="perfil"?"on":""}" data-tab="perfil" onclick="pfTab('perfil')">Mi perfil${pendingInviteCount?` <em class="hot">${pendingInviteCount}</em>`:""}</button>
    </div>
    <div class="pf4-pane" data-tab="partidos" ${tab==="partidos"?"":"hidden"}>
+    ${MR_LEAGUES.includes(k)?matchRequestsHTML(all):""}
     ${reminderHTML(current)}${changesHTML(k,L)}
     ${agendaHTML}
    </div>
