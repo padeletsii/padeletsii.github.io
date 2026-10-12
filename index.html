@@ -3449,7 +3449,8 @@ async function acceptMatchRequest(id){
   if(!m){alert(mrSolo()?"Ya has jugado contra este jugador.":"Ya habéis jugado contra esta pareja.");return}
   // Marca la solicitud como aceptada para que no la coja nadie más. No fija la
   // fecha del partido: eso lo apunta la admin cuando le comunican el horario.
-  try{ await cloudWrite({action:"acceptMatchRequest",...authPayload(),id,mode:"contact"}); }catch(e){}
+  try{ await cloudWrite({action:"acceptMatchRequest",...authPayload(),id,mode:"contact"}); }
+  catch(e){ alert(e.message); playerDashboard(); return; }
   openMrContact(r.team,r);
   playerDashboard();
 }
