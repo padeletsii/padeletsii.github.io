@@ -534,6 +534,36 @@ html.dark .mr-box{background:#241a3d;border-color:#3b2d63}
 .mr-alert{background:#fff4d6;border:2px solid #f0b400;color:#5a4200;border-radius:14px;padding:11px 12px;font-size:13.5px;font-weight:800;margin:12px 0 4px}
 .mr-alert span{display:block;font-weight:600;font-size:12.5px;margin-top:3px}
 html.dark .mr-alert{background:#3a2f0b;border-color:#c99a00;color:#ffe7a3}
+.av-box{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:12px;margin:0 0 14px}
+.av-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 4px 8px;font-size:14px}
+.av-head span{font-size:12px;color:var(--muted);font-weight:700}
+.av-info{font-size:12.5px;line-height:1.4;color:var(--muted);margin:0 4px 10px}
+.av-btns{display:flex;gap:8px;margin-top:10px}
+.av-cta,.av-sec{flex:1;border-radius:12px;padding:10px;font:inherit;font-weight:900;font-size:13.5px;cursor:pointer;border:0}
+.av-cta{background:#6A2EF0;color:#fff}.av-sec{background:var(--paper);border:1px solid var(--line);color:var(--text)}
+/* La tabla general de la web (clasificación) tiene estilos globales de table/th/td: aquí se anulan. */
+html body table.av-grid.av-grid.av-grid{width:100%;min-width:0;border-collapse:separate;border-spacing:3px;table-layout:fixed}
+html body table.av-grid.av-grid.av-grid th{font-size:11px;font-weight:900;color:var(--muted)!important;background:none!important;padding:1px 0!important;border:0!important;border-radius:0!important;text-align:center!important;text-transform:none;letter-spacing:0}
+html body table.av-grid.av-grid.av-grid th.av-h{width:46px;text-align:right!important;padding-right:3px!important;font-weight:700;font-size:10.5px;white-space:nowrap}
+html body table.av-grid.av-grid.av-grid td{height:24px;border-radius:6px;background:#e5484d!important;text-align:center!important;font-size:10.5px;font-weight:900;color:#fff;padding:0!important;border:0!important}
+html body table.av-grid.av-grid.av-edit td{height:30px;cursor:pointer;user-select:none;-webkit-user-select:none}
+html body table.av-grid.av-grid.av-grid td.y{background:#17a34a!important}
+html body table.av-grid.av-grid.av-grid td.h1{background:#f5b301!important;color:#3a2a00}
+html body table.av-grid.av-grid.av-grid td.nf{background:var(--line)!important}
+.av-count{font-size:12px;color:var(--muted);margin-top:6px}
+.av-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11.5px;color:var(--muted);margin:8px 2px 0}
+.av-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;background:#e5484d;vertical-align:-1px;margin-right:4px}
+.av-legend i.y{background:#17a34a}.av-legend i.h1{background:#f5b301}
+.av-miss{background:#efeaff;color:#3510A0;border-radius:12px;padding:9px 11px;font-size:12.5px;margin-top:10px}
+.av-empty{background:#fde3e3;color:#7a1d22;border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px}
+.av-ok{font-size:13px;font-weight:800;margin:12px 2px 6px}
+.av-chips{display:flex;flex-wrap:wrap;gap:6px}
+.av-chip{border:0;border-radius:999px;padding:7px 11px;font:inherit;font-size:13px;font-weight:800;background:#e3f7ea;color:#0f5a2b;cursor:pointer}
+.av-chip.on{background:#DCF23A;color:#15131c}
+.pf4-btn.av-btn{background:transparent;border:1px solid var(--line);color:var(--text);margin-top:6px}
+html.dark .av-miss{background:#241a3d;color:#cbb8ff}
+html.dark .av-empty{background:#3a1c20;color:#ffc9cc}
+html.dark .av-chip{background:#163a24;color:#9be2b4}
 .pf-vs-real{display:inline-flex;align-items:flex-end;gap:8px;flex-wrap:wrap}
 .pf-vs-real>i{font-style:normal;font-size:12px;font-weight:800;color:var(--muted);padding-bottom:2px}
 .pf-side{display:inline-flex;flex-direction:column;line-height:1.15}
@@ -3488,18 +3518,136 @@ async function openMrContact(team,r){
       :`<div class="notice">No hay teléfonos disponibles para ${esc(team)}.</div>`;
   }catch(e){ if(box) box.innerHTML=`<div class="notice">No se pudo cargar el contacto: ${esc(e.message)}</div>`; }
 }
+// ---------------------------------------------------------------------------
+// "Mi disponibilidad" (ligas Mixta, Femenina y Tenis): tabla semanal fija de
+// lunes a viernes en franjas de 1 h (9:30-20:30; a las 20:30 cierra). Cada
+// jugador marca cuándo puede jugar; en cada partido pendiente se cruza con la
+// de su pareja y la de los rivales para ver las horas en que coinciden todos.
+// Casillas guardadas como "día-hora" (día 0-4 = lunes-viernes, hora 0-10).
+// Para abrirlo en otra liga, añadir su clave a AV_LEAGUES (aquí y en Supabase).
+// ---------------------------------------------------------------------------
+const AV_LEAGUES=["mixta","tenis","fem"];
+const AV_DAYS=["Lunes","Martes","Miércoles","Jueves","Viernes"];
+const AV_HOURS=["9:30","10:30","11:30","12:30","13:30","14:30","15:30","16:30","17:30","18:30","19:30"];
+const avEnd=h=>{const [a,b]=h.split(":");return (+a+1)+":"+b};
+const avSet=s=>new Set(String(s||"").split(",").map(x=>x.trim()).filter(Boolean));
+// Tabla de casillas. cell(d,h) -> {cls, txt}; con editable=true se puede tocar.
+function avGridHTML(cell,editable){
+  return `<table class="av-grid${editable?" av-edit":""}"><tr><th class="av-h"></th>${AV_DAYS.map(d=>`<th>${d[0]==="M"&&d[1]==="i"?"X":d[0]}</th>`).join("")}</tr>${AV_HOURS.map((h,hi)=>`<tr><th class="av-h">${h}</th>${AV_DAYS.map((_,d)=>{const c=cell(d,hi)||{};return `<td class="${c.cls||""}" data-s="${d}-${hi}"${editable?` onclick="toggleAvSlot(this)"`:""}>${c.txt||""}</td>`}).join("")}</tr>`).join("")}</table>`;
+}
+function myAvailabilityCardHTML(){
+  const mine=window._avMine, solo=mrSolo();
+  const n=mine&&mine.filled?avSet(mine.slots).size:0;
+  const sel=avSet(mine&&mine.slots);
+  return `<div class="av-box">
+   <div class="av-head"><b>🗓️ Mi disponibilidad</b>${mine&&mine.filled?`<span>${n} hora${n===1?"":"s"} a la semana</span>`:""}</div>
+   ${mine&&mine.filled
+     ?avGridHTML((d,h)=>({cls:sel.has(d+"-"+h)?"y":""}),false)
+     :`<p class="av-info">Marca a qué horas puedes jugar normalmente (de lunes a viernes). ${solo?"Tu rival":"Tu pareja y tus rivales"} lo ver${solo?"á":"án"} y en cada partido saldrán las horas en las que coincidís.</p>`}
+   <div class="av-btns"><button class="av-cta" onclick="openAvailabilityEditor()">${mine&&mine.filled?"Editar":"Marcar mi disponibilidad"}</button>${solo?"":`<button class="av-sec" onclick="openPairAvailability()">Ver con mi pareja</button>`}</div>
+  </div>`;
+}
+function openAvailabilityEditor(){
+  window._avSel=avSet(window._avMine&&window._avMine.slots);
+  openModal(`<h3>Mi disponibilidad</h3><p class="muted" style="font-size:13px">Toca las horas a las que normalmente puedes jugar: <b style="color:#e5484d">rojo</b> = no puedo, <b style="color:#17a34a">verde</b> = puedo. Vale para todas las semanas.</p>
+   <div id="av_editor">${avGridHTML((d,h)=>({cls:window._avSel.has(d+"-"+h)?"y":""}),true)}</div>
+   <div class="av-count" id="av_count">${window._avSel.size} horas marcadas</div>
+   <div class="admin-round-actions" style="margin-top:12px"><button class="primary" onclick="saveAvailability()">Guardar</button><button class="secondary" onclick="window._avSel=new Set();document.getElementById('av_editor').querySelectorAll('td').forEach(t=>t.classList.remove('y'));document.getElementById('av_count').textContent='0 horas marcadas'">Borrar todo</button><button class="secondary" onclick="closeModal()">Cancelar</button></div>`);
+}
+function toggleAvSlot(td){
+  const k=td.dataset.s, sel=window._avSel||(window._avSel=new Set());
+  if(sel.has(k)) sel.delete(k); else sel.add(k);
+  td.classList.toggle("y",sel.has(k));
+  const c=document.getElementById("av_count"); if(c) c.textContent=`${sel.size} hora${sel.size===1?"":"s"} marcada${sel.size===1?"":"s"}`;
+}
+async function saveAvailability(){
+  try{
+    const data=await cloudWrite({action:"saveAvailability",...authPayload(),slots:[...(window._avSel||[])].join(",")});
+    window._avMine={filled:true,slots:data.slots||""};
+    closeModal(); showToast("Disponibilidad guardada"); playerDashboard();
+  }catch(e){alert(e.message)}
+}
+// Celda combinada: verde si pueden todos los que la han rellenado, amarilla con
+// "n/total" si solo algunos, roja si nadie.
+function avCombined(players){
+  const filled=players.filter(p=>p.filled), sets=filled.map(p=>avSet(p.slots));
+  const coin=[];
+  const cell=(d,h)=>{
+    if(!filled.length) return {cls:"nf"};
+    const n=sets.filter(s=>s.has(d+"-"+h)).length;
+    if(n===filled.length){coin.push([d,h]);return {cls:"y"}}
+    return n?{cls:"h1",txt:`${n}/${filled.length}`}:{};
+  };
+  const grid=avGridHTML(cell,false);
+  return {grid,coin,missing:players.filter(p=>!p.filled)};
+}
+const avFirst=n=>String(n||"").split(" ")[0];
+function avMissingHTML(missing){
+  return missing.length?`<div class="av-miss">⏳ Aún no han marcado su disponibilidad: <b>${missing.map(p=>esc(avFirst(p.name))).join(", ")}</b>. La tabla solo cuenta a quien ya la ha rellenado.</div>`:"";
+}
+async function openPairAvailability(){
+  openModal(`<h3>Disponibilidad de la pareja</h3><div id="av_pair"><p class="muted">Cargando…</p></div><div class="admin-round-actions" style="margin-top:12px"><button class="secondary" onclick="closeModal()">Cerrar</button></div>`);
+  const box=document.getElementById("av_pair");
+  try{
+    const data=await cloudWrite({action:"teamAvailability",...authPayload()});
+    const r=avCombined(data.players||[]);
+    if(box) box.innerHTML=`<p class="muted" style="font-size:13px">Verde = podéis los dos · amarillo = solo uno.</p>${r.grid}${avMissingHTML(r.missing)}`;
+  }catch(e){ if(box) box.innerHTML=`<div class="notice">No se pudo cargar: ${esc(e.message)}</div>`; }
+}
+async function openMatchAvailability(opponent){
+  const solo=mrSolo();
+  openModal(`<h3>¿Cuándo podemos jugar?</h3><p class="muted" style="font-size:13px">${esc(playerSession.team)} vs ${esc(opponent)} · se cruza la disponibilidad de ${solo?"los dos":"los 4 jugadores"}.</p><div id="av_match"><p class="muted">Cargando…</p></div><div class="admin-round-actions" style="margin-top:12px"><button class="secondary" onclick="closeModal()">Cerrar</button></div>`);
+  const box=document.getElementById("av_match");
+  try{
+    const [data,contacts]=await Promise.all([
+      cloudWrite({action:"teamAvailability",...authPayload(),opponent}),
+      contactsCache?Promise.resolve(contactsCache):cloudWrite({action:"playerContacts",username:playerSession.username,token:playerSession.token}).then(c=>(contactsCache=c)).catch(()=>null),
+    ]);
+    const players=data.players||[];
+    const rivalsFilled=players.some(p=>!p.mine&&p.filled), meFilled=players.some(p=>p.mine&&p.filled);
+    const r=avCombined(players);
+    r.coin.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
+    window._avMatch={opponent,coin:r.coin,contacts};
+    let foot;
+    if(!meFilled) foot=`<div class="av-empty">Primero marca <b>tu</b> disponibilidad.</div><button class="av-cta" style="margin-top:8px" onclick="openAvailabilityEditor()">Marcar mi disponibilidad</button>`;
+    else if(!rivalsFilled) foot=`<div class="av-empty">${solo?"Tu rival aún no ha":"Tus rivales aún no han"} marcado su disponibilidad. Escribidles para cuadrar la hora.</div>${avWaHTML(opponent,contacts,"")}`;
+    else if(!r.coin.length) foot=`<div class="av-empty">😕 No coincidís en ninguna hora. Escribid al rival para cuadrar otra${MR_LEAGUES.includes(playerSession.league)?" o probad con <b>Buscar rival</b>":""}.</div>${avWaHTML(opponent,contacts,"")}`;
+    else foot=`<p class="av-ok">✅ Coincidís en ${r.coin.length} hora${r.coin.length>1?"s":""} · elige una para proponerla</p>
+      <div class="av-chips">${r.coin.map(([d,h],i)=>`<button class="av-chip" onclick="pickAvSlot(${i})">${AV_DAYS[d].slice(0,3)} ${AV_HOURS[h]}–${avEnd(AV_HOURS[h])}</button>`).join("")}</div><div id="av_pick"></div>`;
+    if(box) box.innerHTML=`${r.grid}<div class="av-legend"><span><i class="y"></i>Podéis todos</span><span><i class="h1"></i>Solo algunos</span><span><i></i>Nadie</span></div>${avMissingHTML(r.missing)}${foot}`;
+  }catch(e){ if(box) box.innerHTML=`<div class="notice">No se pudo cargar: ${esc(e.message)}</div>`; }
+}
+function avWaHTML(team,contacts,slotTxt){
+  const c=contacts&&(contacts.contacts||[]).find(x=>x.team===team);
+  const players=(c&&c.players||[]).filter(p=>waNumber(p.phone));
+  if(!players.length) return `<div class="notice" style="margin-top:8px">No hay teléfonos disponibles para ${esc(team)}.</div>`;
+  const txt=encodeURIComponent(slotTxt
+    ?`¡Hola! Soy de ${playerSession.team}. Según la disponibilidad de la web coincidimos el ${slotTxt}. ¿Os va bien jugar nuestro partido entonces?`
+    :`¡Hola! Soy de ${playerSession.team}. ¿Cuándo os va bien jugar nuestro partido?`);
+  return players.map(p=>`<a class="mr-wa" href="https://wa.me/${waNumber(p.phone)}?text=${txt}" target="_blank" rel="noopener">💬 ${slotTxt?"Proponer a":"WhatsApp a"} ${esc(avFirst(p.name))}${mrSolo()?"":` (${esc(team)})`}</a>`).join("");
+}
+function pickAvSlot(i){
+  const st=window._avMatch; if(!st) return;
+  const [d,h]=st.coin[i];
+  document.querySelectorAll(".av-chip").forEach((b,j)=>b.classList.toggle("on",j===i));
+  const slotTxt=`${AV_DAYS[d].toLowerCase()} de ${AV_HOURS[h]} a ${avEnd(AV_HOURS[h])}`;
+  const box=document.getElementById("av_pick");
+  if(box) box.innerHTML=`${avWaHTML(st.opponent,st.contacts,slotTxt)}<div class="mr-alert">⚠️ ¡Comunica el horario a la admin (${esc(MR_ADMIN)})!<span>Cuando cerréis día y hora, avisadla para que lo apunte en el calendario. Si no, el partido no contará.</span></div>`;
+}
 async function playerDashboard(){
  const c=document.getElementById("content");
  if(!playerSession){playerLoginPage();return}
  try{
   const auth={username:playerSession.username,token:playerSession.token};
-  const [data,mrData]=await Promise.all([
+  const [data,mrData,avData]=await Promise.all([
    cloudWrite({action:"playerDashboard",...auth}),
    MR_LEAGUES.includes(playerSession.league)?cloudWrite({action:"listMatchRequests",...auth}).catch(()=>({items:[]})):Promise.resolve({items:[]}),
+   AV_LEAGUES.includes(playerSession.league)?cloudWrite({action:"myAvailability",...auth}).catch(()=>null):Promise.resolve(null),
    refreshMyProfile(true),
    refreshInvites(true),
   ]);
   window._mrItems=(mrData&&mrData.items)||[];
+  window._avMine=avData;
   const incoming=data.incoming||[],mine=data.mine||[];
   const k=playerSession.league,L=db.leagues[k];
   const all=localMatchesForPlayer();
@@ -3573,7 +3721,7 @@ async function playerDashboard(){
      <div class="pf4-card"><div class="pf4-eb">${esc(eyebrow)}</div>
       <div class="pf4-vs">${pfVsHTML(k,m)}</div>
       <div class="pf-next-when">${pfWhenChip(m.when)} ${icsButton(k,m.home,m.away)}</div>
-      ${action}</div></div>`;
+      ${action}${AV_LEAGUES.includes(k)?`<button class="pf4-btn av-btn" data-opp="${esc(m.opponent)}" onclick="openMatchAvailability(this.dataset.opp)">🗓️ ¿Cuándo podemos jugar?</button>`:""}</div></div>`;
   };
   const weekGroup=(m)=>{const d=m.when&&m.when.date; if(!d) return 2; return daysDiffFromToday(d)<=7?0:1;};
   const groupTitles=["Esta semana","Más adelante","Sin fecha todavía"];
@@ -3602,6 +3750,7 @@ async function playerDashboard(){
     <button class="pf4-tab ${tab==="perfil"?"on":""}" data-tab="perfil" onclick="pfTab('perfil')">Mi perfil${pendingInviteCount?` <em class="hot">${pendingInviteCount}</em>`:""}</button>
    </div>
    <div class="pf4-pane" data-tab="partidos" ${tab==="partidos"?"":"hidden"}>
+    ${AV_LEAGUES.includes(k)?myAvailabilityCardHTML():""}
     ${MR_LEAGUES.includes(k)?matchRequestsHTML(all):""}
     ${reminderHTML(current)}${changesHTML(k,L)}
     ${agendaHTML}
