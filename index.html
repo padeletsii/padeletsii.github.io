@@ -2634,7 +2634,7 @@ function setMatchRound(k,n){
 }
 function adminScheduleImportBox(){
  return `<div class="admin-round-box" style="align-items:flex-start;flex-direction:column;gap:10px">
-  <div><b>Importar horario de partidos</b><span>Pega aquí los días, horas y pistas y se asignará automáticamente a cada partido, en cualquier liga. La cabecera "JORNADA N - fecha" es opcional: si no la pones, se asume el mes actual (o el siguiente si esa fecha ya pasó). Si el mes no se adivina bien, pon el día como "Lunes 28/09" (con el mes incluido).</span></div>
+  <div><b>Importar horario de partidos</b><span>Pega aquí los días, horas y pistas y se asignará automáticamente a cada partido, en cualquier liga. La cabecera "JORNADA N - fecha" es opcional: si no la pones, se asume el mes actual (o el siguiente si esa fecha ya pasó). Si el mes no se adivina bien, pon el día como "Lunes 28/09" (con el mes incluido). Si un partido pone "ANULADO" (o cancelado, suspendido, aplazado), se le quita el horario.</span></div>
   <textarea id="scheduleImportText" rows="8" style="width:100%;box-sizing:border-box;font:inherit;padding:8px" placeholder="Lunes 28
 De la croix VS Alou/Coquillat 12:30 P1
 Black y Rivers VS Violadores del verso 15:30 P1
@@ -2699,11 +2699,26 @@ function resolveImportPair(a,b,relaxed){
   if(opts.length>1&&opts[1].score===opts[0].score) return {ambiguous:opts.slice(0,3)};
   return opts[0];
 }
+// Partido anulado: "A vs B 15:30 P2 → ANULADO", "A - B (suspendido)"... Se manda
+// como "A vs B ANULADO" y el servidor le quita el horario.
+const IMPORT_CANCEL_RE=/\s*(?:[-–—→>:=(]+\s*)?\(?\s*(?:(?:anulad|cancelad|suspendid|aplazad)[oa]s?|sin\s+horario)\s*\)?\.?\s*$/i;
 function preprocessScheduleText(text){
   const changes=[], problems=[];
   const re=/^(.+?)\s+(?:vs\.?|contra|-)\s+(.+?)\s+(\d{1,2}[:.h]\d{2}\b.*)$/i;
   const lines=text.split(/\r?\n/).map(line=>{
     const clean=line.replace(/\*/g,"").trim();
+    const cm=IMPORT_CANCEL_RE.exec(clean);
+    if(cm&&cm.index>0&&!/^jornada\b/i.test(clean)){
+      const base=clean.slice(0,cm.index).replace(/\s+\d{1,2}[:.h]\d{2}\b.*$/i,"").trim();
+      const pm=base.match(/^(.+?)\s+(?:vs\.?|contra)\s+(.+)$/i)||base.match(/^(.+?)\s+-\s+(.+)$/);
+      if(pm){
+        const a=pm[1].trim(), b=pm[2].trim(), r=resolveImportPair(a,b);
+        if(!r){problems.push(`No reconozco: ${a} vs ${b}`);return clean;}
+        if(r.ambiguous){problems.push(`Dudoso: ${a} vs ${b}`);return clean;}
+        changes.push(`${r.home} vs ${r.away} → se quita su horario (anulado)`);
+        return `${r.home} vs ${r.away} ANULADO`;
+      }
+    }
     const m=clean.match(re);
     if(!m||/^jornada\b/i.test(clean)) return line;
     const a=m[1].trim(), b=m[2].trim(), rest=m[3].trim();
@@ -2731,7 +2746,8 @@ async function importScheduleFromText(){
   const data=await cloudWrite({action:"importSchedule",password:adminPassword,text});
   const jornadas=[...new Set((data.entries||[]).map(x=>x.jornada).filter(j=>j>0))];
   const jTxt=jornadas.length?` (jornada ${jornadas.join(", ")})`:"";
-  alert(`Horario actualizado: ${data.imported} partido(s)${jTxt}. Nuevos: ${data.created||0} · Actualizados: ${data.updated||0}.`);
+  const qTxt=(data.cancelledMatches||[]).length?`\n\nHorario quitado (anulados):\n• ${data.cancelledMatches.join("\n• ")}`:"";
+  alert(`Horario actualizado: ${data.imported} partido(s)${jTxt}. Nuevos: ${data.created||0} · Actualizados: ${data.updated||0}.${qTxt}`);
   await loadCloudResults();
  }catch(e){alert(e.message)}
 }
