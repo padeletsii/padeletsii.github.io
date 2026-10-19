@@ -2083,6 +2083,14 @@ html[data-cat="tenis"]{background-color:#C24A00}
 body{min-height:100vh}
 /* Instalada como app (pantalla de inicio): la cabecera se mete bajo la hora y la batería. */
 html body header{padding-top:calc(12px + env(safe-area-inset-top))!important}
+
+/* iOS 26: Safari ya no usa theme-color; colorea la barra de arriba con lo que
+   esté fijo arriba de la pantalla. En el móvil la cabecera se queda fija arriba
+   (como en una app), así la barra de la hora sale verde. Por debajo de las
+   ventanas (z-index 20+) y de la barra de abajo (15). */
+@media (max-width:759px){
+ html[data-cat] body header,html body header{position:-webkit-sticky!important;position:sticky!important;top:0!important;z-index:14!important}
+}
 </style>
 </head>
 <body>
