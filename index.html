@@ -4285,7 +4285,7 @@ async function playerDashboard(){
   const stRow=standingsNow.find(x=>x.team===playerSession.team)||{pj:0,pg:0,pp:0};
   const posIdx=standingsNow.findIndex(x=>x.team===playerSession.team);
   const pfWhenChip=(when)=>{
-    if(!when||!when.date) return `<span class="pf-chip pf-chip-muted">Fecha por confirmar</span>`;
+    if(!when||!when.date) return "";
     const parts=[relativeDayLabel(when.date)]; if(when.time) parts.push(when.time); if(when.court) parts.push(when.court);
     const ts=matchTimestamp(when.date,when.time);
     return `<span class="pf-chip">🗓️ ${esc(parts.join(" · "))}</span>${ts&&ts>Date.now()?` <span class="pf-chip" data-cd="${ts}">⏳ …</span>`:""}`;
@@ -4299,7 +4299,7 @@ async function playerDashboard(){
   const matchRow=(m,old=false)=>{
     const won=old&&m.result?.winner===playerSession.team;
     const rowCls=old?(won?"pf-win":"pf-loss"):"";
-    const when=m.when&&m.when.date?esc([relativeDayLabel(m.when.date),m.when.time,m.when.court].filter(Boolean).join(" · ")):"Fecha por confirmar";
+    const when=m.when&&m.when.date?esc([relativeDayLabel(m.when.date),m.when.time,m.when.court].filter(Boolean).join(" · ")):"";
     const side=old
       ?`<span class="pf-result-pill ${won?"win":"loss"}">${won?"VICTORIA":"DERROTA"}</span><div class="muted" style="font-size:11px;margin-top:4px">${esc(formatScore(m.result))}</div>`
       :`<span class="pf-result-pill pending">${matchStatusLabel(m)}</span>`;
@@ -4324,7 +4324,7 @@ async function playerDashboard(){
     const today=m.when&&m.when.date&&daysDiffFromToday(m.when.date)===0;
     // Tarjeta compacta: jornada, rival, cuándo y botones pequeños en una fila.
     const hasDate=m.when&&m.when.date;
-    const whenTxt=hasDate?[relativeDayLabel(m.when.date),m.when.time,m.when.court].filter(Boolean).join(" · "):"Fecha por confirmar";
+    const whenTxt=hasDate?[relativeDayLabel(m.when.date),m.when.time,m.when.court].filter(Boolean).join(" · "):"";
     const status=waitingIn.has(mk)?`<div class="pf4-wait pf4-wait-in pf5-st">Tienes un resultado por revisar arriba</div>`
       :waitingMine.has(mk)?`<div class="pf4-wait pf5-st">Resultado enviado · falta que lo confirme ${mrSolo()?"tu rival":"la otra pareja"}</div>`:"";
     const si=getMatchSchedule(k,m.home,m.away);
@@ -4337,11 +4337,11 @@ async function playerDashboard(){
      <div class="pf4-card pf5"><span hidden>${teamLinkHTML(k,m.home)}${teamLinkHTML(k,m.away)}</span>
       <div class="pf5-top"><span class="pf5-eb">J${m.round} · ${m.isHome?"Local":"Visitante"}${live?` · <em class="pf5-live">🔴 En juego</em>`:today?` · <em>Hoy</em>`:""}</span></div>
       <div class="pf5-vs">vs <b>${esc(m.opponent)}</b></div>
-      <div class="pf5-when${hasDate?"":" pf5-nodate"}">${whenTxt}</div>
+      ${hasDate?`<div class="pf5-when">${whenTxt}</div>`:""}
       ${status}${btns?`<div class="pf5-act">${btns}</div>`:""}</div></div>`;
   };
   const weekGroup=(m)=>{const d=m.when&&m.when.date; if(!d) return 2; return daysDiffFromToday(d)<=7?0:1;};
-  const groupTitles=["Esta semana","Más adelante","Sin fecha todavía"];
+  const groupTitles=["Esta semana","Más adelante","Por jugar"];
   const agendaHTML=upcoming.length
     ?[0,1,2].map(g=>{const ms=upcoming.filter(m=>weekGroup(m)===g); return ms.length?`<div class="pf4-wk">${groupTitles[g]}</div>${ms.map(matchCard).join("")}`:""}).join("")
     :`<p class="muted" style="padding:6px 4px">${hasLeague?"No tienes partidos pendientes.":"Tu cuenta es solo de amistosos: aquí verás tus invitaciones. Los partidos de liga son para quienes están inscritos."}</p>`;
@@ -5660,7 +5660,7 @@ if("serviceWorker" in navigator){
     }).join("");
     var form = function (t) { var x = formOf(L, t); while (x.length < 5) x.unshift("N"); return '<span class="form">' + x.map(function (c) { return '<i class="' + c + '">' + (c === "W" ? "G" : c === "L" ? "P" : "") + '</i>'; }).join("") + '</span>'; };
     var sc = function (side) { return played ? '<span class="sc">' + sets.map(function (s) { return '<span class="' + (+s[side] > +s[1 - side] ? "w" : "") + '">' + s[side] + '</span>'; }).join("") + '</span>' : ""; };
-    var when = played ? "Resultado confirmado" : (si && si.date ? esc([relativeDayLabel(si.date), si.time, si.court].filter(Boolean).join(" · ")) : "Fecha por confirmar");
+    var when = played ? "Resultado confirmado" : (si && si.date ? esc([relativeDayLabel(si.date), si.time, si.court].filter(Boolean).join(" · ")) : "");
     var tennis = L.sport === "Tenis";
     var html = '<div class="cmp' + (tennis ? " is-tenis" : "") + '">' +
       '<div class="cmp-top"><span class="cmp-lg">' + esc(L.name) + ' · Jornada ' + (f.r + 1) + '</span><button class="cmp-x" onclick="closeModal()" aria-label="Cerrar">✕</button></div>' +
