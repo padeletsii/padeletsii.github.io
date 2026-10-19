@@ -557,18 +557,22 @@ html.dark .mr-alert{background:#3a2f0b;border-color:#c99a00;color:#ffe7a3}
 .wx-cloud{left:-45%;width:55%;height:70%;min-width:120px;background:radial-gradient(closest-side,rgba(255,255,255,.55),rgba(255,255,255,0));filter:blur(2px);animation:wxDrift linear infinite}
 .wx-cloud.dk{background:radial-gradient(closest-side,rgba(225,232,240,.38),rgba(225,232,240,0))}
 @keyframes wxDrift{from{left:-55%}to{left:110%}}
-.wx-rain{inset:-20% 0 0 0;background-image:repeating-linear-gradient(105deg,rgba(255,255,255,0) 0 9px,rgba(255,255,255,.35) 9px 10px,rgba(255,255,255,0) 10px 22px);background-size:60px 60px;animation:wxRain .55s linear infinite;opacity:.45}
-.wx-rain.hv{opacity:.65;animation-duration:.4s}
-@keyframes wxRain{from{background-position:0 0}to{background-position:-16px 60px}}
-.wx-snow{inset:0;background-image:radial-gradient(2px 2px at 20% 30%,#fff,transparent),radial-gradient(2px 2px at 60% 10%,#fff,transparent),radial-gradient(1.5px 1.5px at 80% 50%,#fff,transparent),radial-gradient(2px 2px at 40% 70%,#fff,transparent),radial-gradient(1.5px 1.5px at 90% 85%,#fff,transparent);background-size:120px 120px;animation:wxSnow 6s linear infinite}
-@keyframes wxSnow{from{background-position:0 0}to{background-position:20px 120px}}
-.wx-sun{right:-30px;top:-40px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(255,244,180,.95) 0 18%,rgba(255,226,120,.45) 32%,rgba(255,226,120,0) 68%);animation:wxGlow 4s ease-in-out infinite}
-.wx-sun.hot{background:radial-gradient(circle,rgba(255,240,170,1) 0 20%,rgba(255,180,80,.6) 36%,rgba(255,180,80,0) 70%)}
-@keyframes wxGlow{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.12);opacity:1}}
-.wx-stars{inset:0;background-image:radial-gradient(1.5px 1.5px at 15% 25%,#fff,transparent),radial-gradient(1px 1px at 35% 70%,#fff,transparent),radial-gradient(1.5px 1.5px at 55% 20%,#fff,transparent),radial-gradient(1px 1px at 75% 60%,#fff,transparent),radial-gradient(1.5px 1.5px at 90% 30%,#fff,transparent);background-size:160px 90px;animation:wxTwinkle 3s ease-in-out infinite alternate}
-@keyframes wxTwinkle{from{opacity:.45}to{opacity:1}}
-.wx-flash{inset:0;background:#fff;opacity:0;animation:wxFlash 7s infinite}
-@keyframes wxFlash{0%,90%,94%,100%{opacity:0}91%,93%{opacity:.55}92%{opacity:.15}}
+.wx-drop{top:-25%;width:1.4px;border-radius:2px;background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(230,240,255,.9));transform:rotate(12deg);animation:wxDrop linear infinite}
+@keyframes wxDrop{from{top:-25%;margin-left:0}to{top:110%;margin-left:-16px}}
+.wx-flash{inset:0;background:radial-gradient(ellipse at 30% 0%,rgba(255,255,255,.95),rgba(220,230,255,.35) 60%,rgba(255,255,255,0));opacity:0;animation:wxFlash 6s infinite}
+@keyframes wxFlash{0%,80%,100%{opacity:0}81%{opacity:.85}82%{opacity:.1}84%{opacity:.6}87%{opacity:0}}
+.wx-sun{right:46px;top:-16px;width:40px;height:40px;border-radius:50%;background:radial-gradient(circle,#fff7c2 0,#ffe066 55%,#ffd23f 100%);box-shadow:0 0 22px 8px rgba(255,226,110,.55),0 0 60px 26px rgba(255,214,90,.25);animation:wxGlow 4s ease-in-out infinite}
+.wx-sun.hot{background:radial-gradient(circle,#fff1b8 0,#ffc04d 55%,#ff9a2e 100%);box-shadow:0 0 24px 10px rgba(255,170,70,.6),0 0 70px 30px rgba(255,140,40,.3)}
+@keyframes wxGlow{0%,100%{box-shadow:0 0 22px 8px rgba(255,226,110,.5),0 0 60px 26px rgba(255,214,90,.22)}50%{box-shadow:0 0 28px 12px rgba(255,226,110,.7),0 0 80px 34px rgba(255,214,90,.3)}}
+.wx-sunrays{right:-34px;top:-96px;width:200px;height:200px;border-radius:50%;background:repeating-conic-gradient(rgba(255,240,180,.28) 0 6deg,rgba(255,240,180,0) 6deg 22deg);-webkit-mask:radial-gradient(circle,#000 18%,transparent 68%);mask:radial-gradient(circle,#000 18%,transparent 68%);animation:wxSpin 40s linear infinite}
+.wx-sunrays.hot{background:repeating-conic-gradient(rgba(255,210,140,.35) 0 6deg,rgba(255,210,140,0) 6deg 22deg)}
+@keyframes wxSpin{to{transform:rotate(360deg)}}
+.wx-moon{right:52px;top:-6px;width:28px;height:28px;border-radius:50%;box-shadow:inset -8px -3px 0 0 #f4f1d8;filter:drop-shadow(0 0 8px rgba(240,236,200,.45))}
+.wx-star{border-radius:50%;background:#fff;box-shadow:0 0 4px rgba(255,255,255,.8);animation:wxTwinkle ease-in-out infinite alternate}
+@keyframes wxTwinkle{from{opacity:.15;transform:scale(.7)}to{opacity:1;transform:scale(1.15)}}
+.wx-flake{top:-10px;border-radius:50%;background:radial-gradient(circle,#fff 40%,rgba(255,255,255,.2));opacity:.85;filter:blur(.3px);animation:wxFall linear infinite,wxSway ease-in-out infinite alternate}
+@keyframes wxFall{from{top:-10px}to{top:110%}}
+@keyframes wxSway{from{margin-left:-6px}to{margin-left:6px}}
 @media (prefers-reduced-motion:reduce){.wx-fx i{animation:none!important}}
 .wx-ov{position:fixed;inset:0;z-index:60;pointer-events:none}
 .wx-bg{position:absolute;inset:0;background:rgba(0,0,0,.35);opacity:0;transition:opacity .2s}
@@ -3739,17 +3743,27 @@ function wxQuip(t,code,wind,rainLater,day=1){
   if(code<=2) return "Día perfecto para jugar 🎾";
   return "Nublado pero jugable 👌";
 }
-// Fondo animado según el tiempo: nubes que pasan, lluvia, sol, estrellas, nieve, rayos.
+// Fondo animado según el tiempo: nubes que pasan, gotas de lluvia, sol con
+// rayos, estrellas, copos de nieve y relámpagos. Las posiciones salen de un
+// generador con semilla fija para que no "salten" al repintar.
+function wxRand(seed){let x=seed;return()=>((x=(x*16807)%2147483647)-1)/2147483646}
 function wxFx(code,day,t){
   const cl=(n,dark)=>Array.from({length:n},(_,i)=>`<i class="wx-cloud${dark?" dk":""}" style="top:${[-8,28,6,44][i%4]}%;animation-duration:${[38,52,45,60][i%4]}s;animation-delay:-${[0,17,30,9][i%4]}s;transform:scale(${[1,.8,1.2,.9][i%4]})"></i>`).join("");
-  const rain=heavy=>`<i class="wx-rain${heavy?" hv":""}"></i>`;
+  const drops=(n,heavy)=>{const r=wxRand(7);return Array.from({length:n},()=>{
+    const len=(heavy?13:9)+r()*9, dur=(heavy?.42:.55)+r()*.3, op=.3+r()*.5;
+    return `<i class="wx-drop" style="left:${(r()*110-5).toFixed(1)}%;height:${len.toFixed(0)}px;opacity:${op.toFixed(2)};animation-duration:${dur.toFixed(2)}s;animation-delay:-${(r()*2).toFixed(2)}s"></i>`}).join("")};
+  const stars=n=>{const r=wxRand(3);return Array.from({length:n},()=>{const sz=1+r()*1.8;
+    return `<i class="wx-star" style="left:${(r()*100).toFixed(1)}%;top:${(r()*100).toFixed(1)}%;width:${sz.toFixed(1)}px;height:${sz.toFixed(1)}px;animation-duration:${(1.8+r()*2.5).toFixed(2)}s;animation-delay:-${(r()*3).toFixed(2)}s"></i>`}).join("")};
+  const flakes=n=>{const r=wxRand(11);return Array.from({length:n},()=>{const sz=2.5+r()*3.5;
+    return `<i class="wx-flake" style="left:${(r()*100).toFixed(1)}%;width:${sz.toFixed(1)}px;height:${sz.toFixed(1)}px;animation-duration:${(4+r()*4).toFixed(2)}s,${(1.8+r()*1.5).toFixed(2)}s;animation-delay:-${(r()*6).toFixed(2)}s,-${(r()*2).toFixed(2)}s"></i>`}).join("")};
+  const sun=hot=>`<i class="wx-sunrays${hot?" hot":""}"></i><i class="wx-sun${hot?" hot":""}"></i>`;
   let h="";
-  if(code>=95) h=cl(4,true)+rain(true)+`<i class="wx-flash"></i>`;
-  else if(code>=71&&code<=77) h=cl(2,false)+`<i class="wx-snow"></i>`;
-  else if(wxIsRain(code)) h=cl(4,true)+rain(code>=63&&code!==80);
-  else if(!day) h=`<i class="wx-stars"></i>`+(code>=1?cl(code>=3?3:1,true):"");
-  else if(code===0) h=`<i class="wx-sun${t>=32?" hot":""}"></i>`;
-  else if(code<=2) h=`<i class="wx-sun"></i>`+cl(2,false);
+  if(code>=95) h=cl(4,true)+drops(80,true)+`<i class="wx-flash"></i>`;
+  else if(code>=71&&code<=77) h=cl(2,false)+flakes(18);
+  else if(wxIsRain(code)) h=cl(4,true)+drops(code>=63&&code!==80?70:45,code>=63&&code!==80);
+  else if(!day) h=`<i class="wx-moon"></i>`+stars(34)+(code>=1?cl(code>=3?3:1,true):"");
+  else if(code===0) h=sun(t>=32);
+  else if(code<=2) h=sun(false)+cl(2,false);
   else h=cl(4,false);
   return `<span class="wx-fx" aria-hidden="true">${h}</span>`;
 }
