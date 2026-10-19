@@ -2197,6 +2197,15 @@ footer .ft-cfg .ico{width:16px;height:16px}
  .st-a .st-r{grid-template-columns:34px minmax(0,1fr) 54px 54px 54px 60px;padding:11px 20px;font-size:15px}
  .st-a .st-hd{padding:10px 20px}
 }
+/* Clasificación limpia: un solo marco, cabecera pequeña, filas bajas */
+html[data-cat] body #panelSection:has(.st-a) .panel-head{padding:12px 16px 8px!important}
+html[data-cat] body #panelSection:has(.st-a) #panelTitle{font-size:18px!important}
+html[data-cat] body #panelSection:has(.st-a) .panel-head::after{display:none!important}
+html[data-cat] body #panelSection:has(.st-a) #content{padding:0 0 12px!important}
+.st-a .st-card{border:0!important;border-radius:0!important}
+.st-a .st-r{padding:9px 16px!important}
+.st-a .st-note{margin:10px 16px 0!important}
+@media (min-width:760px){html[data-cat] body #panelSection:has(.st-a) .panel-head{padding:16px 20px 12px!important}.st-a .st-r{padding:10px 20px!important}.st-a .st-note{margin:10px 20px 0!important}}
 </style>
 </head>
 <body>
