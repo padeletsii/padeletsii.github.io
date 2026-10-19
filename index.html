@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0a0a0a">
+<meta name="theme-color" content="#CCFF00">
 <script>try{if(!localStorage.getItem("liga_theme_v2")){localStorage.removeItem("liga_theme");localStorage.setItem("liga_theme_v2","1")}var _t=localStorage.getItem("liga_theme");if(_t==="dark"||(!_t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}</script>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2075,6 +2075,14 @@ footer .ft-btn{border:1px solid var(--line);background:var(--paper);color:var(--
 footer .ft-theme{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px}
 footer .ft-theme button{border:0;background:none;color:var(--muted);border-radius:999px;padding:6px 11px;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer}
 footer .ft-theme button.on{background:var(--text);color:var(--paper)}
+
+/* ---- iPhone: el verde de la cabecera llega hasta arriba ---- */
+/* Fondo del lienzo con el color de la cabecera: es lo que se ve detrás de la barra de estado y al tirar hacia abajo. */
+html{background-color:#CCFF00}
+html[data-cat="tenis"]{background-color:#C24A00}
+body{min-height:100vh}
+/* Instalada como app (pantalla de inicio): la cabecera se mete bajo la hora y la batería. */
+html body header{padding-top:calc(12px + env(safe-area-inset-top))!important}
 </style>
 </head>
 <body>
@@ -4735,7 +4743,8 @@ function applyTheme(dark){
   document.documentElement.classList.toggle("dark",dark);
   const mode=themeMode();
   document.querySelectorAll(".ft-theme button").forEach(b=>b.classList.toggle("on",b.dataset.theme===mode));
-  const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content",dark?"#000000":"#0a0a0a");
+  // La barra de arriba del móvil lleva el color de la cabecera (no cambia con claro/oscuro).
+  const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content",document.documentElement.getAttribute("data-cat")==="tenis"?"#C24A00":"#CCFF00");
 }
 function setThemeMode(mode){
   try{ if(mode==="auto") localStorage.removeItem("liga_theme"); else localStorage.setItem("liga_theme",mode); }catch(_){}
