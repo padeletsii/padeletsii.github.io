@@ -2133,11 +2133,52 @@ html.dark .mr-compact b{color:#cbb8ff}
 body:not(.admin-mode) .admin-btn{display:none!important}
 body:not(.admin-mode) .sync-status.ok{display:none!important}
 footer .ft-admin{font-size:12px;padding:6px 12px;color:var(--muted)}
+/* ---- Iconos dibujados y pantalla de Configuración ---- */
+.ico{width:20px;height:20px;flex:0 0 auto;display:inline-block;vertical-align:middle}
+.pf4-gear{border:1px solid var(--line);background:var(--paper);color:var(--text);width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;margin-right:6px}
+.cfg-page{position:fixed;inset:0;z-index:19;background:var(--cream,#f4f3ef);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;visibility:hidden}
+.cfg-page.open{transform:none;visibility:visible}
+body.cfg-open{overflow:hidden}
+.cfg-top{display:flex;align-items:center;gap:8px;background:#CCFF00;color:#111;padding:calc(10px + env(safe-area-inset-top)) 12px 12px;border-bottom:3px solid #111}
+html[data-cat="tenis"] .cfg-top{background:#C24A00;color:#fff;border-color:#7a2e00}
+.cfg-top h2{margin:0;font-size:19px;font-weight:950}
+.cfg-back{border:0;background:none;color:inherit;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.cfg-back .ico{width:24px;height:24px}
+.cfg-body{flex:1;overflow:auto;padding:6px 14px 40px;max-width:640px;width:100%;margin:0 auto}
+.cfg-h{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:18px 4px 7px}
+.cfg-group{background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.cfg-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line);color:var(--text)}
+.cfg-row:first-child{border-top:0}
+.cfg-row[role=button]{cursor:pointer}
+.cfg-row>.ico{color:var(--muted)}
+.cfg-t{flex:1;min-width:0;font-size:14.5px;font-weight:700}
+.cfg-t small{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:2px;line-height:1.35}
+.cfg-go{color:var(--muted);width:18px;height:18px}
+.cfg-sw{position:relative;width:46px;height:28px;flex:0 0 auto}
+.cfg-sw input{opacity:0;width:0;height:0;position:absolute}
+.cfg-sw span{position:absolute;inset:0;border-radius:999px;background:#d9d6ce;transition:background .15s;cursor:pointer}
+.cfg-sw span::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
+.cfg-sw input:checked+span{background:#7fc400}
+.cfg-sw input:checked+span::after{left:21px}
+.cfg-seg{display:flex;background:var(--soft,#f1efe9);border-radius:10px;padding:3px;gap:2px}
+.cfg-seg button{border:0;background:none;border-radius:8px;padding:6px 10px;font:inherit;font-size:12.5px;font-weight:800;color:var(--muted);cursor:pointer}
+.cfg-seg button.on{background:var(--paper);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.cfg-cta{display:flex;align-items:center;gap:12px;padding:14px}
+.cfg-cta>.ico{color:#6e8a00;width:26px;height:26px}
+.cfg-cta b{display:block;font-size:14.5px}.cfg-cta small{display:block;color:var(--muted);font-size:12px;margin-top:2px;line-height:1.35}
+.cfg-cta button{border:0;background:#15131c;color:#fff;border-radius:999px;padding:9px 16px;font:inherit;font-weight:800;font-size:13.5px;cursor:pointer;white-space:nowrap}
+html.dark .cfg-cta button{background:#CCFF00;color:#111}
+html.dark .cfg-sw span{background:#3a3844}
+html.dark .cfg-sw input:checked+span{background:#7fc400}
+body.cfg-open .sync-status,body.cfg-open .admin-btn{display:none!important}
+html.dark .cfg-page{background:var(--cream)}
+footer .ft-cfg{display:inline-flex;align-items:center;gap:6px}
+footer .ft-cfg .ico{width:16px;height:16px}
 </style>
 </head>
 <body>
 <div id="promoBanner"></div>
-<div id="adminbar" class="adminbar"><div class="wrap"><b>MODO ADMINISTRADOR</b><div><button class="secondary" onclick="openPromoBannerAdmin()">Publicidad</button> <button class="secondary" onclick="showAnalytics()">Estadísticas</button> <details class="admin-dl"><summary class="secondary">⬇ Descargas</summary><div class="admin-dl-menu"><button onclick="this.closest('details').open=false;exportAllStandings()">🏆 Clasificaciones (imágenes)</button><button onclick="this.closest('details').open=false;openRoundExport()">📸 Resultados de una jornada</button><button onclick="this.closest('details').open=false;downloadUpdatedSite()">🌐 Web actualizada</button><button onclick="this.closest('details').open=false;exportData()">💾 Copia de seguridad</button></div></details> <button class="danger" onclick="toggleAdmin(false)">Salir</button></div></div></div>
+<div id="adminbar" class="adminbar"><div class="wrap"><b>MODO ADMINISTRADOR</b><div><button class="secondary" onclick="openBroadcast()">Enviar aviso</button> <button class="secondary" onclick="openPromoBannerAdmin()">Publicidad</button> <button class="secondary" onclick="showAnalytics()">Estadísticas</button> <details class="admin-dl"><summary class="secondary">⬇ Descargas</summary><div class="admin-dl-menu"><button onclick="this.closest('details').open=false;exportAllStandings()">🏆 Clasificaciones (imágenes)</button><button onclick="this.closest('details').open=false;openRoundExport()">📸 Resultados de una jornada</button><button onclick="this.closest('details').open=false;downloadUpdatedSite()">🌐 Web actualizada</button><button onclick="this.closest('details').open=false;exportData()">💾 Copia de seguridad</button></div></details> <button class="danger" onclick="toggleAdmin(false)">Salir</button></div></div></div>
 <div id="nameSuggestions"></div>
 <header>
  <div class="wrap">
@@ -2168,7 +2209,7 @@ footer .ft-admin{font-size:12px;padding:6px 12px;color:var(--muted)}
 <footer>
  <div class="ft-tools">
   <button class="ft-btn" onclick="currentView='info';render();window.scrollTo({top:0})">ⓘ Información de la liga</button>
-  <button class="ft-btn ft-admin" onclick="toggleAdmin()">⚙ Admin</button>
+  <button class="ft-btn ft-cfg" onclick="openConfig()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>Configuración</button>
   <div class="ft-theme" role="group" aria-label="Apariencia"><button data-theme="auto" onclick="setThemeMode('auto')">Automático</button><button data-theme="light" onclick="setThemeMode('light')">☀️ Claro</button><button data-theme="dark" onclick="setThemeMode('dark')">🌙 Oscuro</button></div>
  </div>
  <div>Liga interna ETSII · Pádel</div>
@@ -4019,6 +4060,158 @@ function renderWeatherSheet(){
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeWeather()});
 renderWeatherStrip();
 setInterval(()=>{ if(document.visibilityState==="visible") loadWeather(true).then(renderWeatherStrip).catch(()=>{}); },WX_TTL);
+// ---------------------------------------------------------------------------
+// Iconos dibujados (trazo), en lugar de emoticonos.
+// ---------------------------------------------------------------------------
+const ICONS={
+ bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ check:'<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
+ users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+ megaphone:'<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+ calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+ contrast:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/>',
+ eyeoff:'<path d="M9.9 9.9a3 3 0 1 0 4.2 4.2"/><path d="M10.7 5.1A10.4 10.4 0 0 1 12 5c7 0 10 7 10 7a13.2 13.2 0 0 1-1.7 2.7"/><path d="M6.6 6.6A13.5 13.5 0 0 0 2 12s3 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="m2 2 20 20"/>',
+ info:'<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/>',
+ shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+ send:'<path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>',
+ phone:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+ back:'<path d="m15 18-6-6 6-6"/>',
+ chev:'<path d="m9 18 6-6-6-6"/>'
+};
+function icon(n,cls){return `<svg class="ico${cls?" "+cls:""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]||""}</svg>`}
+
+// ---------------------------------------------------------------------------
+// Notificaciones push. En iPhone solo existen con la web añadida a la pantalla
+// de inicio (iOS 16.4+). La suscripción se guarda en Supabase (pushSubscribe).
+// ---------------------------------------------------------------------------
+const PUSH_PUBLIC_KEY="BGo3Aljj-fDenOcNm3CamdDoiqyqvlDGDJcYUR8vJWie5IuEL12Vx0TGcMHr-RPPyJG_IwNtQur3v7KJhXjNvRY";
+const PUSH_KINDS=[
+ {k:"reminders",ic:"clock",t:"Recordatorio de partidos",d:"Horas antes de jugar y cuando cambie el horario"},
+ {k:"results",ic:"check",t:"Resultados",d:"Cuando el rival propone o confirma un resultado"},
+ {k:"rival",ic:"users",t:"Invitaciones y Buscar rival",d:"Te invitan a jugar o aceptan tu solicitud"},
+ {k:"news",ic:"megaphone",t:"Novedades de la liga",d:"Avisos de la organización"}
+];
+function pushSupported(){return "serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window}
+function pushPrefs(){let o={};try{o=JSON.parse(localStorage.getItem("liga_push_prefs")||"{}")}catch(_){}const r={};PUSH_KINDS.forEach(x=>r[x.k]=o[x.k]!==false);return r}
+function b64uToU8(s){const p="=".repeat((4-s.length%4)%4);const b=atob((s+p).replace(/-/g,"+").replace(/_/g,"/"));return Uint8Array.from(b,c=>c.charCodeAt(0))}
+function withTimeout(pr,ms){return Promise.race([pr,new Promise(r=>setTimeout(()=>r(null),ms))])}
+async function pushReg(){ if(!pushSupported()) return null; try{ return await withTimeout(navigator.serviceWorker.register("sw.js").then(()=>navigator.serviceWorker.ready),4000); }catch(_){ return null; } }
+async function pushCurrentSub(){ const reg=await pushReg(); if(!reg) return null; try{ return await reg.pushManager.getSubscription(); }catch(_){ return null; } }
+async function enablePush(){
+  if(!playerSession){ alert("Inicia sesión para activar los avisos de tus partidos."); return; }
+  try{
+    const perm=await Notification.requestPermission();
+    if(perm!=="granted"){ renderConfig(); return; }
+    const reg=await pushReg(); if(!reg) throw new Error("No se ha podido preparar la web para recibir avisos.");
+    let sub=await reg.pushManager.getSubscription();
+    if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64uToU8(PUSH_PUBLIC_KEY)});
+    await cloudWrite({action:"pushSubscribe",...authPayload(),subscription:JSON.stringify(sub),prefs:JSON.stringify(pushPrefs())});
+    showToast("Notificaciones activadas");
+  }catch(e){ alert(e.message||"No se han podido activar las notificaciones."); }
+  renderConfig();
+}
+async function disablePush(){
+  const sub=await pushCurrentSub();
+  if(sub){ try{ await cloudWrite({action:"pushUnsubscribe",...authPayload(),endpoint:sub.endpoint}); }catch(_){} try{ await sub.unsubscribe(); }catch(_){} }
+  showToast("Notificaciones desactivadas"); renderConfig();
+}
+async function setPushPref(k,on){
+  const p=pushPrefs(); p[k]=on; try{localStorage.setItem("liga_push_prefs",JSON.stringify(p))}catch(_){}
+  const sub=await pushCurrentSub(); if(!sub||!playerSession) return;
+  try{ await cloudWrite({action:"pushPrefs",...authPayload(),endpoint:sub.endpoint,prefs:JSON.stringify(p)}); }
+  catch(e){ try{ await cloudWrite({action:"pushSubscribe",...authPayload(),subscription:JSON.stringify(sub),prefs:JSON.stringify(p)}); }catch(e2){ alert(e2.message); } }
+}
+async function sendPushTest(){
+  try{ await cloudWrite({action:"pushTest",...authPayload()}); showToast("Enviada: debería llegarte en unos segundos"); }catch(e){ alert(e.message); }
+}
+
+// ---------------------------------------------------------------------------
+// Pantalla de Configuración (se abre con la rueda de Mis partidos o desde el pie)
+// ---------------------------------------------------------------------------
+function openConfig(){
+  let el=document.getElementById("cfgPage");
+  if(!el){ el=document.createElement("div"); el.id="cfgPage"; el.className="cfg-page"; document.body.appendChild(el); }
+  el.classList.add("open"); document.body.classList.add("cfg-open"); renderConfig();
+}
+function closeConfig(){ const el=document.getElementById("cfgPage"); if(el) el.classList.remove("open"); document.body.classList.remove("cfg-open"); }
+function cfgRow(ic,title,sub,right,onclick){return `<div class="cfg-row"${onclick?` role="button" tabindex="0" onclick="${onclick}"`:""}>${icon(ic)}<div class="cfg-t">${title}${sub?`<small>${sub}</small>`:""}</div>${right||""}</div>`}
+function cfgSwitch(on,onchange){return `<label class="cfg-sw"><input type="checkbox" ${on?"checked":""} onchange="${onchange}"><span></span></label>`}
+async function renderConfig(){
+  const el=document.getElementById("cfgPage"); if(!el) return;
+  const mode=themeMode(), logged=!!playerSession, ios=typeof isIOS==="function"&&isIOS(), standalone=typeof isStandalone==="function"&&isStandalone();
+  // Notificaciones: según lo que permita este dispositivo
+  let notif;
+  if(!pushSupported()){
+    notif=ios&&!standalone
+      ?cfgRow("phone","Añade la web a tu pantalla de inicio","En iPhone los avisos solo funcionan así: pulsa <b>Compartir</b> y luego <b>«Añadir a pantalla de inicio»</b>, y abre la liga desde ese icono.")
+      :cfgRow("bell","Este navegador no admite notificaciones","Prueba desde Chrome, Safari o la web instalada en el móvil.");
+  }else if(!logged){
+    notif=cfgRow("bell","Inicia sesión para recibir avisos","Recordatorios de tus partidos, resultados e invitaciones.",icon("chev","cfg-go"),"closeConfig();currentView='profile';render()");
+  }else if(Notification.permission==="denied"){
+    notif=cfgRow("bell","Notificaciones bloqueadas","Actívalas para esta web en los ajustes del móvil o del navegador.");
+  }else{
+    const sub=await pushCurrentSub();
+    if(!sub||Notification.permission!=="granted"){
+      notif=`<div class="cfg-cta">${icon("bell")}<div><b>Activa las notificaciones</b><small>Te avisaremos antes de tus partidos, de resultados por confirmar y de las novedades de la liga.</small></div><button onclick="enablePush()">Activar</button></div>`;
+    }else{
+      const p=pushPrefs();
+      notif=PUSH_KINDS.map(x=>cfgRow(x.ic,x.t,x.d,cfgSwitch(p[x.k],`setPushPref('${x.k}',this.checked)`))).join("")
+        +cfgRow("send","Enviar una notificación de prueba","",icon("chev","cfg-go"),"sendPushTest()")
+        +cfgRow("bell","Desactivar en este dispositivo","",icon("chev","cfg-go"),"disablePush()");
+    }
+  }
+  const hidden=!!(typeof myProfile!=="undefined"&&myProfile&&myProfile.hidden);
+  el.innerHTML=`<div class="cfg-top"><button class="cfg-back" onclick="closeConfig()" aria-label="Volver">${icon("back")}</button><h2>Configuración</h2></div>
+   <div class="cfg-body">
+    <div class="cfg-h">Notificaciones</div><div class="cfg-group">${notif}</div>
+    <div class="cfg-h">Apariencia</div><div class="cfg-group">${cfgRow("contrast","Tema","",`<div class="cfg-seg">${[["auto","Auto"],["light","Claro"],["dark","Oscuro"]].map(([v,t])=>`<button class="${mode===v?"on":""}" onclick="setThemeMode('${v}');renderConfig()">${t}</button>`).join("")}</div>`)}</div>
+    ${logged&&db.leagues[playerSession.league]?`<div class="cfg-h">Calendario</div><div class="cfg-group">${cfgRow("calendar","Añadir todos mis partidos","Los que ya tienen día y hora, al calendario del móvil",icon("chev","cfg-go"),"downloadAllICS()")}</div>`:""}
+    ${logged?`<div class="cfg-h">Privacidad</div><div class="cfg-group">${cfgRow("eyeoff","Ocultar mi perfil","No salir en «Buscar jugadores»",cfgSwitch(hidden,"setProfileHidden(this.checked)"))}</div>`:""}
+    <div class="cfg-h">Información</div><div class="cfg-group">
+     ${cfgRow("info","Información de la liga","",icon("chev","cfg-go"),"closeConfig();currentView='info';render();window.scrollTo({top:0})")}
+     ${!standalone&&ios?cfgRow("phone","Instalar en el móvil","Compartir → «Añadir a pantalla de inicio»"):""}
+     ${cfgRow("shield","Acceso admin","",icon("chev","cfg-go"),"closeConfig();toggleAdmin()")}
+    </div>
+   </div>`;
+}
+async function setProfileHidden(on){
+  try{ await cloudWrite({action:"updateProfile",...authPayload(),hidden:on?"true":"false"}); if(typeof myProfile!=="undefined"&&myProfile) myProfile.hidden=on; showToast(on?"Tu perfil queda oculto":"Tu perfil vuelve a ser visible"); }
+  catch(e){ alert(e.message); renderConfig(); }
+}
+// Todos mis partidos con día y hora, en un solo archivo de calendario.
+function downloadAllICS(){
+  if(!playerSession) return;
+  const k=playerSession.league, L=db.leagues[k], p=n=>String(n).padStart(2,"0"), ev=[];
+  localMatchesForPlayer().filter(m=>!m.played).forEach(m=>{
+    const si=getMatchSchedule(k,m.home,m.away); if(!si||!si.date||!si.time) return;
+    const d=si.date.replace(/-/g,""), t=si.time.replace(":","")+"00", end=new Date(matchTimestamp(si.date,si.time)+MATCH_DURATION_MIN*60000);
+    const e=`${end.getFullYear()}${p(end.getMonth()+1)}${p(end.getDate())}T${p(end.getHours())}${p(end.getMinutes())}00`;
+    ev.push("BEGIN:VEVENT",`UID:${k}-${d}-${t}-${Math.abs((m.home+m.away).split("").reduce((a,c)=>a*31+c.charCodeAt(0)|0,0))}@padeletsii`,`DTSTAMP:${d}T${t}`,
+      `DTSTART;TZID=Europe/Madrid:${d}T${t}`,`DTEND;TZID=Europe/Madrid:${e}`,`SUMMARY:${L?L.name:"Liga"} · ${m.home} vs ${m.away}`,
+      `LOCATION:ETSII UPM${si.court?" · "+si.court:""}`,"DESCRIPTION:Liga Pádel ETSII","BEGIN:VALARM","TRIGGER:-PT2H","ACTION:DISPLAY","DESCRIPTION:Partido en 2 horas","END:VALARM","END:VEVENT");
+  });
+  if(!ev.length){ alert("Todavía no tienes partidos con día y hora."); return; }
+  const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Liga Padel ETSII//ES","CALSCALE:GREGORIAN",...ev,"END:VCALENDAR"].join("\r\n");
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([ics],{type:"text/calendar"})); a.download="mis-partidos-liga-etsii.ics";
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+// Aviso a todos (modo admin)
+function openBroadcast(){
+  openModal(`<h3>Enviar aviso</h3><p class="muted" style="font-size:13px">Les llega como notificación a quienes la tengan activada (y «Novedades de la liga» encendido).</p>
+   <div class="admin-team-form"><label>Título<input id="bc_t" maxlength="60" placeholder="Ej: Cambio de pistas"></label>
+   <label>Mensaje<input id="bc_b" maxlength="180" placeholder="Ej: Esta semana se juega en la pista 2"></label>
+   <label>Para<select id="bc_l"><option value="">Todas las ligas</option>${Object.entries(db.leagues).map(([k,L])=>`<option value="${esc(k)}">${esc(L.name)}</option>`).join("")}</select></label></div>
+   <div class="admin-round-actions" style="margin-top:12px"><button class="primary" onclick="sendBroadcast()">Enviar</button><button class="secondary" onclick="closeModal()">Cancelar</button></div>`);
+}
+async function sendBroadcast(){
+  try{ const r=await cloudWrite({action:"adminBroadcast",password:adminPassword,title:v("bc_t"),body:v("bc_b"),league:v("bc_l")});
+    closeModal(); alert(`Aviso enviado a ${r.sent} dispositivo(s).`); }catch(e){ alert(e.message); }
+}
+// Al tocar una notificación se abre "Mis partidos"
+function openFromNotification(url){ try{ if(String(url).includes("#mis-partidos")){ closeConfig(); currentView="profile"; render(); window.scrollTo({top:0}); } }catch(_){} }
+if("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message",e=>{ if(e.data&&e.data.type==="open-url") openFromNotification(e.data.url); });
 async function playerDashboard(){
  const c=document.getElementById("content");
  if(!playerSession){playerLoginPage();return}
@@ -4133,7 +4326,7 @@ async function playerDashboard(){
   const avatarInner=myProfile&&myProfile.avatar?`<img src="${esc(myProfile.avatar)}" alt="">`:esc(initialsOf(playerSession.name));
   const leagueName=esc(L?.name||(k==="amistosos"?"Solo amistosos":k));
   c.innerHTML=`<div class="pf4">
-   <div class="pf4-top"><div class="pf4-av" onclick="pfTab('perfil')">${avatarInner}</div><div class="pf4-id"><h2>Mis partidos</h2><div class="pf4-sub">${esc(playerSession.name)}${playerSession.team?" · "+esc(playerSession.team):""}${posIdx>=0&&stRow.pj>0?" · "+(posIdx+1)+"º":""}</div></div><button class="pf4-refresh" onclick="playerDashboard()" title="Actualizar">⟳</button></div>
+   <div class="pf4-top"><div class="pf4-av" onclick="pfTab('perfil')">${avatarInner}</div><div class="pf4-id"><h2>Mis partidos</h2><div class="pf4-sub">${esc(playerSession.name)}${playerSession.team?" · "+esc(playerSession.team):""}${posIdx>=0&&stRow.pj>0?" · "+(posIdx+1)+"º":""}</div></div><button class="pf4-gear" onclick="openConfig()" title="Configuración" aria-label="Configuración">${icon("gear")}</button><button class="pf4-refresh" onclick="playerDashboard()" title="Actualizar">⟳</button></div>
    ${resultAlerts}${inviteAlerts}
    <div class="pf4-tabs">
     <button class="pf4-tab ${tab==="partidos"?"on":""}" data-tab="partidos" onclick="pfTab('partidos')">Partidos${upcoming.length?` <em>${upcoming.length}</em>`:""}</button>
@@ -5219,6 +5412,7 @@ if(isIOS()) scheduleInstall();
 
 trackEvent("visit");
 restorePlayerSession();
+if(location.hash==="#mis-partidos") currentView="profile";
 render();
 loadCloudResults();
 restoreAdminSession();

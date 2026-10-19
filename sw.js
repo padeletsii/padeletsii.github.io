@@ -1,4 +1,4 @@
-const CACHE_NAME = "liga-etsii-v4";
+const CACHE_NAME = "liga-etsii-v5";
 const APP_SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (event) => {
@@ -53,4 +53,25 @@ self.addEventListener("fetch", (event) => {
       return cached || network;
     })
   );
+});
+
+// ---- Notificaciones push ----
+self.addEventListener("push", (event) => {
+  let d = {};
+  try { d = event.data ? event.data.json() : {}; } catch (_) { d = { body: event.data ? event.data.text() : "" }; }
+  event.waitUntil(self.registration.showNotification(d.title || "Liga Pádel ETSII", {
+    body: d.body || "", icon: "icon-192.png", badge: "icon-192.png",
+    tag: d.tag || undefined, data: { url: d.url || "./" },
+  }));
+});
+// Al tocarla: si la web ya está abierta, se enfoca y se lleva a "Mis partidos"; si no, se abre.
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = new URL((event.notification.data && event.notification.data.url) || "./", self.registration.scope).href;
+  event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+    for (const c of list) {
+      if (c.url.startsWith(self.registration.scope)) { c.postMessage({ type: "open-url", url }); return c.focus(); }
+    }
+    return self.clients.openWindow(url);
+  }));
 });
