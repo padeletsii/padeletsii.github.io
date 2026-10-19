@@ -2091,6 +2091,48 @@ html body header{padding-top:calc(12px + env(safe-area-inset-top))!important}
 @media (max-width:759px){
  html[data-cat] body header,html body header{position:-webkit-sticky!important;position:sticky!important;top:0!important;z-index:14!important}
 }
+
+/* ---- Mis partidos más compacto ---- */
+.av-fold{padding:0}
+.av-fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0;padding:12px 14px;font-size:14px}
+.av-fold>summary::-webkit-details-marker{display:none}
+.av-fold>summary span{font-size:12.5px;color:var(--muted);font-weight:700;text-align:right}
+.av-fold>summary::after{content:"›";font-size:20px;color:var(--muted);transition:transform .2s;margin-left:2px}
+.av-fold[open]>summary::after{transform:rotate(90deg)}
+.av-fold[open]{padding:0 12px 12px}
+.av-fold[open]>summary{padding:12px 2px 8px}
+.mr-box{padding:10px 12px}
+.mr-h{margin:2px 2px 6px}
+.mr-how{margin:0 2px 8px}
+.mr-how>summary{cursor:pointer;font-size:12px;font-weight:800;color:#6A2EF0;list-style:none}
+.mr-how>summary::-webkit-details-marker{display:none}
+.mr-how .mr-info{margin:6px 0 0}
+.mr-empty{padding:2px 2px 8px}
+.mr-cta{padding:9px;font-size:13.5px}
+.pf5-row{margin-bottom:8px}
+.pf4-card.pf5{padding:10px 12px;border-radius:14px}
+.pf5-top{display:flex;justify-content:space-between;align-items:center}
+.pf5-eb{font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pf5-eb em{font-style:normal;color:#c0392b}
+.pf5-vs{font-size:15.5px;margin-top:2px;color:var(--muted)}
+.pf5-vs b{color:var(--text);font-size:16.5px}
+.pf5-when{font-size:13px;font-weight:700;margin-top:2px}
+.pf5-when.pf5-nodate{color:var(--muted);font-weight:600}
+.pf5-st{margin-top:8px;font-size:12px;padding:7px 10px}
+.pf5-act{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pf4-card .pf4-btn.pf5-b,.pf4-card .cal-btn.pf5-b{display:inline-flex;align-items:center;width:auto;margin:0;padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:800;box-shadow:none;background:var(--soft,#f1efe9);border:1px solid var(--line);color:var(--text);text-decoration:none}
+.pf4-card .pf4-btn.pf5-main{background:var(--pf-acc);color:var(--pf-on);border-color:transparent}
+.pf4-card .cal-btn.pf5-cal{padding:6px 10px}
+
+.mr-compact{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px}
+.mr-compact b{display:block;font-size:14px;color:#3510A0}
+.mr-compact small{display:block;font-size:12px;color:var(--muted);margin-top:1px}
+html.dark .mr-compact b{color:#cbb8ff}
+.mr-mini{border:0;border-radius:999px;background:#6A2EF0;color:#fff;font:inherit;font-weight:800;font-size:13px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+/* Botón flotante de Admin e indicador "Actualizado": no le importan a los jugadores. */
+body:not(.admin-mode) .admin-btn{display:none!important}
+body:not(.admin-mode) .sync-status.ok{display:none!important}
+footer .ft-admin{font-size:12px;padding:6px 12px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -2126,6 +2168,7 @@ html body header{padding-top:calc(12px + env(safe-area-inset-top))!important}
 <footer>
  <div class="ft-tools">
   <button class="ft-btn" onclick="currentView='info';render();window.scrollTo({top:0})">ⓘ Información de la liga</button>
+  <button class="ft-btn ft-admin" onclick="toggleAdmin()">⚙ Admin</button>
   <div class="ft-theme" role="group" aria-label="Apariencia"><button data-theme="auto" onclick="setThemeMode('auto')">Automático</button><button data-theme="light" onclick="setThemeMode('light')">☀️ Claro</button><button data-theme="dark" onclick="setThemeMode('dark')">🌙 Oscuro</button></div>
  </div>
  <div>Liga interna ETSII · Pádel</div>
@@ -3626,11 +3669,13 @@ function matchRequestsHTML(all){
   const card=(r)=>`<div class="mr-card"><div class="mr-who"><span class="mr-av">${esc(initialsOf(r.team))}</span><div><b>${esc(r.team)} busca rival</b><small>${esc(mrMembers(r.team))}</small></div></div>${mrChips(r)}${r.message?`<div class="mr-msg">“${esc(r.message)}”</div>`:""}<button class="mr-yes" onclick="acceptMatchRequest('${esc(r.id)}')">${solo?"¡Me va bien!":"¡Nos va bien!"}</button></div>`;
   const mineCard=(r)=>`<div class="mr-card mr-mine"><div class="mr-who"><span class="mr-av">${esc(initialsOf(me))}</span><div><b>Tu solicitud</b><small>Esperando a que ${solo?"alguien":"alguna pareja"} acepte</small></div></div>${mrChips(r)}${r.message?`<div class="mr-msg">“${esc(r.message)}”</div>`:""}<button class="mr-no" onclick="cancelMatchRequest('${esc(r.id)}')">Retirar solicitud</button></div>`;
   const closedCard=(r)=>{const rival=r.team===me?r.acceptedTeam:r.team;return `<div class="mr-card mr-done"><div class="mr-who"><span class="mr-av">${esc(initialsOf(rival))}</span><div><b>💬 En contacto con ${esc(rival)}</b><small>Cerrad día y hora y avisad a la admin</small></div></div>${mrChips(r)}<button class="mr-no" onclick="openMrContact('${esc(rival)}')">Ver contacto</button></div>`};
+  if(!others.length&&!mine.length&&!closed.length)
+    return `<div class="mr-box mr-compact"><span><b>🎾 Buscar rival</b><small>Nadie busca rival ahora</small></span><button class="mr-mini" onclick="openMatchRequestForm()">+ Publicar</button></div>`;
   return `<div class="mr-box">
    <div class="mr-h"><span>🎾 Buscan rival en la ${esc(db.leagues[playerSession.league]?.name||"liga")}</span>${others.length?`<em>${others.length}</em>`:""}</div>
-   <div class="mr-info">ℹ️ ${solo?"Si el partido de esta jornada no te viene bien, puedes adelantar uno de otra jornada: publica qué días y horas te van bien y el primer jugador que acepte (de los que aún no has jugado) te escribirá para cerrarlo.":"Si el partido de esta jornada no os viene bien, podéis adelantar uno de otra jornada: publicad qué días y horas os van bien y la primera pareja que acepte (de las que aún no habéis jugado) os escribirá para cerrarlo."} Cuenta igual para la clasificación.</div>
+   <details class="mr-how"><summary>¿Cómo funciona?</summary><div class="mr-info">${solo?"Si el partido de esta jornada no te viene bien, puedes adelantar uno de otra jornada: publica qué días y horas te van bien y el primer jugador que acepte (de los que aún no has jugado) te escribirá para cerrarlo.":"Si el partido de esta jornada no os viene bien, podéis adelantar uno de otra jornada: publicad qué días y horas os van bien y la primera pareja que acepte (de las que aún no habéis jugado) os escribirá para cerrarlo."} Cuenta igual para la clasificación.</div></details>
    ${closed.map(closedCard).join("")}
-   ${others.length?others.map(card).join(""):`<div class="mr-empty">Ahora mismo nadie busca rival.</div>`}
+   ${others.length?others.map(card).join(""):`<div class="mr-empty">Nadie busca rival ahora.</div>`}
    ${mine.map(mineCard).join("")}
    ${mine.length<2?`<button class="mr-cta" onclick="openMatchRequestForm()">+ Buscar rival</button>`:""}
   </div>`;
@@ -3725,13 +3770,24 @@ function myAvailabilityCardHTML(){
   const mine=window._avMine, solo=mrSolo();
   const n=mine&&mine.filled?avSet(mine.slots).size:0;
   const sel=avSet(mine&&mine.slots);
-  return `<div class="av-box">
-   <div class="av-head"><b>🗓️ Mi disponibilidad</b>${mine&&mine.filled?`<span>${n} hora${n===1?"":"s"} a la semana</span>`:""}</div>
+  // Plegada por defecto: una línea con el resumen; al tocarla se ve la tabla.
+  return `<details class="av-box av-fold"${window._avOpen?" open":""} ontoggle="window._avOpen=this.open">
+   <summary class="av-head"><b>🗓️ Mi disponibilidad</b><span>${mine&&mine.filled?(n?esc(avSummary(sel))+" · "+n+" h":"Sin horas marcadas"):"Sin marcar · márcala"}</span></summary>
    ${mine&&mine.filled
      ?avGridHTML((d,h)=>({cls:sel.has(d+"-"+h)?"y":""}),false)
      :`<p class="av-info">Marca a qué horas puedes jugar normalmente (de lunes a viernes). ${solo?"Tu rival":"Tu pareja y tus rivales"} lo ver${solo?"á":"án"} y en cada partido saldrán las horas en las que coincidís.</p>`}
    <div class="av-btns"><button class="av-cta" onclick="openAvailabilityEditor()">${mine&&mine.filled?"Editar":"Marcar mi disponibilidad"}</button>${solo?"":`<button class="av-sec" onclick="openPairAvailability()">Ver con mi pareja</button>`}</div>
-  </div>`;
+  </details>`;
+}
+// Resumen corto: "L–J 16:30–20:30" si todos los días marcados tienen la misma franja; si no, los días.
+function avSummary(sel){
+  const D="LMXJV", byDay=[0,1,2,3,4].map(d=>AV_HOURS.map((_,h)=>sel.has(d+"-"+h)?h:-1).filter(h=>h>=0));
+  const days=byDay.map((hs,d)=>hs.length?d:-1).filter(d=>d>=0); if(!days.length) return "";
+  const key=hs=>hs.join(","), same=days.every(d=>key(byDay[d])===key(byDay[days[0]]));
+  const consecutive=days.every((d,i)=>!i||d===days[i-1]+1);
+  const dTxt=consecutive&&days.length>2?D[days[0]]+"–"+D[days[days.length-1]]:days.map(d=>D[d]).join(", ");
+  const hs=byDay[days[0]], contiguous=hs.every((h,i)=>!i||h===hs[i-1]+1);
+  return same&&contiguous?`${dTxt} ${AV_HOURS[hs[0]]}–${avEnd(AV_HOURS[hs[hs.length-1]])}`:dTxt;
 }
 function openAvailabilityEditor(){
   window._avSel=avSet(window._avMine&&window._avMine.slots);
@@ -4040,17 +4096,23 @@ async function playerDashboard(){
     const mk=keyOf(m.home,m.away);
     const live=m.when&&m.when.date&&matchLiveStatus(m.when.date,m.when.time)==="live";
     const today=m.when&&m.when.date&&daysDiffFromToday(m.when.date)===0;
-    const eyebrow=`Jornada ${m.round}${live?" · 🔴 En juego":today?" · Hoy":""}`;
-    const action=waitingIn.has(mk)
-      ?`<div class="pf4-wait pf4-wait-in">Tienes un resultado por revisar arriba</div>`
-      :waitingMine.has(mk)
-        ?`<div class="pf4-wait">Resultado enviado · falta que lo confirme la otra pareja</div>`
-        :`<button class="pf4-btn" onclick="openPlayerProposal('${esc(m.key)}')">Proponer resultado</button>`;
-    return `<div class="pf4-row"><div class="pf4-date">${dayBlock(m)}</div><div class="pf4-line"></div>
-     <div class="pf4-card"><div class="pf4-eb">${esc(eyebrow)}</div>
-      <div class="pf4-vs">${pfVsHTML(k,m)}</div>
-      <div class="pf-next-when">${pfWhenChip(m.when)} ${icsButton(k,m.home,m.away)}</div>
-      ${action}${AV_LEAGUES.includes(k)?`<button class="pf4-btn av-btn" data-opp="${esc(m.opponent)}" onclick="openMatchAvailability(this.dataset.opp)">🗓️ ¿Cuándo podemos jugar?</button>`:""}</div></div>`;
+    // Tarjeta compacta: jornada, rival, cuándo y botones pequeños en una fila.
+    const hasDate=m.when&&m.when.date;
+    const whenTxt=hasDate?[relativeDayLabel(m.when.date),m.when.time,m.when.court].filter(Boolean).join(" · "):"Fecha por confirmar";
+    const status=waitingIn.has(mk)?`<div class="pf4-wait pf4-wait-in pf5-st">Tienes un resultado por revisar arriba</div>`
+      :waitingMine.has(mk)?`<div class="pf4-wait pf5-st">Resultado enviado · falta que lo confirme ${mrSolo()?"tu rival":"la otra pareja"}</div>`:"";
+    const si=getMatchSchedule(k,m.home,m.away);
+    const btns=[
+      status?"":`<button class="pf4-btn pf5-b${hasDate&&daysDiffFromToday(m.when.date)<=0?" pf5-main":""}" onclick="openPlayerProposal('${esc(m.key)}')">Resultado</button>`,
+      AV_LEAGUES.includes(k)?`<button class="pf4-btn pf5-b" data-opp="${esc(m.opponent)}" onclick="openMatchAvailability(this.dataset.opp)">🗓️ ¿Cuándo?</button>`:"",
+      si&&si.date&&si.time?`<button type="button" class="cal-btn pf5-b pf5-cal" data-league="${esc(k)}" data-home="${esc(m.home)}" data-away="${esc(m.away)}" title="Añadir a tu calendario" aria-label="Añadir a tu calendario">📅</button>`:""
+    ].join("");
+    return `<div class="pf4-row pf5-row"><div class="pf4-date">${dayBlock(m)}</div><div class="pf4-line"></div>
+     <div class="pf4-card pf5"><span hidden>${teamLinkHTML(k,m.home)}${teamLinkHTML(k,m.away)}</span>
+      <div class="pf5-top"><span class="pf5-eb">J${m.round} · ${m.isHome?"Local":"Visitante"}${live?` · <em class="pf5-live">🔴 En juego</em>`:today?` · <em>Hoy</em>`:""}</span></div>
+      <div class="pf5-vs">vs <b>${esc(m.opponent)}</b></div>
+      <div class="pf5-when${hasDate?"":" pf5-nodate"}">${whenTxt}</div>
+      ${status}${btns?`<div class="pf5-act">${btns}</div>`:""}</div></div>`;
   };
   const weekGroup=(m)=>{const d=m.when&&m.when.date; if(!d) return 2; return daysDiffFromToday(d)<=7?0:1;};
   const groupTitles=["Esta semana","Más adelante","Sin fecha todavía"];
@@ -4081,7 +4143,7 @@ async function playerDashboard(){
    <div class="pf4-pane" data-tab="partidos" ${tab==="partidos"?"":"hidden"}>
     ${AV_LEAGUES.includes(k)?myAvailabilityCardHTML():""}
     ${MR_LEAGUES.includes(k)?matchRequestsHTML(all):""}
-    ${reminderHTML(current)}${changesHTML(k,L)}
+    ${changesHTML(k,L)}
     ${agendaHTML}
    </div>
    <div class="pf4-pane" data-tab="resultados" ${tab==="resultados"?"":"hidden"}>
