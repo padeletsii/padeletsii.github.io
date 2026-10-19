@@ -2207,6 +2207,14 @@ html[data-cat] body #panelSection:has(.st-a) #content{padding:0 0 12px!important
 .st-a .st-note{margin:10px 16px 0!important}
 html[data-cat] body #panelSection:has(.st-a) #content>:not(.st-a){margin-left:16px;margin-right:16px}
 @media (min-width:760px){html[data-cat] body #panelSection:has(.st-a) .panel-head{padding:16px 20px 12px!important}.st-a .st-r{padding:10px 20px!important}.st-a .st-note{margin:10px 20px 0!important}html[data-cat] body #panelSection:has(.st-a) #content>:not(.st-a){margin-left:20px;margin-right:20px}}
+/* Botones de partido discretos: gris con dibujo en lima */
+html[data-cat] body .pf4-card .pf4-btn.pf5-b,html[data-cat] body .pf4-card .pf4-btn.pf5-main,html[data-cat] body .pf4-card .cal-btn.pf5-b{float:none!important;display:inline-flex!important;align-items:center;gap:5px;width:auto;margin:0!important;padding:4px 10px 4px 8px!important;border-radius:999px!important;font-size:12px!important;font-weight:700!important;background:transparent!important;border:1px solid var(--line)!important;color:var(--muted)!important;box-shadow:none!important;text-decoration:none!important;min-height:0}
+html[data-cat] body .pf4-card .cal-btn.pf5-cal{padding:4px 7px!important}
+html[data-cat] body .pf4-card .pf5-b .ico{width:14px;height:14px;color:var(--hl-line,#8DB800)}
+html[data-cat] body .pf4-card .pf5-b:hover{color:var(--text)!important;border-color:var(--muted)!important}
+html[data-cat] body .pf5-act{gap:6px;margin-top:8px}
+.cal-btn .ico,.pf-chip .ico{width:14px;height:14px;margin-right:5px;color:var(--hl-line,#8DB800);vertical-align:-2px}
+.mr-box b .ico,.av-head b .ico{width:17px;height:17px;margin-right:6px;vertical-align:-3px;color:var(--hl-line,#8DB800)}
 </style>
 </head>
 <body>
@@ -3313,7 +3321,7 @@ function showTeam(k,name){
 }
 function icsButton(k,home,away){
  const si=getMatchSchedule(k,home,away); if(!si||!si.date||!si.time) return "";
- return `<button type="button" class="cal-btn" data-league="${esc(k)}" data-home="${esc(home)}" data-away="${esc(away)}" title="Añadir este partido a tu calendario">📅 Añadir a calendario</button>`;
+ return `<button type="button" class="cal-btn" data-league="${esc(k)}" data-home="${esc(home)}" data-away="${esc(away)}" title="Añadir este partido a tu calendario">${icon("calplus")}Añadir a calendario</button>`;
 }
 function downloadICS(k,home,away){
  const si=getMatchSchedule(k,home,away); if(!si||!si.date||!si.time) return;
@@ -3744,7 +3752,7 @@ function matchRequestsHTML(all){
   const mineCard=(r)=>`<div class="mr-card mr-mine"><div class="mr-who"><span class="mr-av">${esc(initialsOf(me))}</span><div><b>Tu solicitud</b><small>Esperando a que ${solo?"alguien":"alguna pareja"} acepte</small></div></div>${mrChips(r)}${r.message?`<div class="mr-msg">“${esc(r.message)}”</div>`:""}<button class="mr-no" onclick="cancelMatchRequest('${esc(r.id)}')">Retirar solicitud</button></div>`;
   const closedCard=(r)=>{const rival=r.team===me?r.acceptedTeam:r.team;return `<div class="mr-card mr-done"><div class="mr-who"><span class="mr-av">${esc(initialsOf(rival))}</span><div><b>💬 En contacto con ${esc(rival)}</b><small>Cerrad día y hora y avisad a la admin</small></div></div>${mrChips(r)}<button class="mr-no" onclick="openMrContact('${esc(rival)}')">Ver contacto</button></div>`};
   if(!others.length&&!mine.length&&!closed.length)
-    return `<div class="mr-box mr-compact"><span><b>🎾 Buscar rival</b><small>Nadie busca rival ahora</small></span><button class="mr-mini" onclick="openMatchRequestForm()">+ Publicar</button></div>`;
+    return `<div class="mr-box mr-compact"><span><b>${icon("racket")}Buscar rival</b><small>Nadie busca rival ahora</small></span><button class="mr-mini" onclick="openMatchRequestForm()">+ Publicar</button></div>`;
   return `<div class="mr-box">
    <div class="mr-h"><span>🎾 Buscan rival en la ${esc(db.leagues[playerSession.league]?.name||"liga")}</span>${others.length?`<em>${others.length}</em>`:""}</div>
    <details class="mr-how"><summary>¿Cómo funciona?</summary><div class="mr-info">${solo?"Si el partido de esta jornada no te viene bien, puedes adelantar uno de otra jornada: publica qué días y horas te van bien y el primer jugador que acepte (de los que aún no has jugado) te escribirá para cerrarlo.":"Si el partido de esta jornada no os viene bien, podéis adelantar uno de otra jornada: publicad qué días y horas os van bien y la primera pareja que acepte (de las que aún no habéis jugado) os escribirá para cerrarlo."} Cuenta igual para la clasificación.</div></details>
@@ -3846,7 +3854,7 @@ function myAvailabilityCardHTML(){
   const sel=avSet(mine&&mine.slots);
   // Plegada por defecto: una línea con el resumen; al tocarla se ve la tabla.
   return `<details class="av-box av-fold"${window._avOpen?" open":""} ontoggle="window._avOpen=this.open">
-   <summary class="av-head"><b>🗓️ Mi disponibilidad</b><span>${mine&&mine.filled?(n?esc(avSummary(sel))+" · "+n+" h":"Sin horas marcadas"):"Sin marcar · márcala"}</span></summary>
+   <summary class="av-head"><b>${icon("calendar")}Mi disponibilidad</b><span>${mine&&mine.filled?(n?esc(avSummary(sel))+" · "+n+" h":"Sin horas marcadas"):"Sin marcar · márcala"}</span></summary>
    ${mine&&mine.filled
      ?avGridHTML((d,h)=>({cls:sel.has(d+"-"+h)?"y":""}),false)
      :`<p class="av-info">Marca a qué horas puedes jugar normalmente (de lunes a viernes). ${solo?"Tu rival":"Tu pareja y tus rivales"} lo ver${solo?"á":"án"} y en cada partido saldrán las horas en las que coincidís.</p>`}
@@ -4097,6 +4105,9 @@ setInterval(()=>{ if(document.visibilityState==="visible") loadWeather(true).the
 // Iconos dibujados (trazo), en lugar de emoticonos.
 // ---------------------------------------------------------------------------
 const ICONS={
+ pen:'<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+ calplus:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v5M9.5 16.5h5"/>',
+ racket:'<ellipse cx="10" cy="9" rx="6" ry="6.5"/><path d="m14.3 13.6 6.2 6.9"/><path d="M8 7h.01M12 7h.01M10 10h.01M8 12h.01M12 11h.01"/>',
  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
  check:'<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
@@ -4288,7 +4299,7 @@ async function playerDashboard(){
     if(!when||!when.date) return "";
     const parts=[relativeDayLabel(when.date)]; if(when.time) parts.push(when.time); if(when.court) parts.push(when.court);
     const ts=matchTimestamp(when.date,when.time);
-    return `<span class="pf-chip">🗓️ ${esc(parts.join(" · "))}</span>${ts&&ts>Date.now()?` <span class="pf-chip" data-cd="${ts}">⏳ …</span>`:""}`;
+    return `<span class="pf-chip">${icon("calendar")}${esc(parts.join(" · "))}</span>${ts&&ts>Date.now()?` <span class="pf-chip" data-cd="${ts}">…</span>`:""}`;
   };
   const matchStatusLabel=(m)=>{
     if(!m.when||!m.when.date) return "PENDIENTE";
@@ -4329,9 +4340,9 @@ async function playerDashboard(){
       :waitingMine.has(mk)?`<div class="pf4-wait pf5-st">Resultado enviado · falta que lo confirme ${mrSolo()?"tu rival":"la otra pareja"}</div>`:"";
     const si=getMatchSchedule(k,m.home,m.away);
     const btns=[
-      status?"":`<button class="pf4-btn pf5-b${hasDate&&daysDiffFromToday(m.when.date)<=0?" pf5-main":""}" onclick="openPlayerProposal('${esc(m.key)}')">Resultado</button>`,
-      AV_LEAGUES.includes(k)?`<button class="pf4-btn pf5-b" data-opp="${esc(m.opponent)}" onclick="openMatchAvailability(this.dataset.opp)">🗓️ ¿Cuándo?</button>`:"",
-      si&&si.date&&si.time?`<button type="button" class="cal-btn pf5-b pf5-cal" data-league="${esc(k)}" data-home="${esc(m.home)}" data-away="${esc(m.away)}" title="Añadir a tu calendario" aria-label="Añadir a tu calendario">📅</button>`:""
+      status?"":`<button class="pf4-btn pf5-b${hasDate&&daysDiffFromToday(m.when.date)<=0?" pf5-main":""}" onclick="openPlayerProposal('${esc(m.key)}')">${icon("pen")}Resultado</button>`,
+      AV_LEAGUES.includes(k)?`<button class="pf4-btn pf5-b" data-opp="${esc(m.opponent)}" onclick="openMatchAvailability(this.dataset.opp)">${icon("clock")}¿Cuándo?</button>`:"",
+      si&&si.date&&si.time?`<button type="button" class="cal-btn pf5-b pf5-cal" data-league="${esc(k)}" data-home="${esc(m.home)}" data-away="${esc(m.away)}" title="Añadir a tu calendario" aria-label="Añadir a tu calendario">${icon("calplus")}</button>`:""
     ].join("");
     return `<div class="pf4-row pf5-row"><div class="pf4-date">${dayBlock(m)}</div><div class="pf4-line"></div>
      <div class="pf4-card pf5"><span hidden>${teamLinkHTML(k,m.home)}${teamLinkHTML(k,m.away)}</span>
