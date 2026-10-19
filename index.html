@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a0a0a">
-<script>try{var _t=localStorage.getItem("liga_theme");if(_t==="dark"||(!_t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}</script>
+<script>try{if(!localStorage.getItem("liga_theme_v2")){localStorage.removeItem("liga_theme");localStorage.setItem("liga_theme_v2","1")}var _t=localStorage.getItem("liga_theme");if(_t==="dark"||(!_t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}</script>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -2053,6 +2053,28 @@ html[data-cat="padel"] body header .brand h1, html[data-cat="padel"] body header
 html[data-cat="padel"] body header .brand p { opacity: .75; }
 html[data-cat] body .ag-t .livenow-vs { margin: 0 6px; font-size: 11.5px; color: var(--muted); font-weight: 500; }
 
+
+/* ---- Cabecera compacta (Info y apariencia van ahora en el pie) ---- */
+html body header{padding-top:12px!important;padding-bottom:12px!important}
+html body header .brand h1,html[data-cat] body header h1{font-size:clamp(22px,3vw,32px)!important;line-height:1!important;white-space:nowrap}
+html body header .brand p{margin-top:3px!important;font-size:12.5px!important}
+html body header .brand-left{gap:12px}
+html body .id-emblem{width:46px;height:46px;flex:0 0 46px}
+html body header #nav{margin-top:12px!important}
+html body header .brand-right{gap:6px}
+@media (max-width:759px){
+ html body header .brand{flex-direction:row!important;align-items:center!important}
+ html body header .brand-right{display:none!important}
+}
+/* El tiempo, pegado a la cabecera */
+#homePanel .wx-strip{margin-top:-14px}
+/* ---- Pie: Información y apariencia ---- */
+footer{padding-bottom:72px!important}
+footer .ft-tools{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px;margin-bottom:12px}
+footer .ft-btn{border:1px solid var(--line);background:var(--paper);color:var(--text);border-radius:999px;padding:8px 14px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+footer .ft-theme{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px}
+footer .ft-theme button{border:0;background:none;color:var(--muted);border-radius:999px;padding:6px 11px;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer}
+footer .ft-theme button.on{background:var(--text);color:var(--paper)}
 </style>
 </head>
 <body>
@@ -2061,7 +2083,7 @@ html[data-cat] body .ag-t .livenow-vs { margin: 0 6px; font-size: 11.5px; color:
 <div id="nameSuggestions"></div>
 <header>
  <div class="wrap">
-  <div class="brand"><div class="brand-left"><div><h1>LIGA PÁDEL<br>ETSII</h1><p>Partidos · clasificación · cruces · copa</p></div></div><div class="brand-right"><div class="badge">CD INDUSTRIALES · 2026/27</div><div class="brand-tools"><button class="theme-toggle" id="infoBtn" onclick="currentView='info';render()" title="Información de la liga" aria-label="Información">ⓘ Info</button><button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambiar a modo oscuro" aria-label="Modo oscuro">🌙 Oscuro</button><button id="profileFab" class="profile-fab" onclick="currentView='profile';render()"><span id="profileFabIcon" class="profile-fab-avatar">👤</span><span id="profileFabLabel">Iniciar sesión</span></button></div></div></div>
+  <div class="brand"><div class="brand-left"><div><h1>LIGA PÁDEL ETSII</h1><p>Partidos · clasificación · cruces · copa</p></div></div><div class="brand-right"><div class="badge">CD INDUSTRIALES · 2026/27</div><div class="brand-tools"><button id="profileFab" class="profile-fab" onclick="currentView='profile';render()"><span id="profileFabIcon" class="profile-fab-avatar">👤</span><span id="profileFabLabel">Iniciar sesión</span></button></div></div></div>
   <nav id="nav">
    <button data-view="adminProposals" class="admin-nav-only">Resultados propuestos</button>
    <button data-view="inicio" class="active">Inicio</button>
@@ -2085,7 +2107,13 @@ html[data-cat] body .ag-t .livenow-vs { margin: 0 6px; font-size: 11.5px; color:
  </section>
 </main>
 <div class="whatsapp-banner"><div class="wrap"><div><strong>Únete al grupo de WhatsApp</strong><span>Por el grupo se concretan los horarios de los partidos.</span></div><a href="https://chat.whatsapp.com/FvMwrv1TFQhBtuukJVumSv?mode=gi_t" target="_blank" rel="noopener">UNIRME AL GRUPO</a></div></div>
-<footer>Liga interna ETSII · Pádel</footer>
+<footer>
+ <div class="ft-tools">
+  <button class="ft-btn" onclick="currentView='info';render();window.scrollTo({top:0})">ⓘ Información de la liga</button>
+  <div class="ft-theme" role="group" aria-label="Apariencia"><button data-theme="auto" onclick="setThemeMode('auto')">Automático</button><button data-theme="light" onclick="setThemeMode('light')">☀️ Claro</button><button data-theme="dark" onclick="setThemeMode('dark')">🌙 Oscuro</button></div>
+ </div>
+ <div>Liga interna ETSII · Pádel</div>
+</footer>
 <div id="syncStatus" class="sync-status bad">Sin conectar</div>
 <button class="admin-btn" onclick="toggleAdmin()">⚙ Admin</button>
 
@@ -4699,16 +4727,21 @@ function renderLigaSubTabs(show){
 
 /* ---- modo oscuro ---- */
 function isDark(){return document.documentElement.classList.contains("dark")}
+// Por defecto ("Automático") sigue el modo claro/oscuro del móvil u ordenador;
+// abajo del todo se puede forzar Claro u Oscuro.
+function themeMode(){try{return localStorage.getItem("liga_theme")||"auto"}catch(_){return "auto"}}
+function systemDark(){return !!(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)}
 function applyTheme(dark){
   document.documentElement.classList.toggle("dark",dark);
-  const t=document.getElementById("themeToggle");
-  if(t){t.textContent=dark?"☀️ Claro":"🌙 Oscuro";t.title=dark?"Cambiar a modo claro":"Cambiar a modo oscuro"}
+  const mode=themeMode();
+  document.querySelectorAll(".ft-theme button").forEach(b=>b.classList.toggle("on",b.dataset.theme===mode));
   const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content",dark?"#000000":"#0a0a0a");
 }
-function toggleTheme(){
-  const d=!isDark(); applyTheme(d);
-  try{localStorage.setItem("liga_theme",d?"dark":"light")}catch(_){}
+function setThemeMode(mode){
+  try{ if(mode==="auto") localStorage.removeItem("liga_theme"); else localStorage.setItem("liga_theme",mode); }catch(_){}
+  applyTheme(mode==="auto"?systemDark():mode==="dark");
 }
+function toggleTheme(){ setThemeMode(isDark()?"light":"dark"); }
 applyTheme(isDark());
 try{ if(window.matchMedia) matchMedia("(prefers-color-scheme: dark)").addEventListener("change",e=>{ if(!localStorage.getItem("liga_theme")) applyTheme(e.matches) }); }catch(_){}
 
@@ -5211,7 +5244,7 @@ if("serviceWorker" in navigator){
   function paintTitle() {
     var h1 = document.querySelector("header .brand h1");
     if (!h1) return;
-    var want = cat === "tenis" ? "LIGA TENIS<br>ETSII" : "LIGA PÁDEL<br>ETSII";
+    var want = cat === "tenis" ? "LIGA TENIS ETSII" : "LIGA PÁDEL ETSII";
     if (h1.innerHTML !== want) h1.innerHTML = want;
   }
 
