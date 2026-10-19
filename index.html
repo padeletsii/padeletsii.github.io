@@ -2174,6 +2174,29 @@ body.cfg-open .sync-status,body.cfg-open .admin-btn{display:none!important}
 html.dark .cfg-page{background:var(--cream)}
 footer .ft-cfg{display:inline-flex;align-items:center;gap:6px}
 footer .ft-cfg .ico{width:16px;height:16px}
+
+/* ---- Clasificación "A": tabla compacta (móvil y ordenador) ---- */
+#content .st-a ~ .table-scroll,#content .st-a ~ table.st-table,#content .st-a ~ .standings-note{display:none!important}
+.st-a{margin:0 0 8px}
+.st-a .st-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.st-a .st-r{display:grid;grid-template-columns:24px minmax(0,1fr) 30px 30px 30px 34px;gap:4px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);font-size:14px;position:relative}
+.st-a .st-r:first-child{border-top:0}
+.st-a .st-hd{font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:.05em;padding:9px 14px}
+.st-a .st-r.in::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--hl-line,#8db300)}
+.st-a .st-r.cut{border-top:2px dashed var(--hl-line,#8db300)}
+.st-a .st-r.me{background:color-mix(in srgb,var(--hl,#CCFF00) 30%,var(--paper))}
+.st-a .n{font-weight:900;font-size:12.5px;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.st-a .st-r.me .n{color:var(--text)}
+.st-a .c{text-align:center;color:var(--muted);font-variant-numeric:tabular-nums;font-size:13.5px}
+.st-a .st-hd span,.st-a .st-hd .c,.st-a .st-hd .p{font-size:10.5px}
+.st-a .p{text-align:right;font-weight:950;font-variant-numeric:tabular-nums}
+.st-a .nm{min-width:0}
+.st-a .nm .team-link{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:100%;color:var(--text)}
+.st-a .st-note{font-size:12px;color:var(--muted);margin:8px 4px 0}
+@media (min-width:760px){
+ .st-a .st-r{grid-template-columns:34px minmax(0,1fr) 54px 54px 54px 60px;padding:11px 20px;font-size:15px}
+ .st-a .st-hd{padding:10px 20px}
+}
 </style>
 </head>
 <body>
@@ -5558,28 +5581,28 @@ if("serviceWorker" in navigator){
     });
   }
 
-  // clasificación en el móvil: lista compacta en vez de la tabla ancha
+  // Clasificación (móvil y ordenador): tabla compacta "A" — # · pareja · PJ · G · P · PTS.
+  // Las que pasan a la Copa llevan una raya de color a la izquierda; tu pareja, resaltada.
   function mobileStandings() {
     var c = document.getElementById("content");
     if (!c || currentView !== "standings") return;
     var tbl = c.querySelector("table.st-table");
     if (!tbl) return;
     var L = db.leagues[currentLeague]; if (!L) return;
-    var st = calcStandings(L);
-    var sig = currentLeague + "|" + JSON.stringify(st.map(function (x) { return [x.team, x.pts, x.pj, x.sf, x.sc]; }));
-    var old = c.querySelector(".st-mobile");
+    var st = calcStandings(L), k = currentLeague, tennis = L.sport === "Tenis";
+    var myTeam = (typeof playerSession !== "undefined" && playerSession && playerSession.league === k) ? playerSession.team : "";
+    var sig = k + "|" + myTeam + "|" + JSON.stringify(st.map(function (x) { return [x.team, x.pts, x.pj, x.pg, x.pp]; }));
+    var old = c.querySelector(".st-a");
     if (old && old.getAttribute("data-sig") === sig) return;
     if (old) old.remove();
-    var tennis = L.sport === "Tenis", k = currentLeague;
     var rows = st.map(function (x, i) {
-      var cls = (i < 8 ? "in" : "") + (i < 3 ? " top" : "") + (i === 8 ? " cut" : "");
-      var me = (typeof playerSession !== "undefined" && playerSession && playerSession.league === k && playerSession.team === x.team) ? " me" : "";
-      var sub = x.pj ? ("sets " + x.sf + "-" + x.sc) : "Sin partidos todavía";
-      return '<li class="' + cls + me + '"><span class="pos">' + (i + 1) + '</span><div class="nm">' + teamLinkHTML(k, x.team) + '<small>' + sub + '</small></div><span class="pj">' + x.pj + '</span><b class="pt">' + x.pts + '</b></li>';
+      var cls = "st-r" + (i < 8 ? " in" : "") + (i === 8 ? " cut" : "") + (x.team === myTeam ? " me" : "");
+      return '<div class="' + cls + '"><span class="n">' + (i + 1) + '</span><span class="nm">' + teamLinkHTML(k, x.team) + '</span><span class="c">' + x.pj + '</span><span class="c">' + x.pg + '</span><span class="c">' + x.pp + '</span><b class="p">' + x.pts + '</b></div>';
     }).join("");
     var wrap = document.createElement("div");
-    wrap.className = "st-mobile"; wrap.setAttribute("data-sig", sig);
-    wrap.innerHTML = '<div class="st-h"><span>#</span><span>' + (tennis ? "Jugador" : "Pareja") + '</span><span>PJ</span><span>PTS</span></div><ol>' + rows + '</ol><p class="st-note">Las 8 primeras ' + (tennis ? "posiciones" : "parejas") + ' (resaltadas) pasan a la copa.</p>';
+    wrap.className = "st-a"; wrap.setAttribute("data-sig", sig);
+    wrap.innerHTML = '<div class="st-card"><div class="st-r st-hd"><span class="n">#</span><span>' + (tennis ? "JUGADOR" : "PAREJA") + '</span><span class="c">PJ</span><span class="c">G</span><span class="c">P</span><span class="p">PTS</span></div>' + rows + '</div>' +
+      '<p class="st-note">La raya de color marca ' + (tennis ? "los 8 primeros, que pasan" : "las 8 primeras parejas, que pasan") + ' a la Copa.</p>';
     var scroll = c.querySelector(".table-scroll") || tbl;
     scroll.parentNode.insertBefore(wrap, scroll);
   }
