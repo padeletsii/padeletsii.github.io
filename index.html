@@ -534,6 +534,74 @@ html.dark .mr-box{background:#241a3d;border-color:#3b2d63}
 .mr-alert{background:#fff4d6;border:2px solid #f0b400;color:#5a4200;border-radius:14px;padding:11px 12px;font-size:13.5px;font-weight:800;margin:12px 0 4px}
 .mr-alert span{display:block;font-weight:600;font-size:12.5px;margin-top:3px}
 html.dark .mr-alert{background:#3a2f0b;border-color:#c99a00;color:#ffe7a3}
+.wx-strip{display:flex;align-items:center;gap:10px;width:100%;margin:12px 0;text-shadow:0 1px 3px rgba(0,0,0,.25);padding:9px 12px;border:0;border-radius:14px;color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.08);position:relative;text-align:left;font:inherit}
+.wx-ic{font-size:24px;line-height:1}
+.wx-t{font-size:22px;font-weight:900;letter-spacing:-.02em}
+.wx-mid{flex:1;min-width:0}
+.wx-mid b{display:block;font-size:13px}
+.wx-mid span{display:block;font-size:12px;opacity:.92;line-height:1.3}
+.wx-go{font-size:22px;font-weight:700;opacity:.85}
+.wx-alert{box-shadow:inset 0 0 0 2px #ffd54a,0 4px 14px rgba(0,0,0,.08)}
+.wx-sky-sun{background:linear-gradient(135deg,#2f8ff0,#6cc3ff)}
+.wx-sky-part{background:linear-gradient(135deg,#4f86c6,#9ab8d8)}
+.wx-sky-cloud{background:linear-gradient(135deg,#6b7b8c,#9aa7b4)}
+.wx-sky-rain{background:linear-gradient(135deg,#3b4a63,#5f7390)}
+.wx-sky-storm{background:linear-gradient(135deg,#262b3d,#4b4f6b)}
+.wx-sky-night{background:linear-gradient(135deg,#141c3a,#2d3a6b)}
+.wx-sky-cold{background:linear-gradient(135deg,#4a7fa8,#a9cde6)}
+.wx-sky-hot{background:linear-gradient(135deg,#f07a2f,#ffb347)}
+.wx-strip,.wx-top{overflow:hidden;position:relative}
+.wx-strip>*:not(.wx-fx),.wx-top>*:not(.wx-fx){position:relative;z-index:1}
+.wx-fx{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.wx-fx i{position:absolute;display:block}
+.wx-cloud{left:-45%;width:55%;height:70%;min-width:120px;background:radial-gradient(closest-side,rgba(255,255,255,.55),rgba(255,255,255,0));filter:blur(2px);animation:wxDrift linear infinite}
+.wx-cloud.dk{background:radial-gradient(closest-side,rgba(225,232,240,.38),rgba(225,232,240,0))}
+@keyframes wxDrift{from{left:-55%}to{left:110%}}
+.wx-rain{inset:-20% 0 0 0;background-image:repeating-linear-gradient(105deg,rgba(255,255,255,0) 0 9px,rgba(255,255,255,.35) 9px 10px,rgba(255,255,255,0) 10px 22px);background-size:60px 60px;animation:wxRain .55s linear infinite;opacity:.45}
+.wx-rain.hv{opacity:.65;animation-duration:.4s}
+@keyframes wxRain{from{background-position:0 0}to{background-position:-16px 60px}}
+.wx-snow{inset:0;background-image:radial-gradient(2px 2px at 20% 30%,#fff,transparent),radial-gradient(2px 2px at 60% 10%,#fff,transparent),radial-gradient(1.5px 1.5px at 80% 50%,#fff,transparent),radial-gradient(2px 2px at 40% 70%,#fff,transparent),radial-gradient(1.5px 1.5px at 90% 85%,#fff,transparent);background-size:120px 120px;animation:wxSnow 6s linear infinite}
+@keyframes wxSnow{from{background-position:0 0}to{background-position:20px 120px}}
+.wx-sun{right:-30px;top:-40px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(255,244,180,.95) 0 18%,rgba(255,226,120,.45) 32%,rgba(255,226,120,0) 68%);animation:wxGlow 4s ease-in-out infinite}
+.wx-sun.hot{background:radial-gradient(circle,rgba(255,240,170,1) 0 20%,rgba(255,180,80,.6) 36%,rgba(255,180,80,0) 70%)}
+@keyframes wxGlow{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.12);opacity:1}}
+.wx-stars{inset:0;background-image:radial-gradient(1.5px 1.5px at 15% 25%,#fff,transparent),radial-gradient(1px 1px at 35% 70%,#fff,transparent),radial-gradient(1.5px 1.5px at 55% 20%,#fff,transparent),radial-gradient(1px 1px at 75% 60%,#fff,transparent),radial-gradient(1.5px 1.5px at 90% 30%,#fff,transparent);background-size:160px 90px;animation:wxTwinkle 3s ease-in-out infinite alternate}
+@keyframes wxTwinkle{from{opacity:.45}to{opacity:1}}
+.wx-flash{inset:0;background:#fff;opacity:0;animation:wxFlash 7s infinite}
+@keyframes wxFlash{0%,90%,94%,100%{opacity:0}91%,93%{opacity:.55}92%{opacity:.15}}
+@media (prefers-reduced-motion:reduce){.wx-fx i{animation:none!important}}
+.wx-ov{position:fixed;inset:0;z-index:60;pointer-events:none}
+.wx-bg{position:absolute;inset:0;background:rgba(0,0,0,.35);opacity:0;transition:opacity .2s}
+.wx-sheet{position:absolute;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;max-height:88vh;overflow:auto;background:var(--paper);color:var(--text);border-radius:24px 24px 0 0;transform:translateY(100%);transition:transform .25s;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
+.wx-ov.open{pointer-events:auto}.wx-ov.open .wx-bg{opacity:1}.wx-ov.open .wx-sheet{transform:none}
+.wx-top{padding:16px 16px 14px;color:#fff;border-radius:24px 24px 0 0;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+.wx-grab{width:40px;height:4px;border-radius:4px;background:rgba(255,255,255,.6);margin:0 auto 10px}
+.wx-row{display:flex;align-items:center;justify-content:space-between}
+.wx-big{font-size:46px;font-weight:300;line-height:1}
+.wx-cond{font-size:15px;font-weight:700}
+.wx-hl{font-size:13px;opacity:.9}
+.wx-x{border:0;background:rgba(255,255,255,.22);color:#fff;border-radius:999px;width:30px;height:30px;font-size:16px;cursor:pointer}
+.wx-msg{margin-top:8px;font-size:13.5px;font-weight:700}
+.wx-mine{margin:10px 16px 0;border-radius:14px;padding:10px 12px;font-size:13px;background:#efeaff;color:#3510A0}
+.wx-mine b{display:block;font-size:13.5px}
+.wx-mine.bad{background:#fff4d6;color:#5a4200;box-shadow:inset 0 0 0 2px #f0b400}
+.wx-days{display:flex;gap:6px;overflow-x:auto;padding:12px 16px 4px;scrollbar-width:none}
+.wx-days button{flex:0 0 auto;border:1px solid var(--line);background:var(--paper);color:var(--text);border-radius:12px;padding:6px 10px;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;text-align:center;line-height:1.25}
+.wx-days button small{display:block;font-weight:600;color:var(--muted);font-size:11px}
+.wx-days button.on{background:#15131c;color:#fff;border-color:#15131c}.wx-days button.on small{color:#ddd}
+.wx-hours{display:flex;gap:8px;overflow-x:auto;padding:12px 16px 6px}
+.wx-h{flex:0 0 54px;border-radius:14px;background:var(--bg,#f4f2ee);text-align:center;padding:8px 0;font-size:12px}
+.wx-hh{font-weight:800;color:var(--muted)}
+.wx-hi{font-size:22px;margin:4px 0}
+.wx-ht{font-weight:900;font-size:14px}
+.wx-hp{font-size:11px;font-weight:800;color:#2f7de1;min-height:14px}
+.wx-h.match{background:#DCF23A;color:#15131c}.wx-h.match .wx-hh{color:#15131c}
+.wx-h.past{opacity:.45}
+.wx-legend{padding:4px 16px 0;font-size:11.5px;color:var(--muted)}
+html.dark .wx-mine{background:#241a3d;color:#cbb8ff}
+html.dark .wx-mine.bad{background:#3a2f0b;color:#ffe7a3}
+html.dark .wx-h{background:rgba(255,255,255,.06)}
+html.dark .wx-days button.on{background:#fff;color:#15131c}html.dark .wx-days button.on small{color:#555}
 .av-box{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:12px;margin:0 0 14px}
 .av-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 4px 8px;font-size:14px}
 .av-head span{font-size:12px;color:var(--muted);font-weight:700}
@@ -1932,6 +2000,7 @@ html[data-cat] body .ag-t .livenow-vs { margin: 0 6px; font-size: 11.5px; color:
 </header>
 <main class="wrap">
  <div id="homePanel">
+  <div id="wxStrip"></div>
   <div id="homeAlerts"></div>
   <div id="liveNow"></div>
  </div>
@@ -3634,6 +3703,128 @@ function pickAvSlot(i){
   const box=document.getElementById("av_pick");
   if(box) box.innerHTML=`${avWaHTML(st.opponent,st.contacts,slotTxt)}<div class="mr-alert">⚠️ ¡Comunica el horario a la admin (${esc(MR_ADMIN)})!<span>Cuando cerréis día y hora, avisadla para que lo apunte en el calendario. Si no, el partido no contará.</span></div>`;
 }
+// ---------------------------------------------------------------------------
+// El tiempo en la ETSII (pistas al aire libre). Franja discreta arriba en
+// Inicio y, al tocarla, previsión por horas (9:00-20:00) de hoy y 6 días más,
+// con la hora del partido de quien ha iniciado sesión marcada.
+// Datos: Open-Meteo (gratis, sin clave), pedidos desde el navegador.
+// ---------------------------------------------------------------------------
+const WX_LAT=40.4405, WX_LON=-3.6894, WX_TTL=15*60*1000;
+const WX_DAYN=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+const WX_COURT_H=[9,10,11,12,13,14,15,16,17,18,19,20];
+let wxData=null, wxAt=0, wxDay=0;
+function wxCode(code,day=1){
+  if(code===0) return day?["☀️","Despejado","sun"]:["🌙","Despejado","night"];
+  if(code<=2) return day?["🌤️","Poco nuboso","part"]:["☁️","Poco nuboso","night"];
+  if(code===3) return ["☁️","Nublado","cloud"];
+  if(code===45||code===48) return ["🌫️","Niebla","cloud"];
+  if(code>=51&&code<=57) return ["🌦️","Llovizna","rain"];
+  if(code>=61&&code<=67) return ["🌧️","Lluvia","rain"];
+  if(code>=71&&code<=77) return ["❄️","Nieve","cold"];
+  if(code>=80&&code<=82) return ["🌦️","Chubascos","rain"];
+  if(code>=95) return ["⛈️","Tormenta","storm"];
+  return ["⛅","Variable","part"];
+}
+const wxIsRain=c=>(c>=51&&c<=67)||(c>=80&&c<=82)||c>=95;
+function wxSky(code,day,t){const s=wxCode(code,day)[2];if(s==="sun"&&t>=32)return "hot";if((s==="sun"||s==="part")&&t<=7)return "cold";return s}
+function wxQuip(t,code,wind,rainLater,day=1){
+  if(code>=95) return "Tormenta: hoy ni globos ni bandejas ⛈️";
+  if(wxIsRain(code)) return "Pista mojada = resbalones. Mejor aplazar";
+  if(rainLater) return `Ojo: lluvia hacia las ${rainLater}. Revisad si suspendéis`;
+  if(t>=32) return "Hidrátate, que hoy se suda 🥵";
+  if(t<=7) return "Calienta bien o te lesionas 🥶";
+  if(wind>=30) return "Viento: excusa perfecta si fallas el globo 💨";
+  if(!day) return code<=2?"Noche despejada: mañana, a la pista 🌙":"Noche nublada: a descansar para mañana 😴";
+  if(code===0) return "Crema solar, que no hay excusa 😎";
+  if(code<=2) return "Día perfecto para jugar 🎾";
+  return "Nublado pero jugable 👌";
+}
+// Fondo animado según el tiempo: nubes que pasan, lluvia, sol, estrellas, nieve, rayos.
+function wxFx(code,day,t){
+  const cl=(n,dark)=>Array.from({length:n},(_,i)=>`<i class="wx-cloud${dark?" dk":""}" style="top:${[-8,28,6,44][i%4]}%;animation-duration:${[38,52,45,60][i%4]}s;animation-delay:-${[0,17,30,9][i%4]}s;transform:scale(${[1,.8,1.2,.9][i%4]})"></i>`).join("");
+  const rain=heavy=>`<i class="wx-rain${heavy?" hv":""}"></i>`;
+  let h="";
+  if(code>=95) h=cl(4,true)+rain(true)+`<i class="wx-flash"></i>`;
+  else if(code>=71&&code<=77) h=cl(2,false)+`<i class="wx-snow"></i>`;
+  else if(wxIsRain(code)) h=cl(4,true)+rain(code>=63&&code!==80);
+  else if(!day) h=`<i class="wx-stars"></i>`+(code>=1?cl(code>=3?3:1,true):"");
+  else if(code===0) h=`<i class="wx-sun${t>=32?" hot":""}"></i>`;
+  else if(code<=2) h=`<i class="wx-sun"></i>`+cl(2,false);
+  else h=cl(4,false);
+  return `<span class="wx-fx" aria-hidden="true">${h}</span>`;
+}
+function wxISO(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+async function loadWeather(force){
+  if(!force&&wxData&&Date.now()-wxAt<WX_TTL) return wxData;
+  const u=`https://api.open-meteo.com/v1/forecast?latitude=${WX_LAT}&longitude=${WX_LON}&current=temperature_2m,weather_code,is_day,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability,is_day&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=Europe%2FMadrid&forecast_days=7`;
+  const ctrl=new AbortController(); const tm=setTimeout(()=>ctrl.abort(),8000);
+  try{
+    const j=await (await fetch(u,{signal:ctrl.signal})).json();
+    wxData={cur:{t:j.current.temperature_2m,code:j.current.weather_code,day:j.current.is_day,wind:j.current.wind_speed_10m},
+      hourly:j.hourly.time.map((tm,i)=>({tm,t:j.hourly.temperature_2m[i],code:j.hourly.weather_code[i],p:j.hourly.precipitation_probability[i]??0,day:j.hourly.is_day[i]})),
+      daily:j.daily.time.map((d,i)=>({d,max:j.daily.temperature_2m_max[i],min:j.daily.temperature_2m_min[i],code:j.daily.weather_code[i]}))};
+    wxAt=Date.now();
+  }finally{clearTimeout(tm)}
+  return wxData;
+}
+function wxRainLaterToday(){
+  const nowH=new Date().getHours(), td=wxISO(new Date());
+  const h=wxData.hourly.find(x=>x.tm.startsWith(td)&&+x.tm.slice(11,13)>=Math.max(nowH,9)&&+x.tm.slice(11,13)<=20&&(x.p>=60||wxIsRain(x.code)));
+  return h?h.tm.slice(11,16):null;
+}
+// Próximo partido con fecha de quien ha iniciado sesión (si cae en la previsión).
+function wxMyMatch(){
+  try{
+    if(!playerSession||!db.leagues[playerSession.league]) return null;
+    const ms=localMatchesForPlayer().filter(m=>!m.played&&m.when&&m.when.date&&daysDiffFromToday(m.when.date)>=0)
+      .sort((a,b)=>(a.when.date+(a.when.time||"")).localeCompare(b.when.date+(b.when.time||"")));
+    const m=ms[0]; if(!m) return null;
+    const mins=minutesFromHHMM(m.when.time), hour=mins===null?null:Math.floor(mins/60);
+    const dt=new Date(m.when.date+"T12:00");
+    return {date:m.when.date,hour,label:`${WX_DAYN[dt.getDay()]} ${dt.getDate()}/${dt.getMonth()+1}${m.when.time?" · "+m.when.time:""}`,opponent:m.opponent};
+  }catch(e){return null}
+}
+async function renderWeatherStrip(){
+  const el=document.getElementById("wxStrip"); if(!el) return;
+  try{ await loadWeather(); }catch(e){ el.innerHTML=""; return; }
+  const c=wxData.cur,[ic,txt]=wxCode(c.code,c.day),today=wxData.daily[0],rl=wxRainLaterToday();
+  el.innerHTML=`<button class="wx-strip wx-sky-${wxSky(c.code,c.day,c.t)}${rl||wxIsRain(c.code)?" wx-alert":""}" onclick="openWeather()" aria-label="Ver el tiempo por horas">${wxFx(c.code,c.day,c.t)}
+   <span class="wx-ic">${ic}</span><span class="wx-t">${Math.round(c.t)}°</span>
+   <span class="wx-mid"><b>${txt} · ${Math.round(today.min)}°/${Math.round(today.max)}° · ETSII</b><span>${wxQuip(c.t,c.code,c.wind,rl,c.day)}</span></span><span class="wx-go">›</span></button>`;
+}
+function openWeather(){
+  if(!wxData) return;
+  wxDay=0;
+  let ov=document.getElementById("wxSheet");
+  if(!ov){ov=document.createElement("div");ov.id="wxSheet";ov.className="wx-ov";ov.innerHTML=`<div class="wx-bg" onclick="closeWeather()"></div><div class="wx-sheet" id="wxSheetBody"></div>`;document.body.appendChild(ov);}
+  renderWeatherSheet();
+  requestAnimationFrame(()=>ov.classList.add("open"));
+}
+function closeWeather(){const ov=document.getElementById("wxSheet");if(ov)ov.classList.remove("open")}
+function renderWeatherSheet(){
+  const body=document.getElementById("wxSheetBody"); if(!body||!wxData) return;
+  const c=wxData.cur,[ic,txt]=wxCode(c.code,c.day),today=wxData.daily[0],rl=wxRainLaterToday();
+  const m=wxMyMatch(), day=wxData.daily[wxDay], nowH=new Date().getHours();
+  let mm="";
+  if(m){
+    const mh=m.hour===null?null:wxData.hourly.find(x=>x.tm===`${m.date}T${String(m.hour).padStart(2,"0")}:00`);
+    if(mh){const [mi,mt]=wxCode(mh.code,1),bad=mh.p>=50||wxIsRain(mh.code);
+      mm=`<div class="wx-mine${bad?" bad":""}"><b>🎾 Tu partido · ${esc(m.label)}</b>${mi} ${mt} · ${Math.round(mh.t)}° · ${mh.p}% de lluvia${bad?" — puede suspenderse, hablad con el rival":""}</div>`;}
+    else mm=`<div class="wx-mine"><b>🎾 Tu partido · ${esc(m.label)}</b>Todavía no hay previsión para ese día.</div>`;
+  }
+  const hrs=wxData.hourly.filter(x=>x.tm.startsWith(day.d)&&WX_COURT_H.includes(+x.tm.slice(11,13)));
+  body.innerHTML=`<div class="wx-top wx-sky-${wxSky(c.code,c.day,c.t)}">${wxFx(c.code,c.day,c.t)}<div class="wx-grab"></div>
+    <div class="wx-row"><div><div class="wx-cond">ETSII · ahora</div><div class="wx-big">${Math.round(c.t)}°</div><div class="wx-cond">${ic} ${txt}</div><div class="wx-hl">Máx ${Math.round(today.max)}° · Mín ${Math.round(today.min)}°</div></div><button class="wx-x" onclick="closeWeather()" aria-label="Cerrar">✕</button></div>
+    <div class="wx-msg">${wxQuip(c.t,c.code,c.wind,rl,c.day)}</div></div>
+   ${mm}
+   <div class="wx-days">${wxData.daily.map((d,i)=>{const dt=new Date(d.d+"T12:00");const [di]=wxCode(d.code,1);return `<button class="${i===wxDay?"on":""}" onclick="wxDay=${i};renderWeatherSheet()">${i===0?"Hoy":i===1?"Mañana":WX_DAYN[dt.getDay()]+" "+dt.getDate()}<small>${di} ${Math.round(d.min)}°/${Math.round(d.max)}°</small></button>`}).join("")}</div>
+   <div class="wx-hours">${hrs.map(x=>{const H=+x.tm.slice(11,13);const [hi]=wxCode(x.code,x.day);const isM=m&&day.d===m.date&&H===m.hour;const past=wxDay===0&&H<nowH;
+     return `<div class="wx-h${isM?" match":""}${past?" past":""}"><div class="wx-hh">${isM?"🎾 ":""}${H}:00</div><div class="wx-hi">${hi}</div><div class="wx-ht">${Math.round(x.t)}°</div><div class="wx-hp">${x.p>=20?"💧"+x.p+"%":""}</div></div>`}).join("")}</div>
+   <div class="wx-legend">Horario de pistas (9:30–20:30) · 💧 probabilidad de lluvia${m?" · 🎾 tu partido":""} · Datos: Open-Meteo</div>`;
+}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeWeather()});
+renderWeatherStrip();
+setInterval(()=>{ if(document.visibilityState==="visible") loadWeather(true).then(renderWeatherStrip).catch(()=>{}); },WX_TTL);
 async function playerDashboard(){
  const c=document.getElementById("content");
  if(!playerSession){playerLoginPage();return}
