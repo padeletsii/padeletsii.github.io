@@ -627,6 +627,32 @@ html.dark .wx-mine{background:#241a3d;color:#cbb8ff}
 html.dark .wx-mine.bad{background:#3a2f0b;color:#ffe7a3}
 html.dark .wx-h{background:rgba(255,255,255,.06)}
 html.dark .wx-days button.on{background:#fff;color:#15131c}html.dark .wx-days button.on small{color:#555}
+@media (min-width:760px){
+ /* Previsión completa: ventana centrada y ancha en vez de la hoja de abajo del móvil. */
+ .wx-sheet{top:50%;bottom:auto;left:50%;right:auto;width:min(980px,92vw);max-width:none;max-height:90vh;margin:0;border-radius:26px;transform:translate(-50%,-46%) scale(.97);opacity:0;transition:transform .22s,opacity .22s;padding-bottom:22px}
+ .wx-ov.open .wx-sheet{transform:translate(-50%,-50%);opacity:1}
+ .wx-top{padding:26px 30px 24px;border-radius:26px 26px 0 0}
+ .wx-grab{display:none}
+ .wx-big{font-size:84px}
+ .wx-cond{font-size:19px}
+ .wx-hl{font-size:16px}
+ .wx-msg{font-size:17px;margin-top:12px}
+ .wx-x{width:40px;height:40px;font-size:20px}
+ .wx-mine{margin:18px 30px 0;padding:14px 18px;font-size:15px}
+ .wx-mine b{font-size:16px}
+ .wx-days{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;padding:20px 30px 6px;overflow:visible}
+ .wx-days button{padding:12px 6px;font-size:15px;border-radius:16px}
+ .wx-days button small{font-size:14px;margin-top:4px}
+ .wx-hours{display:grid;grid-template-columns:repeat(12,1fr);gap:8px;padding:16px 30px 8px;overflow:visible}
+ .wx-h{padding:14px 0;border-radius:16px;font-size:14px}
+ .wx-hi{font-size:32px;margin:8px 0}
+ .wx-ht{font-size:19px}
+ .wx-hp{font-size:13px;min-height:16px;margin-top:2px}
+ .wx-legend{padding:10px 30px 0;font-size:13px}
+ .wx-sheet .wx-sun{right:120px;top:-10px;width:80px;height:80px}
+ .wx-sheet .wx-sunrays{right:-10px;top:-120px;width:320px;height:320px}
+ .wx-sheet .wx-moon{right:130px;top:10px;width:56px;height:56px;box-shadow:inset -15px -5px 0 0 #f4f1d8}
+}
 .av-box{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:12px;margin:0 0 14px}
 .av-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 4px 8px;font-size:14px}
 .av-head span{font-size:12px;color:var(--muted);font-weight:700}
