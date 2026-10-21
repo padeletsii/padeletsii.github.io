@@ -2227,7 +2227,7 @@ html[data-cat] body .mr-quiet button{background:transparent!important;border:0!i
 .mr-pulse{width:10px;height:10px;border-radius:50%;background:var(--hl-line,#8DB800);flex:0 0 10px;box-shadow:0 0 0 0 var(--hl-line,#8DB800);animation:mrp 1.8s infinite}
 @keyframes mrp{70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
 /* Banner «Añadir a pantalla de inicio» */
-html[data-cat] body .install-bar{display:block;background:var(--paper)!important;color:var(--text);border:1px solid var(--line);border-radius:20px;padding:14px 14px 14px;box-shadow:0 12px 34px rgba(20,20,30,.18);bottom:calc(84px + env(safe-area-inset-bottom));animation:ibIn .35s ease}
+html[data-cat] body .install-bar{z-index:16;display:block;background:var(--paper)!important;color:var(--text);border:1px solid var(--line);border-radius:20px;padding:14px 14px 14px;box-shadow:0 12px 34px rgba(20,20,30,.18);bottom:calc(84px + env(safe-area-inset-bottom));animation:ibIn .35s ease}
 @keyframes ibIn{from{transform:translateY(20px);opacity:0}}
 .install-bar .ib-top{display:flex;gap:12px;align-items:center;padding-right:24px}
 .install-bar .ib-top img{width:46px;height:46px;border-radius:12px}
@@ -2287,6 +2287,10 @@ html[data-cat] body .msg-th{display:flex;align-items:center;gap:10px;width:100%;
 .ft-msg.has-new::after{position:absolute;top:4px;right:6px;margin:0}
 html[data-cat] body .home-msg{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--paper)!important;border:1px solid var(--line)!important;border-radius:18px!important;padding:12px 14px!important;margin:12px 0 0!important;box-shadow:none!important;color:var(--text)!important;font:inherit;cursor:pointer}
 .home-msg>span:nth-child(2){flex:1}.home-msg b{display:block;font-size:14px}.home-msg small{display:block;font-size:12px;color:var(--muted)}
+body:has(.modal.open) .install-bar,body:has(.wx-ov.open) .install-bar{display:none!important}
+.wo-field small{display:block;font-size:12px;margin:-2px 0 6px}
+.wo-btns{display:flex;gap:6px;flex-wrap:wrap}.wo-btns button{font-size:12.5px!important;padding:7px 11px!important}
+.wo-btns button.on{outline:2px solid var(--hl-line,#8DB800)}
 </style>
 </head>
 <body>
@@ -2500,7 +2504,7 @@ async function loadCloudResults(){
         const match=L.schedule?.[r]?.[i];
         if(match){
           const k=stableMatchKey(match.home,match.away);
-          L.results[k]={sets:x.sets||[],winner:x.winner};
+          L.results[k]={sets:x.sets||[],winner:x.winner,wo:x.home_note==="NP"?"home":x.away_note==="NP"?"away":""};
         }
       }
     });
@@ -2511,7 +2515,7 @@ async function loadCloudResults(){
       const L=db.leagues[x.league];
       if(!L) return;
       if(String(x.key||"").startsWith("v2:")){
-        L.results[x.key]={sets:x.sets||[],winner:x.winner};
+        L.results[x.key]={sets:x.sets||[],winner:x.winner,wo:x.home_note==="NP"?"home":x.away_note==="NP"?"away":""};
       }
     });
 
@@ -3036,7 +3040,7 @@ function renderMatches(L){
   const score=res?formatScore(res):"—";
   const si=getMatchSchedule(k,m.home,m.away);
   const homeWin=res&&res.winner===m.home, awayWin=res&&res.winner===m.away;
-  return `<div class="match"><div class="match-head"><div class="match-head-when">${matchWhenHTML(si)}</div><div class="match-status ${res?"is-played":"is-pending"}">${res?"Jugado":"Pendiente"}</div></div><div class="match-teams">
+  return `<div class="match"><div class="match-head"><div class="match-head-when">${matchWhenHTML(si)}</div><div class="match-status ${res?"is-played":"is-pending"}">${res?(res.wo?"No presentado":"Jugado"):"Pendiente"}</div></div><div class="match-teams">
   <div class="match-team${res?(homeWin?" is-winner":" is-loser"):""}"><span class="match-avatar">${esc(initialsOf(m.home))}</span><span class="match-team-name">${teamLinkHTML(k,m.home)}</span></div>
   <div class="match-score ${res?"played":"pending"}">${res?score:"VS"}</div>
   <div class="match-team match-team-away${res?(awayWin?" is-winner":" is-loser"):""}"><span class="match-team-name">${teamLinkHTML(k,m.away)}</span><span class="match-avatar">${esc(initialsOf(m.away))}</span></div>
@@ -3166,7 +3170,7 @@ async function importScheduleFromText(){
   await loadCloudResults();
  }catch(e){alert(e.message)}
 }
-function formatScore(res){return (res.sets||[]).filter(s=>s[0]!==""&&s[1]!=="").map(s=>`${s[0]}-${s[1]}`).join(" · ") || "Resultado"}
+function formatScore(res){return (res&&res.wo?"W.O. · ":"")+(res.sets||[]).filter(s=>s[0]!==""&&s[1]!=="").map(s=>`${s[0]}-${s[1]}`).join(" · ") || "Resultado"}
 const SHARE_CAT={pro:"masc",media:"masc",fem:"fem",mixta:"mix",tenis:"tenis"};
 const SHARE_PAL={masc:["#0A3BA8","#1F6BEA","#3FDED6"],fem:["#7E0C45","#E81E7C","#F98BBE"],mix:["#3510A0","#6A2EF0","#DCF23A"],tenis:["#24106B","#5B22E0","#C9E13A"],gen:["#0C2A6B","#1E5BD8","#F2B82E"]};
 function shareLoadImg(src){return new Promise(res=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src;});}
@@ -3650,7 +3654,21 @@ function editMatch(r,i){
  <div class="field"><label>Set 2</label><div class="setrow"><input id="s20" type="number" min="0" value="${esc(old.sets?.[1]?.[0]??"")}"><span>–</span><input id="s21" type="number" min="0" value="${esc(old.sets?.[1]?.[1]??"")}"></div></div>
  <div class="field"><label>Set 3</label><div class="setrow"><input id="s30" type="number" min="0" value="${esc(old.sets?.[2]?.[0]??"")}"><span>–</span><input id="s31" type="number" min="0" value="${esc(old.sets?.[2]?.[1]??"")}"></div></div>
  <div class="field"><label>Ganador</label><select id="winner"><option value="">Detectar por sets</option><option ${old.winner===m.home?"selected":""}>${esc(m.home)}</option><option ${old.winner===m.away?"selected":""}>${esc(m.away)}</option></select><small class="muted">Puedes elegirlo manualmente si el partido termina por tiempo.</small></div>
+ <div class="field wo-field"><label>No presentado (W.O.)</label><small class="muted">Gana 6-0 6-0 la pareja que se presentó.</small><div class="wo-btns"><button class="secondary${old.wo==="home"?" on":""}" onclick="saveWO(${r},${i},'home')">No vino ${esc(m.home)}</button><button class="secondary${old.wo==="away"?" on":""}" onclick="saveWO(${r},${i},'away')">No vino ${esc(m.away)}</button></div></div>
  <div class="actions"><button class="secondary" onclick="closeModal()">Cancelar</button><button class="primary" onclick="saveResult(${r},${i})">Guardar resultado</button></div>`);
+}
+// Partido no presentado: la pareja que fue gana 6-0 6-0 y queda marcado como W.O.
+async function saveWO(r,i,absent){
+ const L=db.leagues[currentLeague],m=L.schedule[r][i];
+ const winner=absent==="home"?m.away:m.home, loser=absent==="home"?m.home:m.away;
+ if(!confirm(`${loser} no se presentó: ${winner} gana 6-0 6-0. ¿Guardar?`)) return;
+ const sets=absent==="home"?[["0","6"],["0","6"],["",""]]:[["6","0"],["6","0"],["",""]];
+ try{
+   setSync(false,"Guardando…");
+   await cloudWrite({action:"save",password:adminPassword,league:currentLeague,key:resultKey(L,r,i),sets,winner,homeNote:absent==="home"?"NP":"",awayNote:absent==="away"?"NP":""});
+   L.results[resultKey(L,r,i)]={sets,winner,wo:absent};
+   closeModal();render();setSync(true,"Guardado");
+ }catch(e){setSync(false,"Error al guardar");alert(e.message)}
 }
 async function saveResult(r,i){
  const L=db.leagues[currentLeague],m=L.schedule[r][i];
@@ -3663,7 +3681,7 @@ async function saveResult(r,i){
  if(!winner){alert("Indica el ganador o introduce sets suficientes para detectarlo.");return}
  try{
    setSync(false,"Guardando…");
-   await cloudWrite({action:"save",password:adminPassword,league:currentLeague,key:resultKey(L,r,i),sets,winner});
+   await cloudWrite({action:"save",password:adminPassword,league:currentLeague,key:resultKey(L,r,i),sets,winner,homeNote:"",awayNote:""});
    L.results[resultKey(L,r,i)]={sets,winner};
    closeModal();render();setSync(true,"Guardado");
  }catch(e){setSync(false,"Error al guardar");alert(e.message)}
