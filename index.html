@@ -2297,6 +2297,15 @@ html[data-cat] body .admin-btn{display:inline-flex;align-items:center;gap:6px;pa
 .admin-btn svg{width:16px;height:16px}
 .admin-btn .ab-on{display:none}body.admin-mode .admin-btn .ab-on{display:inline}body.admin-mode .admin-btn .ab-off{display:none}
 header .brand h1{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+/* Sin franja negra: las opciones de admin van en un menú */
+html body #adminbar,html body #adminbar.on{display:none!important}
+.admin-btn .ab-n{font-style:normal;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#e5484d;color:#fff;font-size:11px;font-weight:800;display:inline-grid;place-items:center}
+html body #nav .admin-nav-only{display:none!important}
+.am-menu{max-height:min(80vh,680px);overflow-y:auto}
+.am-sec{font:800 11px/1 Inter,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:16px 2px 4px}
+html[data-cat] body .am-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:transparent!important;border:0!important;border-bottom:1px solid var(--line)!important;border-radius:0!important;padding:12px 2px!important;margin:0!important;box-shadow:none!important;color:var(--text)!important;font:inherit;font-size:15px!important;font-weight:600!important;cursor:pointer}
+.am-row .ico{width:20px;height:20px;color:var(--hl-line,#8DB800)}.am-row span{flex:1}.am-row i{font-style:normal;color:var(--muted);font-size:18px}
+html[data-cat] body .am-exit{display:block;width:100%;margin:18px 0 2px!important;background:transparent!important;border:1px solid var(--line)!important;border-radius:999px!important;box-shadow:none!important;color:#c0392b!important;font-weight:800!important;padding:11px!important;cursor:pointer}
 </style>
 </head>
 <body>
@@ -2340,7 +2349,7 @@ header .brand h1{-webkit-user-select:none;user-select:none;-webkit-touch-callout
  <div>Liga interna ETSII · Pádel</div>
 </footer>
 <div id="syncStatus" class="sync-status bad">Sin conectar</div>
-<button class="admin-btn" onclick="toggleAdmin()" aria-label="Modo admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8.2 8 9 4.6-.8 8-4.5 8-9V6Z"/></svg><span class="ab-on">Salir de admin</span><span class="ab-off">Admin</span></button>
+<button class="admin-btn" onclick="admin?openAdminMenu():toggleAdmin()" aria-label="Modo admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8.2 8 9 4.6-.8 8-4.5 8-9V6Z"/></svg><span class="ab-on">Admin</span><span class="ab-off">Admin</span><em class="ab-n" id="adminBtnCount"></em></button>
 
 <nav id="bottomNav" class="bottom-nav">
  <button data-view="inicio" class="active"><span class="bn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="bn-stroke" d="M3 11.5 12 4l9 7.5"/><path class="bn-stroke" d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/><path class="bn-accent" d="M10 20v-5h4v5"/></svg></span><span class="bn-label">Inicio</span></button>
@@ -4438,7 +4447,7 @@ async function refreshAdminInbox(){
   if(!admin) return;
   try{ const r=await cloudWrite({action:"adminInbox",password:adminPassword}); adminMsgs=r.items||[]; }catch(_){ return; }
   const n=adminMsgs.filter(m=>!m.from_admin&&!m.read).length, el=document.getElementById("adminMsgCount");
-  if(el) el.innerHTML=n?` <em class="msg-count">${n}</em>`:"";
+  if(el) el.innerHTML=n?` <em class="msg-count">${n}</em>`:""; window._adminUnread=n; paintAdminBtn();
 }
 async function openAdminInbox(){
   if(!admin) return;
@@ -4458,7 +4467,7 @@ async function openAdminThread(key){
    ${t.username?`<div class="msg-compose"><textarea id="msg_reply" rows="1" maxlength="1000" placeholder="Responder a ${esc((t.name||"").split(" ")[0])}…" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea><button data-u="${esc(t.username)}" data-key="${esc(key)}" onclick="sendAdminReply(this.dataset.u,this.dataset.key)" aria-label="Enviar">${icon("send")}</button></div>`:`<p class="muted" style="font-size:12.5px;margin:10px 2px 0">Escribió sin iniciar sesión: respóndele por su contacto.</p>`}</div>`);
   msgScroll();
   const ids=t.items.filter(m=>!m.from_admin&&!m.read).map(m=>m.id);
-  if(ids.length){ try{ await cloudWrite({action:"adminMarkRead",password:adminPassword,ids:ids.join(",")}); adminMsgs.forEach(m=>{ if(ids.includes(m.id)) m.read=true; }); const n=adminMsgs.filter(m=>!m.from_admin&&!m.read).length, el=document.getElementById("adminMsgCount"); if(el) el.innerHTML=n?` <em class="msg-count">${n}</em>`:""; }catch(_){} }
+  if(ids.length){ try{ await cloudWrite({action:"adminMarkRead",password:adminPassword,ids:ids.join(",")}); adminMsgs.forEach(m=>{ if(ids.includes(m.id)) m.read=true; }); const n=adminMsgs.filter(m=>!m.from_admin&&!m.read).length, el=document.getElementById("adminMsgCount"); if(el) el.innerHTML=n?` <em class="msg-count">${n}</em>`:""; window._adminUnread=n; paintAdminBtn(); }catch(_){} }
 }
 async function sendAdminReply(username,key){
   const body=v("msg_reply").trim(); if(!body) return;
@@ -5684,6 +5693,28 @@ if(isIOS()) scheduleInstall();
   h.addEventListener("contextmenu",e=>e.preventDefault());
 })();
 paintAdminDevice();
+// Menú de administradora: sustituye a la franja negra. Se abre desde el botón «Admin».
+function paintAdminBtn(){ const e=document.getElementById("adminBtnCount"); if(e){ const n=window._adminUnread||0; e.textContent=n||""; e.style.display=n?"":"none"; } }
+function openAdminMenu(){
+  if(!admin) return;
+  const n=window._adminUnread||0;
+  const row=(ic,t,fn,extra)=>`<button class="am-row" onclick="closeModal();${fn}">${icon(ic)}<span>${t}</span>${extra||""}<i>›</i></button>`;
+  openModal(`<div class="am-menu"><div class="msg-head"><span class="msg-av">${icon("shield")}</span><div><b>Modo admin</b><small>Opciones de la organización</small></div><button class="msg-x" onclick="closeModal()" aria-label="Cerrar">✕</button></div>
+   <div class="am-sec">Día a día</div>
+   ${row("mail","Mensajes","openAdminInbox()",n?`<em class="msg-count">${n}</em>`:"")}
+   ${row("check","Resultados propuestos","currentView='adminProposals';render();window.scrollTo({top:0})")}
+   ${row("users","Usuarios","currentView='users';render();window.scrollTo({top:0})")}
+   ${row("megaphone","Enviar aviso","openBroadcast()")}
+   <div class="am-sec">Web</div>
+   ${row("info","Publicidad","openPromoBannerAdmin()")}
+   ${row("contrast","Estadísticas","showAnalytics()")}
+   <div class="am-sec">Descargas</div>
+   ${row("send","Clasificaciones (imágenes)","exportAllStandings()")}
+   ${row("calendar","Resultados de una jornada","openRoundExport()")}
+   ${row("back","Web actualizada","downloadUpdatedSite()")}
+   ${row("eyeoff","Copia de seguridad","exportData()")}
+   <button class="am-exit" onclick="closeModal();toggleAdmin(false)">Salir del modo admin</button></div>`);
+}
 trackEvent("visit");
 restorePlayerSession();
 if(location.hash==="#mis-partidos") currentView="profile";
