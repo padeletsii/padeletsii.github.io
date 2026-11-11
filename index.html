@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
-<script>try{if(!localStorage.getItem("liga_theme_v2")){localStorage.removeItem("liga_theme");localStorage.setItem("liga_theme_v2","1")}var _t=localStorage.getItem("liga_theme");if(_t==="dark"||(!_t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}</script>
+<script>try{var _t=localStorage.getItem("liga_tema")||"dark";if(_t==="dark"||(_t==="auto"&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){document.documentElement.classList.add("dark")}</script>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -2700,6 +2700,9 @@ html[data-cat]:not(.dark) .pr-cur-ring{box-shadow:inset 0 0 0 1.5px rgba(110,142
 html[data-cat]:not(.dark) .pr-cur-ring.big{background:rgba(141,184,0,.1)}
 html[data-cat]:not(.dark) body.pr :is(.hf-card,.journey .match,.pf5,.team-card,.rec,.next-hero):hover{box-shadow:inset 0 0 0 1px rgba(141,184,0,.5),0 24px 50px -28px rgba(0,0,0,.25)!important}
 html[data-cat]:not(.dark) body.pr .ag-row time{color:#111114}
+/* zona del notch / barra de estado: igual que el fondo, no lima */
+html[data-cat],html.dark[data-cat]{background-color:#0B0B0D!important}
+html[data-cat]:not(.dark){background-color:#F2F1EC!important}
 </style>
 </head>
 <body>
@@ -6185,9 +6188,9 @@ document.body.classList.add("pr");
   const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
   // Siempre oscuro, como la presentación
   // Oscuro por defecto; Claro / Oscuro / Automático elegibles (se guarda la elección)
-  themeMode=function(){ try{ return localStorage.getItem("liga_theme")||"dark"; }catch(_){ return "dark"; } };
+  themeMode=function(){ try{ return localStorage.getItem("liga_tema")||"dark"; }catch(_){ return "dark"; } };
   const _ap=applyTheme; applyTheme=function(dark){ _ap(dark); const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content",dark?"#0B0B0D":"#F2F1EC"); };
-  setThemeMode=function(mode){ try{ localStorage.setItem("liga_theme",mode); }catch(_){} applyTheme(mode==="auto"?systemDark():mode==="dark"); try{ if(document.body.classList.contains("cfg-open")&&typeof renderConfig==="function") renderConfig(); }catch(_){} };
+  setThemeMode=function(mode){ try{ localStorage.setItem("liga_tema",mode); }catch(_){} applyTheme(mode==="auto"?systemDark():mode==="dark"); try{ if(document.body.classList.contains("cfg-open")&&typeof renderConfig==="function") renderConfig(); }catch(_){} };
   const curMode=themeMode(); applyTheme(curMode==="auto"?systemDark():curMode==="dark");
   try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change",e=>{ if(themeMode()==="auto") applyTheme(e.matches); }); }catch(_){}
   // Barra de progreso de lectura
@@ -6350,7 +6353,7 @@ if("serviceWorker" in navigator){
   var FILE = { padel: "padel", tenis: "tenis-o" };
   var BALL = { padel: [58.77, 30.70], tenis: [59.55, 30.70] };
   var DOTS = { masc: ["#1F6BEA", "#3FDED6"], fem: ["#E81E7C", "#F98BBE"], mix: ["#6A2EF0", "#DCF23A"], tenis: ["#5B22E0", "#C9E13A"], gen: ["#1E5BD8", "#F2B82E"] };
-  var THEME = { padel: "#CCFF00", tenis: "#C24A00" };
+  var THEME = { get padel(){ return root.classList.contains("dark")?"#0B0B0D":"#F2F1EC"; }, get tenis(){ return root.classList.contains("dark")?"#0B0B0D":"#F2F1EC"; } };
   var REDUCE = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var root = document.documentElement;
   var cat = null, emblem = null, busy = false;
