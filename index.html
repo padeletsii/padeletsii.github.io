@@ -2306,6 +2306,11 @@ html body #nav .admin-nav-only{display:none!important}
 html[data-cat] body .am-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:transparent!important;border:0!important;border-bottom:1px solid var(--line)!important;border-radius:0!important;padding:12px 2px!important;margin:0!important;box-shadow:none!important;color:var(--text)!important;font:inherit;font-size:15px!important;font-weight:600!important;cursor:pointer}
 .am-row .ico{width:20px;height:20px;color:var(--hl-line,#8DB800)}.am-row span{flex:1}.am-row i{font-style:normal;color:var(--muted);font-size:18px}
 html[data-cat] body .am-exit{display:block;width:100%;margin:18px 0 2px!important;background:transparent!important;border:1px solid var(--line)!important;border-radius:999px!important;box-shadow:none!important;color:#c0392b!important;font-weight:800!important;padding:11px!important;cursor:pointer}
+html[data-cat] body .am-main{display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin:14px 0 0!important;padding:14px!important;border-radius:16px!important;border:0!important;background:#15131C!important;color:#fff!important;box-shadow:none!important;font:inherit;cursor:pointer}
+.am-main .ico{width:24px;height:24px;color:var(--hl,#CCFF00)}.am-main b{display:block;font-size:15px}.am-main small{display:block;font-size:12px;opacity:.75}
+.sq-text{width:100%;box-sizing:border-box;margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;font:inherit;font-size:14px;background:var(--paper);color:var(--text);resize:vertical}
+.sq-help{font-size:12px;margin:8px 2px 0}
+.sq-acts{display:flex;gap:8px;margin-top:12px}.sq-acts button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px}.sq-acts .ico{width:16px;height:16px}
 </style>
 </head>
 <body>
@@ -3187,7 +3192,26 @@ async function importScheduleFromText(){
   const qTxt=(data.cancelledMatches||[]).length?`\n\nHorario quitado (anulados):\n• ${data.cancelledMatches.join("\n• ")}`:"";
   alert(`Horario actualizado: ${data.imported} partido(s)${jTxt}. Nuevos: ${data.created||0} · Actualizados: ${data.updated||0}.${qTxt}`);
   await loadCloudResults();
+  if(document.getElementById("sqBox")) closeModal();
  }catch(e){alert(e.message)}
+}
+// Meter horarios desde cualquier pantalla (menú Admin), sin ir a Liga → Partidos
+function openScheduleQuick(){
+ if(!admin) return;
+ openModal(`<div class="am-menu" id="sqBox"><div class="msg-head"><span class="msg-av">${icon("calendar")}</span><div><b>Meter horarios</b><small>Pega el texto tal cual, de cualquier liga</small></div><button class="msg-x" onclick="closeModal()" aria-label="Cerrar">✕</button></div>
+  <textarea id="scheduleImportText" rows="10" class="sq-text" placeholder="Lunes 28/09
+De la croix VS Alou/Coquillat 12:30 P1
+Black y Rivers VS Violadores del verso 15:30 P1
+
+Martes 29/09
+Pa amb tomàquet - Toca y vuela, ciruela 13:30 P1"></textarea>
+  <p class="muted sq-help">Pon el día (mejor con el mes, «Lunes 28/09») y debajo cada partido con hora y pista. Si uno pone «ANULADO», se le quita el horario.</p>
+  <div class="sq-acts"><button class="secondary" onclick="pasteSchedule()">${icon("check")}Pegar</button><button class="primary" onclick="importScheduleFromText()">Importar horario</button></div></div>`);
+ setTimeout(()=>{const t=document.getElementById("scheduleImportText"); if(t) t.focus();},50);
+}
+async function pasteSchedule(){
+ try{ const t=await navigator.clipboard.readText(); const el=document.getElementById("scheduleImportText"); if(el&&t){ el.value=t; } else showToast("No hay texto copiado"); }
+ catch(_){ showToast("Mantén pulsado el cuadro y elige «Pegar»"); }
 }
 function formatScore(res){return (res&&res.wo?"W.O. · ":"")+(res.sets||[]).filter(s=>s[0]!==""&&s[1]!=="").map(s=>`${s[0]}-${s[1]}`).join(" · ") || "Resultado"}
 const SHARE_CAT={pro:"masc",media:"masc",fem:"fem",mixta:"mix",tenis:"tenis"};
@@ -5700,6 +5724,7 @@ function openAdminMenu(){
   const n=window._adminUnread||0;
   const row=(ic,t,fn,extra)=>`<button class="am-row" onclick="closeModal();${fn}">${icon(ic)}<span>${t}</span>${extra||""}<i>›</i></button>`;
   openModal(`<div class="am-menu"><div class="msg-head"><span class="msg-av">${icon("shield")}</span><div><b>Modo admin</b><small>Opciones de la organización</small></div><button class="msg-x" onclick="closeModal()" aria-label="Cerrar">✕</button></div>
+   <button class="am-main" onclick="openScheduleQuick()">${icon("calendar")}<span><b>Meter horarios</b><small>Pega el horario y se asigna solo, en cualquier liga</small></span></button>
    <div class="am-sec">Día a día</div>
    ${row("mail","Mensajes","openAdminInbox()",n?`<em class="msg-count">${n}</em>`:"")}
    ${row("check","Resultados propuestos","currentView='adminProposals';render();window.scrollTo({top:0})")}
