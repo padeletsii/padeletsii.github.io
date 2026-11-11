@@ -2311,6 +2311,37 @@ html[data-cat] body .am-main{display:flex;align-items:center;gap:12px;width:100%
 .sq-text{width:100%;box-sizing:border-box;margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;font:inherit;font-size:14px;background:var(--paper);color:var(--text);resize:vertical}
 .sq-help{font-size:12px;margin:8px 2px 0}
 .sq-acts{display:flex;gap:8px;margin-top:12px}.sq-acts button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px}.sq-acts .ico{width:16px;height:16px}
+/* Inicio en ordenador: clasificación a la derecha (en el móvil no se ve) */
+#homeSide{display:none}
+@media (min-width:1000px){
+ #homePanel:not([style*="none"]){display:grid!important;grid-template-columns:minmax(0,1fr) 360px;column-gap:24px;align-items:start}
+ #homePanel>*:not(#homeSide){grid-column:1;min-width:0}
+ #homePanel .wx-next-row .wx-nh:nth-child(n+4){display:none}
+ #homePanel .wx-strip .wx-next{flex:0 0 auto!important;margin-right:26px}
+ #homePanel .wx-next-row{justify-content:flex-start;gap:14px}
+ #homeSide{display:block;grid-column:2;grid-row:1 / span 20;position:sticky;top:16px;margin-top:14px}
+ .hs-h{display:flex;align-items:baseline;justify-content:space-between;margin:2px 4px 10px}
+ .hs-h b{font:800 18px var(--font-head)}
+ .hs-h a{font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
+ .hs-st{background:var(--paper);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+ .hs-tabs{display:flex;gap:4px;padding:6px;background:var(--soft);margin:10px;border-radius:999px}
+ .hs-tabs button{flex:1;border:0;background:transparent;border-radius:999px;padding:7px 0;font:800 11.5px Inter,sans-serif;letter-spacing:.04em;color:var(--muted);cursor:pointer}
+ .hs-tabs button.on{background:var(--paper);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+ .hs-r{display:grid;grid-template-columns:24px minmax(0,1fr) 26px 26px 26px 32px;align-items:center;padding:8px 14px;border-top:1px solid var(--line);font-size:13.5px}
+ .hs-r.hd{border-top:0;font-size:10.5px;font-weight:800;letter-spacing:.05em;color:var(--muted);padding-top:4px}
+ .hs-r>*:nth-child(n+3){text-align:center;color:var(--muted)}
+ .hs-r>*:last-child{text-align:right;font-weight:900;color:var(--text)}
+ .hs-r .n{font-weight:900;font-size:12px;color:var(--muted);text-align:center}
+ .hs-r b{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+ .hs-r.q{box-shadow:inset 3px 0 0 var(--hl-line,#8DB800)}
+ .hs-r.cut{border-top:2px dashed var(--hl-line,#8DB800)}
+ .hs-r.me{background:color-mix(in srgb,var(--hl,#CCFF00) 28%,var(--paper))}
+ .hs-ft{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+ .hs-ft i{width:10px;height:10px;border-radius:3px;background:var(--hl-line,#8DB800)}
+ .hs-ft a{margin-left:auto;font-weight:700;color:var(--text);cursor:pointer}
+ html[data-cat] body .hs-vel{display:flex;align-items:center;gap:8px;margin:14px 4px 0!important;font-weight:700;font-size:13.5px;color:var(--text)!important;background:none!important;border:0!important;box-shadow:none!important;padding:0!important;cursor:pointer}
+ .hs-vel .ico{width:18px;height:18px;color:var(--hl-line,#8DB800)}
+}
 </style>
 </head>
 <body>
@@ -5740,6 +5771,30 @@ function openAdminMenu(){
    ${row("eyeoff","Copia de seguridad","exportData()")}
    <button class="am-exit" onclick="closeModal();toggleAdmin(false)">Salir del modo admin</button></div>`);
 }
+/* ===== Inicio en ordenador: clasificación a la derecha ===== */
+(function(){
+  const hp=document.getElementById("homePanel"); if(!hp) return;
+  const side=document.createElement("aside"); side.id="homeSide"; hp.appendChild(side);
+})();
+function renderHomeSide(){
+  const box=document.getElementById("homeSide"); if(!box||!db||!db.leagues) return;
+  const keys=Object.keys(db.leagues).filter(k=>db.leagues[k].teams&&db.leagues[k].teams.length);
+  let k=window._hsL||(playerSession&&db.leagues[playerSession.league]?playerSession.league:"pro"); if(!db.leagues[k]) k=keys[0];
+  const L=db.leagues[k], st=calcStandings(L), me=playerSession&&playerSession.league===k?playerSession.team:"";
+  const NM={pro:"PRO",media:"MEDIA",fem:"FEM",mixta:"MIXTA",tenis:"TENIS"};
+  const myI=st.findIndex(x=>x.team===me);
+  let rows=st.slice(0,9); if(myI>8) rows=st.slice(0,8).concat([st[myI]]);
+  box.innerHTML=`<div class="hs-h"><b>Clasificación</b><a onclick="currentLeague='${k}';currentView='standings';render();window.scrollTo({top:0})">Ver toda ›</a></div>
+   <div class="hs-st"><div class="hs-tabs">${keys.map(x=>`<button class="${x===k?"on":""}" onclick="window._hsL='${x}';renderHomeSide()">${NM[x]||x}</button>`).join("")}</div>
+   <div class="hs-r hd"><span>#</span><span>${L.sport==="Tenis"?"JUGADOR":"PAREJA"}</span><span>PJ</span><span>G</span><span>P</span><span>PTS</span></div>
+   ${rows.map(x=>{const i=st.indexOf(x);return `<div class="hs-r${i<8?" q":""}${i===8?" cut":""}${x.team===me?" me":""}"><span class="n">${i+1}</span><b onclick="showTeam('${k}',this.textContent)">${esc(x.team)}</b><span>${x.pj}</span><span>${x.pg}</span><span>${x.pp}</span><span>${x.pts}</span></div>`}).join("")}
+   <div class="hs-ft"><i></i>Pasan a la Copa<a onclick="currentLeague='${k}';currentView='standings';render();window.scrollTo({top:0})">Ver ${st.length} ›</a></div></div>
+   <button class="hs-vel" onclick="openContact()">${icon("mail")}Escribe a Velasco (organizadora)</button>`;
+}
+(function(){ const _r=render; render=function(){ const out=_r.apply(this,arguments); try{ if(currentView==="inicio") renderHomeSide(); }catch(_){} return out; }; })();
+setTimeout(()=>{ try{ if(currentView==="inicio") renderHomeSide(); }catch(_){} },1500);
+setInterval(()=>{ try{ if(currentView==="inicio"&&window.innerWidth>=1000) renderHomeSide(); }catch(_){} },30000);
+
 trackEvent("visit");
 restorePlayerSession();
 if(location.hash==="#mis-partidos") currentView="profile";
