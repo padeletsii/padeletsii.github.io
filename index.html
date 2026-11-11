@@ -2352,6 +2352,27 @@ html[data-cat] body .am-main{display:flex;align-items:center;gap:12px;width:100%
  #homePanel .wx-next-row .wx-nh:nth-child(n+4){display:flex!important}
  #homePanel .wx-strip .wx-next{flex:1!important}
 }
+/* Ordenador: repartir en columnas para que nada quede tan alargado */
+@media (min-width:1000px){
+ .hs-more .hs-h{margin-top:22px}
+ .rr-r{display:flex;align-items:center;gap:10px;padding:9px 14px;border-top:1px solid var(--line);font-size:13px}
+ .rr-r:first-child{border-top:0}
+ .rr-l{font:800 10px Inter,sans-serif;letter-spacing:.06em;color:var(--muted);width:40px;flex:0 0 40px}
+ .rr-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+ .rr-t span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted);font-weight:600}
+ .rr-t span.w{color:var(--text);font-weight:800}
+ .rr-s{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;font-size:12.5px}
+ #content.st-wide{display:grid!important;grid-template-columns:minmax(0,1fr) clamp(320px,30vw,440px);column-gap:24px;align-items:start}
+ #content.st-wide>*:not(.st-side){grid-column:1;min-width:0}
+ #content.st-wide .st-side{grid-column:2;grid-row:1 / span 20}
+ #content.st-wide .st-side .hs-h:first-child{margin-top:0}
+ #content.st-wide .st-side .season{margin-top:22px}
+ #content.st-wide .st-side .records{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media (min-width:1300px){
+ #liveNow .livenow-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))}
+ #liveNow .livenow-grid>.ag-row{border-right:1px solid var(--line)}
+}
 </style>
 </head>
 <body>
@@ -5786,6 +5807,21 @@ function openAdminMenu(){
   const hp=document.getElementById("homePanel"); if(!hp) return;
   const side=document.createElement("aside"); side.id="homeSide"; hp.appendChild(side);
 })();
+// Últimos resultados (todas las ligas o una), por fecha del partido
+function recentResults(onlyK,n){
+  const out=[];
+  Object.entries(db.leagues).forEach(([k,L])=>{ if(onlyK&&k!==onlyK) return;
+    (L.schedule||[]).forEach((round,r)=>round.forEach((m,i)=>{ const res=getResult(L,r,i); if(!res||!res.winner) return;
+      const w=getMatchSchedule(k,m.home,m.away)||{}; out.push({k,L,m,res,r,d:(w.date||"")+" "+(w.time||""),date:w.date||""}); })); });
+  return out.sort((a,b)=>b.d.localeCompare(a.d)||b.r-a.r).slice(0,n);
+}
+function recentResultsHTML(onlyK,n,title){
+  const NM={pro:"PRO",media:"MEDIA",fem:"FEM",mixta:"MIXTA",tenis:"TENIS"};
+  const list=recentResults(onlyK,n); if(!list.length) return "";
+  return `<div class="hs-h"><b>${title||"Últimos resultados"}</b></div><div class="hs-st rr">${list.map(x=>{
+    const hw=x.res.winner===x.m.home;
+    return `<div class="rr-r">${onlyK?"":`<span class="rr-l">${NM[x.k]||x.k}</span>`}<div class="rr-t"><span class="${hw?"w":""}">${esc(x.m.home)}</span><span class="${hw?"":"w"}">${esc(x.m.away)}</span></div><span class="rr-s">${esc(formatScore(x.res).replace(/ · /g," "))}</span></div>`;}).join("")}</div>`;
+}
 function renderHomeSide(){
   const box=document.getElementById("homeSide"); if(!box||!db||!db.leagues) return;
   const keys=Object.keys(db.leagues).filter(k=>db.leagues[k].teams&&db.leagues[k].teams.length);
@@ -5799,9 +5835,20 @@ function renderHomeSide(){
    <div class="hs-r hd"><span>#</span><span>${L.sport==="Tenis"?"JUGADOR":"PAREJA"}</span><span>PJ</span><span>G</span><span>P</span><span>PTS</span></div>
    ${rows.map(x=>{const i=st.indexOf(x);return `<div class="hs-r${i<8?" q":""}${i===8?" cut":""}${x.team===me?" me":""}"><span class="n">${i+1}</span><b onclick="showTeam('${k}',this.textContent)">${esc(x.team)}</b><span>${x.pj}</span><span>${x.pg}</span><span>${x.pp}</span><span>${x.pts}</span></div>`}).join("")}
    <div class="hs-ft"><i></i>Pasan a la Copa<a onclick="currentLeague='${k}';currentView='standings';render();window.scrollTo({top:0})">Ver ${st.length} ›</a></div></div>
-   <button class="hs-vel" onclick="openContact()">${icon("mail")}Escribe a Velasco (organizadora)</button>`;
+   <button class="hs-vel" onclick="openContact()">${icon("mail")}Escribe a Velasco (organizadora)</button>
+   <div class="hs-more">${recentResultsHTML("",6)}</div>`;
 }
-(function(){ const _r=render; render=function(){ const out=_r.apply(this,arguments); try{ if(currentView==="inicio") renderHomeSide(); }catch(_){} return out; }; })();
+// Clasificación en ordenador: tabla a la izquierda y, al lado, últimos resultados y récords de esa liga
+function renderStandingsSide(){
+  const c=document.getElementById("content"); if(!c||currentView!=="standings"||window.innerWidth<1000) return;
+  if(c.querySelector(".st-side")) return;
+  const main=c.querySelector(".st-a"); if(!main) return;
+  const side=document.createElement("aside"); side.className="st-side";
+  side.innerHTML=recentResultsHTML(currentLeague,8,"Últimos resultados");
+  const rec=c.querySelector(".season"); if(rec) side.appendChild(rec);
+  c.classList.add("st-wide"); c.appendChild(side);
+}
+(function(){ const _r=render; render=function(){ const out=_r.apply(this,arguments); try{ if(currentView==="inicio") renderHomeSide(); }catch(_){} try{ const c=document.getElementById("content"); if(c) c.classList.remove("st-wide"); requestAnimationFrame(()=>requestAnimationFrame(renderStandingsSide)); }catch(_){} return out; }; })();
 setTimeout(()=>{ try{ if(currentView==="inicio") renderHomeSide(); }catch(_){} },1500);
 setInterval(()=>{ try{ if(currentView==="inicio"&&window.innerWidth>=1000) renderHomeSide(); }catch(_){} },30000);
 
