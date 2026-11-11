@@ -2342,6 +2342,16 @@ html[data-cat] body .am-main{display:flex;align-items:center;gap:12px;width:100%
  html[data-cat] body .hs-vel{display:flex;align-items:center;gap:8px;margin:14px 4px 0!important;font-weight:700;font-size:13.5px;color:var(--text)!important;background:none!important;border:0!important;box-shadow:none!important;padding:0!important;cursor:pointer}
  .hs-vel .ico{width:18px;height:18px;color:var(--hl-line,#8DB800)}
 }
+/* Ordenador: aprovechar todo el ancho de la pantalla */
+@media (min-width:1000px){
+ html body .wrap,html body main.wrap,html body header .wrap,html body .whatsapp-banner .wrap,html body footer{max-width:none!important;width:auto!important}
+ html body main.wrap,html body header .wrap,html body .whatsapp-banner .wrap{margin-left:clamp(24px,3vw,56px)!important;margin-right:clamp(24px,3vw,56px)!important}
+ #homePanel:not([style*="none"]){grid-template-columns:minmax(0,1fr) clamp(360px,28vw,460px)!important}
+}
+@media (min-width:1500px){
+ #homePanel .wx-next-row .wx-nh:nth-child(n+4){display:flex!important}
+ #homePanel .wx-strip .wx-next{flex:1!important}
+}
 </style>
 </head>
 <body>
