@@ -10,8 +10,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#CCFF00">
-<script>try{if(!localStorage.getItem("liga_theme_v2")){localStorage.removeItem("liga_theme");localStorage.setItem("liga_theme_v2","1")}var _t=localStorage.getItem("liga_theme");if(_t==="dark"||(!_t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}</script>
+<meta name="theme-color" content="#0B0B0D">
+<script>try{var _t=localStorage.getItem("liga_tema")||"dark";if(_t==="dark"||(_t==="auto"&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){document.documentElement.classList.add("dark")}</script>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -616,7 +616,7 @@ html.dark .mr-alert{background:#3a2f0b;border-color:#c99a00;color:#ffe7a3}
 .wx-flake{top:-10px;border-radius:50%;background:radial-gradient(circle,#fff 40%,rgba(255,255,255,.2));opacity:.85;filter:blur(.3px);animation:wxFall linear infinite,wxSway ease-in-out infinite alternate}
 @keyframes wxFall{from{top:-10px}to{top:110%}}
 @keyframes wxSway{from{margin-left:-6px}to{margin-left:6px}}
-@media (prefers-reduced-motion:reduce){.wx-fx i{animation:none!important}}
+
 .wx-ov{position:fixed;inset:0;z-index:60;pointer-events:none}
 .wx-bg{position:absolute;inset:0;background:rgba(0,0,0,.35);opacity:0;transition:opacity .2s}
 .wx-sheet{position:absolute;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;max-height:88vh;overflow:auto;background:var(--paper);color:var(--text);border-radius:24px 24px 0 0;transform:translateY(100%);transition:transform .25s;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
@@ -973,7 +973,7 @@ body.tennis-theme table tbody tr:hover td{background:rgba(232,96,10,.08)}
 
 /* Respeta a quien prefiere sin animaciones (accesibilidad) */
 @media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  *:not(.wx-fx):not(.wx-fx *):not(.pr-ball):not(.pr-ball *):not(.pr-hero em):not(.next-hero),*:not(.wx-fx):not(.wx-fx *):not(.pr-ball):not(.pr-ball *):not(.pr-hero em):not(.next-hero)::before,*:not(.wx-fx):not(.wx-fx *):not(.pr-ball):not(.pr-ball *):not(.pr-hero em):not(.next-hero)::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
 }
 
 
@@ -1274,7 +1274,7 @@ html.dark .br-svg .box.win{fill:#33400a}
 .install-bar b{display:block;font-size:14px}.install-bar small{opacity:.7;font-size:12px;line-height:1.3;display:block}
 .install-bar .ib-go{margin-left:auto;border:0;background:var(--tennis);color:#0a0a0a;font-weight:900;border-radius:999px;padding:9px 14px;cursor:pointer;white-space:nowrap}
 .install-bar .ib-x{border:0;background:transparent;color:#fff;opacity:.6;font-size:18px;cursor:pointer;padding:4px 6px}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+@media(prefers-reduced-motion:reduce){*:not(.wx-fx):not(.wx-fx *):not(.pr-ball):not(.pr-ball *):not(.pr-hero em):not(.next-hero),*:not(.wx-fx):not(.wx-fx *):not(.pr-ball):not(.pr-ball *):not(.pr-hero em):not(.next-hero)::before,*:not(.wx-fx):not(.wx-fx *):not(.pr-ball):not(.pr-ball *):not(.pr-hero em):not(.next-hero)::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
 /* ---- menú simplificado ---- */
 .brand-tools{display:flex;gap:8px;align-items:center}
@@ -2373,6 +2373,336 @@ html[data-cat] body .am-main{display:flex;align-items:center;gap:12px;width:100%
  #liveNow .livenow-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))}
  #liveNow .livenow-grid>.ag-row{border-right:1px solid var(--line)}
 }
+/* ================= ESTILO PRESENTACIÓN (oscuro premium) ================= */
+html.dark[data-cat],html[data-cat]{--cream:#0B0B0D;--paper:#16161A;--soft:#1E1E23;--line:rgba(255,255,255,.09);--text:#F5F5F2;--text2:#C8C8CF;--muted:#9A9AA3;--bd:rgba(255,255,255,.14);
+  --font-head:Inter,system-ui,sans-serif;--font-display:Inter,system-ui,sans-serif;--pr-ease:cubic-bezier(.16,1,.3,1);--pr-r:22px;color-scheme:dark}
+html[data-cat] body.pr{background:#0B0B0D!important;color:var(--text);font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+html[data-cat] body.pr :focus-visible{outline:2px solid var(--hl,#CCFF00)!important;outline-offset:3px}
+
+/* barra de progreso */
+.pr-progress{position:fixed;inset:0 0 auto 0;height:3px;background:var(--hl,#CCFF00);transform-origin:0 50%;transform:scaleX(0);z-index:30;pointer-events:none}
+
+/* ---------- cabecera de cristal oscuro ---------- */
+html[data-cat] body.pr header{position:sticky!important;top:0;z-index:14;background:rgba(11,11,13,.78)!important;backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid var(--line)!important;box-shadow:none!important;padding:calc(10px + env(safe-area-inset-top)) 16px 10px!important;color:var(--text)!important}
+html[data-cat] body.pr header,html[data-cat] body.pr #nav{--text:#F5F5F2!important;--muted:#9A9AA3!important}
+html[data-cat] body.pr header *{text-shadow:none!important}
+html[data-cat] body.pr header::before,html[data-cat] body.pr header::after{display:none!important}
+html[data-cat] body.pr header .wrap .brand .brand-left h1,html[data-cat] body.pr header .wrap .brand h1,html[data-cat] body.pr header h1{color:#F5F5F2!important;-webkit-text-fill-color:#F5F5F2!important}
+html[data-cat] body.pr header h1{font:900 18px/1 Inter,sans-serif!important;letter-spacing:-.02em!important;text-transform:none!important;color:var(--text)!important}
+html[data-cat] body.pr header h1 .pr-l{color:var(--hl,#CCFF00)}
+html[data-cat] body.pr header .brand-left p{display:none!important}
+html[data-cat] body.pr header .id-emblem{width:36px!important;height:36px!important;flex:0 0 36px!important}
+html[data-cat="padel"] body.pr header .badge,html[data-cat] body.pr header .badge{background:transparent!important;border:0!important;color:var(--muted)!important;font:700 10.5px Inter!important;letter-spacing:.14em!important;padding:0!important}
+html[data-cat] body.pr .profile-fab{background:var(--hl,#CCFF00)!important;color:#0B0B0D!important;border:0!important;border-radius:999px!important;font:800 13.5px Inter!important;padding:8px 14px 8px 8px!important;box-shadow:none!important;transition:transform .5s var(--pr-ease),box-shadow .35s var(--pr-ease)}
+html[data-cat] body.pr .profile-fab:hover{box-shadow:0 10px 30px -8px rgba(204,255,0,.55)}
+html[data-cat] body.pr .profile-fab .profile-fab-avatar{background:#0B0B0D!important;color:var(--hl,#CCFF00)!important}
+html[data-cat] body.pr #nav button{background:transparent!important;border:0!important;color:var(--muted)!important;border-radius:999px!important;box-shadow:none!important;font:700 14px Inter!important;padding:9px 14px!important;transition:color .25s,background .25s}
+html[data-cat] body.pr #nav button:hover{color:var(--text)!important;background:rgba(255,255,255,.06)!important}
+html[data-cat] body.pr #nav button.active{color:#0B0B0D!important;background:var(--hl,#CCFF00)!important}
+@media (max-width:759px){
+ html[data-cat] body.pr header .brand-right .badge{display:none!important}
+ html[data-cat] body.pr header .brand{gap:10px}
+}
+
+/* ---------- portada de Inicio ---------- */
+.pr-hero{position:relative;overflow:hidden;border-radius:28px;padding:28px 22px 22px;margin:14px 0 16px;background:linear-gradient(160deg,#17171C,#0F0F12);box-shadow:inset 0 0 0 1px var(--line)}
+.pr-hero .glow{position:absolute;width:420px;height:420px;border-radius:50%;filter:blur(70px);opacity:.32;pointer-events:none;background:radial-gradient(circle,var(--hl,#CCFF00),transparent 62%);top:-220px;right:-160px}
+.pr-hero .glow.b{background:radial-gradient(circle,#2B5BD7,transparent 62%);top:auto;bottom:-260px;left:-200px;right:auto;opacity:.25}
+.pr-hero svg.court{position:absolute;right:-60px;top:50%;width:340px;transform:translateY(-50%) rotate(-12deg);opacity:.45;pointer-events:none}
+.pr-hero svg.court *{fill:none;stroke:rgba(255,255,255,.16);stroke-width:2;stroke-dasharray:1200;stroke-dashoffset:1200;animation:prDraw 2.4s var(--pr-ease) .2s forwards}
+.pr-hero svg.court .net{stroke:var(--hl,#CCFF00);stroke-width:3;opacity:.7}
+@keyframes prDraw{to{stroke-dashoffset:0}}
+.pr-eyebrow{display:inline-flex;align-items:center;gap:8px;font:800 11.5px/1 Inter;letter-spacing:.16em;text-transform:uppercase;color:var(--hl,#CCFF00);position:relative}
+.pr-eyebrow::before{content:"";width:18px;height:2px;background:currentColor;border-radius:2px}
+.pr-hero h2{position:relative;font:900 clamp(34px,9.5vw,64px)/.98 Inter;letter-spacing:-.04em;margin:14px 0 18px;color:var(--text)}
+.pr-hero h2 em{font-style:normal;color:var(--hl,#CCFF00)}
+.pr-hero h2 .ln{display:block;overflow:hidden;padding-bottom:.05em}
+.pr-hero h2 .ln>span{display:inline-block;transform:translateY(105%);animation:prUp 1.1s var(--pr-ease) forwards}
+.pr-hero h2 .ln:nth-child(2)>span{animation-delay:.08s}.pr-hero h2 .ln:nth-child(3)>span{animation-delay:.16s}
+@keyframes prUp{to{transform:none}}
+.pr-stats{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pr-stat{padding:12px 12px 10px;border-radius:16px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px var(--line)}
+.pr-stat b{display:block;font:900 26px/1.05 Inter;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--text)}
+.pr-stat span{font-size:12px;color:var(--muted)}
+
+/* ---------- tarjetas ---------- */
+html[data-cat] body.pr :is(.panel,.hf-card,.home-msg,.pf4-card,.pf4-me,.pf4-menu,.pf4-alert,.mr-box,.mr-card,.mr-quiet,.av-card,.rec,.cfg-group,.am-card,.am-form-card,.inv-row,.info-card,.team-card,.journey .match,.match,.notice,.hs-st,.sk-card,.home-alerts .pf4-alert){background:var(--paper)!important;border:0!important;box-shadow:inset 0 0 0 1px var(--line)!important;border-radius:var(--pr-r)!important}
+html[data-cat] body.pr .panel{border-radius:26px!important}
+html[data-cat] body.pr .panel-head{border-bottom:1px solid var(--line)!important}
+html[data-cat] body.pr .panel-head h2{font:900 22px Inter!important;letter-spacing:-.03em!important;text-transform:none!important;color:var(--text)!important}
+html[data-cat] body.pr .panel-head::after{display:none!important}
+html[data-cat] body.pr .hf-ic,html[data-cat] body.pr .rec-ic{background:rgba(204,255,0,.12)!important;color:var(--hl,#CCFF00)!important}
+
+/* ---------- ¿qué se juega? ---------- */
+html[data-cat] body.pr .livenow-panel{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+html[data-cat] body.pr .livenow-kicker{display:inline-flex!important;align-items:center;gap:8px;background:transparent!important;color:var(--hl,#CCFF00)!important;padding:0!important;border-radius:0!important;box-shadow:none!important;font:800 11.5px Inter!important;letter-spacing:.16em!important;text-transform:uppercase;margin:26px 0 14px!important}
+html[data-cat] body.pr .livenow-kicker::before{content:"";width:18px;height:2px;background:currentColor;border-radius:2px}
+html[data-cat] body.pr .next-hero{border-radius:var(--pr-r)!important;background:linear-gradient(150deg,#1A1A10,#101012)!important;box-shadow:inset 0 0 0 1px rgba(204,255,0,.28),0 30px 60px -40px rgba(204,255,0,.45)!important;overflow:hidden}
+html[data-cat] body.pr :is(.livenow-subhead,.livenow-day-label){font:800 11.5px Inter!important;letter-spacing:.14em!important;text-transform:uppercase;color:var(--muted)!important;margin:22px 4px 10px!important;border:0!important;padding:0!important}
+html[data-cat] body.pr .livenow-grid{background:var(--paper)!important;border:0!important;box-shadow:inset 0 0 0 1px var(--line)!important;border-radius:var(--pr-r)!important;overflow:hidden}
+html[data-cat] body.pr .ag-row{background:transparent!important;border:0!important;border-top:1px solid var(--line)!important;border-radius:0!important;box-shadow:none!important;transition:background .3s}
+html[data-cat] body.pr .livenow-grid>.ag-row:first-child{border-top:0!important}
+html[data-cat] body.pr .ag-row:hover{background:rgba(255,255,255,.03)!important}
+
+/* ---------- botones (pastilla lima / fantasma) ---------- */
+html[data-cat] body.pr :is(.primary,.hf-pub,.mr-mini,.pf4-ok,button.login-main-btn,.am-publish-btn){background:var(--hl,#CCFF00)!important;color:#0B0B0D!important;border:0!important;border-radius:999px!important;font-weight:800!important;box-shadow:none!important;transition:transform .5s var(--pr-ease),box-shadow .35s var(--pr-ease)!important}
+html[data-cat] body.pr :is(.primary,.hf-pub,.mr-mini,.pf4-ok,button.login-main-btn,.am-publish-btn):hover{box-shadow:0 10px 34px -10px rgba(204,255,0,.6)!important}
+html[data-cat] body.pr :is(.secondary,.pf4-no){background:rgba(255,255,255,.06)!important;color:var(--text)!important;border:0!important;box-shadow:inset 0 0 0 1px var(--line)!important;border-radius:999px!important}
+html[data-cat] body.pr :is(.primary,.secondary,.hf-pub,.mr-mini,.profile-fab,.pr-btn):active{transform:scale(.96)}
+.pr-ripple{position:absolute;border-radius:50%;transform:scale(0);background:currentColor;opacity:.25;pointer-events:none;animation:prRip .7s var(--pr-ease) forwards}
+@keyframes prRip{to{transform:scale(1);opacity:0}}
+
+/* ---------- pestañas ---------- */
+html[data-cat] body.pr .league-tabs{background:rgba(255,255,255,.04)!important;border:0!important;box-shadow:inset 0 0 0 1px var(--line)!important;border-radius:999px!important;padding:5px!important;gap:4px!important}
+html[data-cat] body.pr .league-tabs button{background:transparent!important;border:0!important;border-radius:999px!important;box-shadow:none!important;color:var(--muted)!important;font:800 12.5px Inter!important;letter-spacing:.08em!important;padding:10px 0!important;transition:background .3s,color .3s}
+html[data-cat] body.pr .league-tabs button::after,html[data-cat] body.pr .league-tabs button::before{display:none!important}
+html[data-cat] body.pr .league-tabs button.active{background:var(--hl,#CCFF00)!important;color:#0B0B0D!important}
+html[data-cat] body.pr .liga-sub{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;gap:6px!important;margin:12px 0 14px!important}
+html[data-cat] body.pr .liga-sub button{background:rgba(255,255,255,.05)!important;border:0!important;border-radius:999px!important;box-shadow:none!important;color:var(--muted)!important;font:700 12.5px Inter!important;padding:10px 4px!important;min-width:0;white-space:nowrap;letter-spacing:-.01em}
+html[data-cat] body.pr .liga-sub button.active{background:var(--text)!important;color:#0B0B0D!important}
+html[data-cat] body.pr .jr-chips button{border-radius:999px!important;background:rgba(255,255,255,.05)!important;border:0!important;box-shadow:inset 0 0 0 1px var(--line)!important;color:var(--muted)!important}
+html[data-cat] body.pr .jr-chips button.on{background:var(--hl,#CCFF00)!important;color:#0B0B0D!important;box-shadow:none!important}
+html[data-cat] body.pr .pf4-tabs{background:rgba(255,255,255,.04)!important;box-shadow:inset 0 0 0 1px var(--line)!important;border-radius:999px!important;padding:5px!important}
+html[data-cat] body.pr .pf4-tab{border-radius:999px!important;color:var(--muted)!important}
+html[data-cat] body.pr .pf4-tab.on{background:var(--text)!important;color:#0B0B0D!important;box-shadow:none!important}
+
+/* ---------- clasificación ---------- */
+html[data-cat] body.pr .st-a .st-card{background:var(--paper)!important;box-shadow:inset 0 0 0 1px var(--line)!important;border-radius:var(--pr-r)!important;border:0!important}
+html[data-cat] body.pr .st-a .st-r{font-size:15px}
+html[data-cat] body.pr .st-a .st-r.in .n{color:var(--hl,#CCFF00)}
+
+/* ---------- barra inferior ---------- */
+html[data-cat] body.pr .bottom-nav{background:rgba(11,11,13,.82)!important;backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-top:1px solid var(--line)!important;box-shadow:none!important}
+html[data-cat] body.pr .bottom-nav button{color:var(--muted)!important}
+html[data-cat] body.pr .bottom-nav button.active{color:var(--text)!important}
+html[data-cat] body.pr .bottom-nav button.active .bn-icon-wrap{background:var(--hl,#CCFF00)!important;color:#0B0B0D!important}
+html[data-cat] body.pr .bottom-nav .bn-label{font:700 11px Inter!important}
+
+/* ---------- WhatsApp y pie ---------- */
+html[data-cat] body.pr .whatsapp-banner{background:transparent!important;border:0!important;padding:0 16px!important;margin:24px 0 0!important}
+html[data-cat] body.pr .whatsapp-banner .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:22px!important;border-radius:26px!important;background:var(--hl,#CCFF00)!important;color:#0B0B0D!important;position:relative;overflow:hidden}
+html[data-cat] body.pr .whatsapp-banner .wrap::after{content:"";position:absolute;right:-90px;top:-120px;width:280px;height:280px;border-radius:50%;border:2px solid rgba(0,0,0,.12);pointer-events:none}
+html[data-cat] body.pr .whatsapp-banner strong{color:#0B0B0D!important;font:900 20px Inter!important;letter-spacing:-.02em!important;text-transform:none!important;display:block}
+html[data-cat] body.pr .whatsapp-banner span{color:#2A3300!important}
+html[data-cat] body.pr .whatsapp-banner a{background:#0B0B0D!important;color:var(--hl,#CCFF00)!important;border:0!important;border-radius:999px!important;box-shadow:none!important;font:800 14px Inter!important;padding:13px 20px!important;position:relative;z-index:1}
+html[data-cat] body.pr footer{color:var(--muted)!important;border-top:1px solid var(--line)}
+html[data-cat] body.pr footer .ft-btn,html[data-cat] body.pr footer .ft-theme{background:rgba(255,255,255,.05)!important;border:0!important;box-shadow:inset 0 0 0 1px var(--line)!important;color:var(--text)!important;border-radius:999px!important}
+
+/* ---------- formularios y ventanas ---------- */
+html[data-cat] body.pr :is(input,select,textarea){background:rgba(255,255,255,.04)!important;border:1px solid var(--line)!important;color:var(--text)!important;border-radius:14px!important}
+html[data-cat] body.pr .modal-card{background:#141417!important;border:0!important;box-shadow:inset 0 0 0 1px var(--line),0 40px 80px -30px rgba(0,0,0,.7)!important;border-radius:26px!important;color:var(--text)}
+html[data-cat] body.pr .modal{background:rgba(0,0,0,.6)!important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+
+/* ---------- entrada suave al cambiar de pantalla ---------- */
+body.pr.pr-enter #homePanel>*:not(#wxStrip),body.pr.pr-enter #content>*,body.pr.pr-enter .livenow-grid,body.pr.pr-enter .journey .match{animation:prIn .8s var(--pr-ease) both}
+body.pr.pr-enter #homePanel>*:nth-child(2),body.pr.pr-enter #content>*:nth-child(2){animation-delay:.06s}
+body.pr.pr-enter #homePanel>*:nth-child(3),body.pr.pr-enter #content>*:nth-child(3){animation-delay:.12s}
+body.pr.pr-enter #homePanel>*:nth-child(n+4),body.pr.pr-enter #content>*:nth-child(n+4){animation-delay:.18s}
+@keyframes prIn{from{opacity:0;transform:translateY(18px)}}
+
+@media (min-width:1000px){
+ .pr-hero{padding:44px 40px 34px}
+ .pr-hero h2{font-size:clamp(48px,4.6vw,76px)}
+ .pr-hero svg.court{width:520px;right:-40px}
+ .pr-stats{max-width:560px}
+ html[data-cat] body.pr header{padding:12px 0!important}
+}
+@media (prefers-reduced-motion:reduce){
+ body.pr *:not(.wx-fx):not(.wx-fx *):not(.pr-ball):not(.pr-ball *):not(.pr-hero em):not(.next-hero),body.pr *:not(.wx-fx *):not(.pr-ball *):not(.next-hero)::before,body.pr *:not(.wx-fx *):not(.pr-ball *):not(.next-hero)::after{animation-duration:.001ms!important;animation-delay:0s!important;transition-duration:.001ms!important}
+ .pr-hero h2 .ln>span{transform:none}
+ .pr-hero svg.court *{stroke-dashoffset:0}
+}
+
+/* ---------- transiciones entre pantallas (View Transitions) ---------- */
+html[data-cat] body.pr header{view-transition-name:pr-header}
+html[data-cat] body.pr .bottom-nav{view-transition-name:pr-tabbar}
+::view-transition-group(root){animation-duration:.42s;animation-timing-function:cubic-bezier(.16,1,.3,1)}
+::view-transition-old(root){animation:prVtOut .22s cubic-bezier(.4,0,1,1) both}
+::view-transition-new(root){animation:prVtIn .42s cubic-bezier(.16,1,.3,1) both}
+::view-transition-old(pr-header),::view-transition-new(pr-header),::view-transition-old(pr-tabbar),::view-transition-new(pr-tabbar){animation:none;mix-blend-mode:normal}
+@keyframes prVtOut{to{opacity:0;transform:translateY(-8px) scale(.995);filter:blur(2px)}}
+@keyframes prVtIn{from{opacity:0;transform:translateY(14px)}}
+html.pr-vt body.pr.pr-enter #homePanel>*,html.pr-vt body.pr.pr-enter #content>*,html.pr-vt body.pr.pr-enter .livenow-grid,html.pr-vt body.pr.pr-enter .journey .match{animation:none!important}
+/* pestañas y botones: respuesta inmediata y suave */
+html[data-cat] body.pr :is(.league-tabs button,.liga-sub button,.jr-chips button,.pf4-tab,#nav button,.bottom-nav button){transition:background .35s cubic-bezier(.16,1,.3,1),color .35s,transform .35s cubic-bezier(.16,1,.3,1)!important}
+html[data-cat] body.pr :is(.league-tabs button,.liga-sub button,.jr-chips button,.pf4-tab,.bottom-nav button):active{transform:scale(.95)}
+html[data-cat] body.pr .modal.open .modal-card{animation:prModal .45s cubic-bezier(.16,1,.3,1) both}
+@keyframes prModal{from{opacity:0;transform:translateY(24px) scale(.98)}}
+@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
+/* cabecera en una línea en ordenador, como la presentación */
+@media (min-width:1000px){
+ html[data-cat] body.pr header .wrap{display:flex!important;align-items:center;gap:28px}
+ html[data-cat] body.pr header .brand{display:contents!important}
+ html[data-cat] body.pr header .brand-left{order:0}
+ html[data-cat] body.pr header #nav{order:1;margin:0 0 0 auto!important;display:flex!important;gap:4px;background:transparent!important;padding:0!important;border:0!important}
+ html[data-cat] body.pr header .brand-right{order:2;display:flex!important;flex-direction:row!important;align-items:center;gap:18px}
+}
+html[data-cat] body.pr header .brand-tools .profile-fab,html[data-cat="padel"] body.pr header .profile-fab{background:var(--hl,#CCFF00)!important;color:#0B0B0D!important}
+html[data-cat] body.pr header .profile-fab #profileFabLabel{color:#0B0B0D!important}
+/* ---------- cursor personalizado (ratón) ---------- */
+.pr-cur-dot,.pr-cur-ring{position:fixed;left:0;top:0;pointer-events:none;z-index:9999;opacity:0;transition:opacity .3s}
+html.pr-cur-on .pr-cur-dot,html.pr-cur-on .pr-cur-ring{opacity:1}
+html.pr-cur-text .pr-cur-dot,html.pr-cur-text .pr-cur-ring{opacity:0!important}
+.pr-cur-dot{width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:var(--hl,#CCFF00);transition:opacity .3s,width .2s,height .2s,margin .2s;will-change:transform}
+.pr-cur-ring{width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;box-shadow:inset 0 0 0 1.5px rgba(204,255,0,.55);transition:opacity .3s,width .45s cubic-bezier(.16,1,.3,1),height .45s cubic-bezier(.16,1,.3,1),margin .45s cubic-bezier(.16,1,.3,1),background .3s}
+.pr-cur-ring.big{width:58px;height:58px;margin:-29px 0 0 -29px;background:rgba(204,255,0,.08)}
+.pr-cur-ring.press{width:26px;height:26px;margin:-13px 0 0 -13px}
+.pr-cur-dot.big{width:4px;height:4px;margin:-2px 0 0 -2px}
+html.pr-cursor.pr-cur-on body,html.pr-cursor.pr-cur-on body *:not(input):not(textarea):not(select){cursor:none!important}
+/* ---------- hover: escala fluida en tarjetas y botones (solo ratón) ---------- */
+@media (hover:hover) and (pointer:fine){
+ html[data-cat] body.pr :is(.hf-card,.hs-st,.rr,.journey .match,.pf5,.team-card,.rec,.next-hero){transition:transform .6s cubic-bezier(.16,1,.3,1),box-shadow .45s cubic-bezier(.16,1,.3,1)!important}
+ html[data-cat] body.pr :is(.hf-card,.journey .match,.pf5,.team-card,.rec,.next-hero):hover{transform:translateY(-3px) scale(1.012);box-shadow:inset 0 0 0 1px rgba(204,255,0,.35),0 24px 50px -28px rgba(204,255,0,.35)!important}
+ html[data-cat] body.pr :is(.primary,.hf-pub,.mr-mini,.profile-fab,.whatsapp-banner a):hover{transform:translateY(-2px) scale(1.03)}
+ html[data-cat] body.pr .ag-row:hover{transform:translateX(4px)}
+ html[data-cat] body.pr .ag-row{transition:transform .5s cubic-bezier(.16,1,.3,1),background .3s!important}
+}
+/* ======== MÓVIL v2: como la presentación ======== */
+@media (max-width:759px){
+ html[data-cat] body.pr header{padding:calc(8px + env(safe-area-inset-top)) 16px 8px!important}
+ html[data-cat] body.pr header .id-emblem{width:30px!important;height:30px!important;flex:0 0 30px!important}
+ html[data-cat] body.pr header h1{font-size:16px!important}
+ .pr-hero{margin:0 -16px 6px;border-radius:0;box-shadow:none;background:transparent;padding:30px 16px 26px}
+ .pr-hero h2{font-size:clamp(40px,12vw,56px);margin:14px 0 22px}
+ .pr-hero svg.court{width:300px;right:-110px;top:44%;opacity:.4}
+ .pr-stat b{font-size:24px}
+ .pr-stat span{font-size:11.5px}
+ /* títulos de sección grandes */
+ .pr-sh{margin:34px 0 14px}
+ .pr-sh h3{font:900 30px/1.02 Inter;letter-spacing:-.035em;color:var(--text);margin-top:10px}
+ html[data-cat] body.pr .livenow-kicker{display:none!important}
+ /* partidos como tarjetas sueltas */
+ html[data-cat] body.pr .livenow-grid{background:transparent!important;box-shadow:none!important;border-radius:0!important;display:flex!important;flex-direction:column;gap:8px;overflow:visible}
+ html[data-cat] body.pr .livenow-grid>.ag-row{background:var(--paper)!important;box-shadow:inset 0 0 0 1px var(--line)!important;border:0!important;border-radius:18px!important;padding:14px 16px!important}
+ html[data-cat] body.pr .ag-row time{font:900 17px Inter!important;letter-spacing:-.02em}
+ html[data-cat] body.pr .ag-cat{background:var(--hl,#CCFF00)!important;color:#0B0B0D!important;border:0!important;border-radius:6px!important;padding:3px 7px!important;font:800 10px Inter!important;letter-spacing:.1em!important;text-decoration:none!important;box-shadow:none!important}
+ html[data-cat] body.pr .ag-cat.t{background:#F06A12!important;color:#fff!important}
+ /* clasificación y resultados también en el móvil */
+ body.pr #homeSide{display:block!important;margin-top:4px}
+ body.pr #homeSide .hs-h{display:block;margin:34px 0 14px}
+ body.pr #homeSide .hs-h b{display:block;font:900 30px/1.02 Inter;letter-spacing:-.035em;color:var(--text);margin-top:10px}
+ body.pr #homeSide .hs-h b::before{content:attr(data-eb);display:flex;align-items:center;gap:8px;font:800 11.5px/1 Inter;letter-spacing:.16em;text-transform:uppercase;color:var(--hl,#CCFF00);margin-bottom:10px}
+ body.pr #homeSide .hs-h a{display:none}
+ body.pr .hs-st{background:var(--paper);box-shadow:inset 0 0 0 1px var(--line);border-radius:22px;overflow:hidden}
+ body.pr .hs-tabs{display:flex;gap:6px;padding:12px 12px 4px;overflow-x:auto;scrollbar-width:none}
+ body.pr .hs-tabs button{flex:0 0 auto;border:0;padding:9px 14px;border-radius:999px;background:rgba(255,255,255,.05);color:var(--muted);font:800 12px Inter;letter-spacing:.08em}
+ body.pr .hs-tabs button.on{background:var(--hl,#CCFF00);color:#0B0B0D}
+ body.pr .hs-r{display:grid;grid-template-columns:30px minmax(0,1fr) 30px 30px 30px 38px;align-items:center;padding:12px 16px;border-top:1px solid var(--line);font-size:15px}
+ body.pr .hs-r.hd{font:800 10.5px Inter;letter-spacing:.12em;color:var(--muted);border-top:0}
+ body.pr .hs-r>*:nth-child(n+3){text-align:center;color:var(--muted)}
+ body.pr .hs-r>*:last-child{text-align:right;font-weight:900;color:var(--text)}
+ body.pr .hs-r .n{font-weight:900;color:var(--muted)} body.pr .hs-r.q .n{color:var(--hl,#CCFF00)}
+ body.pr .hs-r b{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ body.pr .hs-r.cut{border-top:2px dashed var(--hl,#CCFF00)}
+ body.pr .hs-ft{display:flex;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+ body.pr .hs-ft i{width:10px;height:10px;border-radius:3px;background:var(--hl,#CCFF00)}
+ body.pr .hs-ft a{margin-left:auto;font-weight:800;color:var(--text)}
+ body.pr .hs-vel{display:none!important}
+ body.pr .hs-more .hs-st.rr{background:transparent;box-shadow:none;display:flex;flex-direction:column;gap:8px}
+ body.pr .rr-r{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--line);font-size:14px}
+ body.pr .rr-l{font:800 10px Inter;letter-spacing:.1em;color:#0B0B0D;background:var(--hl,#CCFF00);padding:4px 7px;border-radius:6px;flex:0 0 auto}
+ body.pr .rr-t{flex:1;min-width:0;display:flex;flex-direction:column}
+ body.pr .rr-t span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+ body.pr .rr-t span.w{color:var(--text);font-weight:800}
+ body.pr .rr-s{font-weight:900;white-space:nowrap}
+}
+.pr-sh .pr-eyebrow{display:inline-flex}
+@media (min-width:760px){.pr-sh{display:none}}
+/* cada pareja en su línea: nunca «Pa amb tomàquet vs…» */
+html[data-cat] body.pr .ag-row .livenow-teams{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:1px!important;white-space:normal!important;overflow:visible!important}
+html[data-cat] body.pr .ag-row .livenow-teams .team-link{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
+html[data-cat] body.pr .ag-row .livenow-vs{display:none!important}
+html[data-cat] body.pr .ag-row .livenow-teams .team-link+.livenow-vs+.team-link::before{content:"vs  ";color:var(--muted);font-weight:500;font-size:.85em}
+html[data-cat] body.pr .ag-row small{margin-top:4px!important}
+/* títulos antiguos en mayúsculas → estilo nuevo */
+html[data-cat] body.pr :is(.pf4-top h2,.login-card h2,.login-card h3,.player-login h2,.pl-title){font-family:Inter!important;font-weight:900!important;letter-spacing:-.03em!important;text-transform:none!important}
+/* acceso de jugadores con el estilo nuevo */
+html[data-cat] body.pr .profile-login-card{background:var(--paper)!important;border:0!important;box-shadow:inset 0 0 0 1px var(--line)!important;border-radius:26px!important}
+html[data-cat] body.pr .profile-login-eyebrow{color:var(--hl,#CCFF00)!important;font:800 11.5px Inter!important;letter-spacing:.16em!important;display:inline-flex;align-items:center;gap:8px}
+html[data-cat] body.pr .profile-login-eyebrow::before{content:"";width:18px;height:2px;background:currentColor;border-radius:2px}
+html[data-cat] body.pr .profile-login-card h3{font:900 30px/1.05 Inter!important;letter-spacing:-.035em!important;text-transform:none!important;color:var(--text)!important}
+html[data-cat] body.pr .profile-login-card label{text-transform:none!important;letter-spacing:0!important;font:600 13px Inter!important;color:var(--muted)!important}
+
+html[data-cat] body.pr .pr-hid,html[data-cat] body.pr .livenow-grid.pr-hid{display:none!important}
+html[data-cat] body.pr .pr-moredays{display:block;width:100%;margin:12px 0 0;padding:14px;border:0;border-radius:999px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px var(--line);color:var(--text);font:800 14px Inter;cursor:pointer}
+/* ======== «¡Qué chulo!» ======== */
+/* pelota que bota sobre la pista */
+.pr-ball{position:absolute;right:18%;top:20%;width:44px;height:44px;pointer-events:none;z-index:0;animation:prBounceX 3.2s cubic-bezier(.45,0,.55,1) infinite alternate}
+.pr-ball i{display:block;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 32% 30%,#F2FF8A,#CCFF00 40%,#8DB300 100%);box-shadow:0 18px 40px -12px rgba(204,255,0,.6),inset -5px -7px 12px rgba(0,0,0,.25);animation:prBounceY .8s cubic-bezier(.33,0,.66,0) infinite alternate;position:relative}
+.pr-ball i::before,.pr-ball i::after{content:"";position:absolute;inset:8%;border-radius:50%;border:2px solid rgba(255,255,255,.8);clip-path:inset(0 52% 0 0)}
+.pr-ball i::after{clip-path:inset(0 0 0 52%)}
+.pr-ball b{position:absolute;left:50%;bottom:-70px;width:34px;height:8px;margin-left:-17px;border-radius:50%;background:rgba(0,0,0,.55);filter:blur(3px);animation:prShadow .8s cubic-bezier(.33,0,.66,0) infinite alternate}
+@keyframes prBounceY{from{transform:translateY(0) rotate(0)}to{transform:translateY(70px) rotate(160deg)}}
+@keyframes prShadow{from{transform:scale(.45);opacity:.35}to{transform:scale(1);opacity:.8}}
+@keyframes prBounceX{from{transform:translateX(0)}to{transform:translateX(-90px)}}
+@media (min-width:760px){.pr-ball{width:64px;height:64px;right:22%}}
+/* brillo que recorre «pádel y tenis» */
+.pr-hero h2 em{background:linear-gradient(100deg,#CCFF00 0%,#CCFF00 40%,#F7FFC2 50%,#CCFF00 60%,#CCFF00 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:prSheen 3.6s ease-in-out 1.2s infinite}
+@keyframes prSheen{0%{background-position:100% 0}60%,100%{background-position:-50% 0}}
+/* partido en juego: borde lima que gira */
+html[data-cat] body.pr .next-hero{position:relative;isolation:isolate}
+html[data-cat] body.pr .next-hero::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1.5px;background:conic-gradient(from var(--pr-a,0deg),transparent 0 70%,#CCFF00 85%,transparent 100%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:prSpin 3.5s linear infinite;pointer-events:none;z-index:2}
+@property --pr-a{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes prSpin{to{--pr-a:360deg}}
+/* títulos palabra a palabra */
+.pr-w{display:inline-block;opacity:0;transform:translateY(60%) rotate(4deg);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);transition-delay:calc(var(--i)*70ms)}
+.pr-split.in .pr-w{opacity:1;transform:none}
+/* clasificación en cascada + barra de puntos */
+@keyframes prRow{from{opacity:0;transform:translateX(-14px)}}
+body.pr .hs-st.pr-cas .hs-r:not(.hd){animation:prRow .6s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--i)*45ms)}
+body.pr .hs-r{position:relative}
+body.pr .hs-r .pr-bar{position:absolute;left:0;bottom:0;height:2px;background:linear-gradient(90deg,rgba(204,255,0,.0),rgba(204,255,0,.55));width:var(--w,0%);transition:width 1s cubic-bezier(.16,1,.3,1)}
+/* respuesta al tocar */
+@media (hover:none){
+ html[data-cat] body.pr :is(.ag-row,.hf-card,.rr-r,.hs-r,.pr-stat,.next-hero,.match,.pf5){transition:transform .35s cubic-bezier(.16,1,.3,1)!important}
+ html[data-cat] body.pr :is(.ag-row,.hf-card,.rr-r,.hs-r,.pr-stat,.next-hero,.match,.pf5):active{transform:scale(.97)!important}
+}
+@media (prefers-reduced-motion:reduce){.pr-w{opacity:1;transform:none;transition:none}}
+@media (max-width:759px){
+ .pr-ball{right:5%;top:56px;width:38px;height:38px;animation-name:prBounceXm}
+ .pr-ball i{animation-name:prBounceYm}
+ .pr-ball b{bottom:-48px}
+ @keyframes prBounceYm{from{transform:translateY(0) rotate(0)}to{transform:translateY(46px) rotate(160deg)}}
+ @keyframes prBounceXm{from{transform:translateX(0)}to{transform:translateX(-60px)}}
+}
+
+/* ================= MODO CLARO ================= */
+html[data-cat]:not(.dark){--cream:#F2F1EC;--paper:#FFFFFF;--soft:#F1EFE9;--line:rgba(0,0,0,.08);--text:#111114;--text2:#3A3A40;--muted:#6E6D74;--bd:rgba(0,0,0,.14);--pr-lime-ink:#5E7A00;color-scheme:light}
+html[data-cat]:not(.dark) body.pr{background:#F2F1EC!important;color:#111114}
+html[data-cat]:not(.dark) body.pr header{background:rgba(242,241,236,.82)!important}
+html[data-cat]:not(.dark) body.pr header,html[data-cat]:not(.dark) body.pr #nav{--text:#111114!important;--muted:#6E6D74!important}
+html[data-cat]:not(.dark) body.pr header .wrap .brand .brand-left h1,html[data-cat]:not(.dark) body.pr header .wrap .brand h1,html[data-cat]:not(.dark) body.pr header h1{color:#111114!important;-webkit-text-fill-color:#111114!important}
+html[data-cat]:not(.dark) body.pr #nav button:hover{background:rgba(0,0,0,.05)!important}
+html[data-cat]:not(.dark) body.pr .bottom-nav{background:rgba(255,255,255,.86)!important}
+html[data-cat]:not(.dark) .pr-hero{background:linear-gradient(160deg,#FFFFFF,#F4F3EE)}
+html[data-cat]:not(.dark) .pr-hero svg.court *{stroke:rgba(0,0,0,.12)}
+html[data-cat]:not(.dark) .pr-hero svg.court .net{stroke:#8DB800}
+html[data-cat]:not(.dark) .pr-hero h2 em{background-image:linear-gradient(100deg,#6E8E00 0%,#6E8E00 40%,#B8E000 50%,#6E8E00 60%,#6E8E00 100%)}
+html[data-cat]:not(.dark) :is(.pr-eyebrow,body.pr .livenow-kicker,body.pr .profile-login-eyebrow){color:#5E7A00!important}
+html[data-cat]:not(.dark) body.pr #homeSide .hs-h b::before{color:#5E7A00}
+html[data-cat]:not(.dark) .pr-stat{background:rgba(0,0,0,.035)}
+html[data-cat]:not(.dark) body.pr .next-hero{--text:#F5F5F2;--muted:#9A9AA3;--line:rgba(255,255,255,.1);color:#F5F5F2}
+html[data-cat]:not(.dark) body.pr :is(.secondary,.pf4-no,.pr-moredays){background:rgba(0,0,0,.04)!important}
+html[data-cat]:not(.dark) body.pr :is(.liga-sub button,.hs-tabs button){background:rgba(0,0,0,.05)!important}
+html[data-cat]:not(.dark) body.pr .liga-sub button.active,html[data-cat]:not(.dark) body.pr .pf4-tab.on{background:#111114!important;color:#FFFFFF!important}
+html[data-cat]:not(.dark) body.pr .hs-tabs button.on{background:var(--hl,#CCFF00)!important;color:#0B0B0D!important}
+html[data-cat]:not(.dark) body.pr :is(.league-tabs,.pf4-tabs){background:rgba(0,0,0,.04)!important}
+html[data-cat]:not(.dark) body.pr .hs-r.q .n,html[data-cat]:not(.dark) body.pr .st-a .st-r.in .n{color:#5E7A00}
+html[data-cat]:not(.dark) body.pr .hs-r.cut{border-top-color:#8DB800}
+html[data-cat]:not(.dark) body.pr .hs-r .pr-bar{background:linear-gradient(90deg,rgba(141,184,0,0),rgba(141,184,0,.6))}
+html[data-cat]:not(.dark) body.pr :is(input,select,textarea){background:rgba(0,0,0,.03)!important}
+html[data-cat]:not(.dark) body.pr .modal-card{background:#FFFFFF!important;box-shadow:inset 0 0 0 1px var(--line),0 40px 80px -30px rgba(0,0,0,.25)!important}
+html[data-cat]:not(.dark) body.pr .modal{background:rgba(20,20,25,.35)!important}
+html[data-cat]:not(.dark) body.pr footer :is(.ft-btn,.ft-theme){background:rgba(0,0,0,.04)!important}
+html[data-cat]:not(.dark) body.pr .ft-theme button.on{background:#111114!important;color:#fff!important}
+html[data-cat]:not(.dark) .pr-cur-dot{background:#6E8E00}
+html[data-cat]:not(.dark) .pr-cur-ring{box-shadow:inset 0 0 0 1.5px rgba(110,142,0,.6)}
+html[data-cat]:not(.dark) .pr-cur-ring.big{background:rgba(141,184,0,.1)}
+html[data-cat]:not(.dark) body.pr :is(.hf-card,.journey .match,.pf5,.team-card,.rec,.next-hero):hover{box-shadow:inset 0 0 0 1px rgba(141,184,0,.5),0 24px 50px -28px rgba(0,0,0,.25)!important}
+html[data-cat]:not(.dark) body.pr .ag-row time{color:#111114}
+/* zona del notch / barra de estado: igual que el fondo, no lima */
+html[data-cat],html.dark[data-cat]{background-color:#0B0B0D!important}
+html[data-cat]:not(.dark){background-color:#F2F1EC!important}
 </style>
 </head>
 <body>
@@ -5852,6 +6182,140 @@ function renderStandingsSide(){
 setTimeout(()=>{ try{ if(currentView==="inicio") renderHomeSide(); }catch(_){} },1500);
 setInterval(()=>{ try{ if(currentView==="inicio"&&window.innerWidth>=1000) renderHomeSide(); }catch(_){} },30000);
 
+/* ===== Estilo presentación: oscuro premium ===== */
+document.body.classList.add("pr");
+(function(){
+  const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Siempre oscuro, como la presentación
+  // Oscuro por defecto; Claro / Oscuro / Automático elegibles (se guarda la elección)
+  themeMode=function(){ try{ return localStorage.getItem("liga_tema")||"dark"; }catch(_){ return "dark"; } };
+  const _ap=applyTheme; applyTheme=function(dark){ _ap(dark); const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content",dark?"#0B0B0D":"#F2F1EC"); };
+  setThemeMode=function(mode){ try{ localStorage.setItem("liga_tema",mode); }catch(_){} applyTheme(mode==="auto"?systemDark():mode==="dark"); try{ if(document.body.classList.contains("cfg-open")&&typeof renderConfig==="function") renderConfig(); }catch(_){} };
+  const curMode=themeMode(); applyTheme(curMode==="auto"?systemDark():curMode==="dark");
+  try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change",e=>{ if(themeMode()==="auto") applyTheme(e.matches); }); }catch(_){}
+  // Barra de progreso de lectura
+  const bar=document.createElement("div"); bar.className="pr-progress"; bar.setAttribute("aria-hidden","true"); document.body.appendChild(bar);
+  let tk=false; addEventListener("scroll",()=>{ if(tk) return; tk=true; requestAnimationFrame(()=>{ const h=document.documentElement.scrollHeight-innerHeight; bar.style.transform=`scaleX(${h>0?scrollY/h:0})`; tk=false; }); },{passive:true});
+  // Onda al pulsar botones
+  if(!reduce) document.addEventListener("pointerdown",e=>{
+    const b=e.target.closest(".primary,.secondary,.hf-pub,.mr-mini,.profile-fab,.pf4-ok,.pf4-no,.whatsapp-banner a,.league-tabs button,.liga-sub button,#nav button"); if(!b) return;
+    const r=b.getBoundingClientRect(), d=Math.max(r.width,r.height)*2.2, s=document.createElement("span");
+    if(getComputedStyle(b).position==="static") b.style.position="relative"; b.style.overflow="hidden";
+    s.className="pr-ripple"; s.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;
+    b.appendChild(s); setTimeout(()=>s.remove(),720);
+  },{passive:true});
+  // Portada de Inicio
+  const hp=document.getElementById("homePanel");
+  if(hp){ const h=document.createElement("section"); h.className="pr-hero"; h.id="prHero";
+    h.innerHTML=`<span class="glow" aria-hidden="true"></span><span class="glow b" aria-hidden="true"></span>
+     <svg class="court" viewBox="0 0 400 200" aria-hidden="true"><rect x="10" y="10" width="380" height="180" rx="4"/><line class="net" x1="200" y1="6" x2="200" y2="194"/><line x1="70" y1="10" x2="70" y2="190"/><line x1="330" y1="10" x2="330" y2="190"/><line x1="70" y1="100" x2="330" y2="100"/></svg>
+     <span class="pr-ball" aria-hidden="true"><i></i><b></b></span>
+     <span class="pr-eyebrow">CD Industriales · 2026/27</span>
+     <h2><span class="ln"><span>La liga de</span></span><span class="ln"><span><em>pádel y tenis</em></span></span><span class="ln"><span>de la ETSII.</span></span></h2>
+     <div class="pr-stats"><div class="pr-stat"><b>5</b><span>ligas</span></div><div class="pr-stat"><b id="prTeams">–</b><span>inscritos</span></div><div class="pr-stat"><b id="prPlayed">–</b><span>partidos</span></div></div>`;
+    hp.insertBefore(h,hp.firstChild); }
+  let counted=false;
+  window.prStats=function(){
+    try{
+      const Ls=Object.values(db.leagues||{}); if(!Ls.length) return;
+      const teams=Ls.reduce((a,L)=>a+((L.teams||[]).length),0);
+      const played=Ls.reduce((a,L)=>a+Object.values(L.results||{}).filter(r=>r&&r.winner).length,0);
+      const set=(id,v)=>{ const el=document.getElementById(id); if(!el) return; if(reduce||counted){ el.textContent=v; return; }
+        const t0=performance.now(); const step=t=>{ const p=Math.min(1,(t-t0)/1300), e=1-Math.pow(1-p,4); el.textContent=Math.round(v*e); if(p<1) requestAnimationFrame(step); }; requestAnimationFrame(step); };
+      set("prTeams",teams); set("prPlayed",played); if(played) counted=true;
+    }catch(_){}
+  };
+  // Entrada suave al cambiar de pantalla (solo una vez por cambio, no en cada refresco)
+  let lastView=null;
+  // Transición de vista al cambiar de pantalla o de liga (si el navegador la soporta)
+  const vt=!reduce&&typeof document.startViewTransition==="function"; if(vt) document.documentElement.classList.add("pr-vt");
+  let lastKey=null, inVT=false;
+  const _r0=render; render=function(){ const key=currentView+"|"+currentLeague;
+    if(vt&&!inVT&&lastKey!==null&&key!==lastKey){ lastKey=key; inVT=true; const args=arguments; let out;
+      const t=document.startViewTransition(()=>{ out=_r0.apply(this,args); }); t.finished.finally(()=>{ inVT=false; }); return out; }
+    lastKey=key; return _r0.apply(this,arguments); };
+  const _r=render; render=function(){ const out=_r.apply(this,arguments);
+    try{ if(currentView!==lastView){ lastView=currentView; if(!reduce){ document.body.classList.remove("pr-enter"); void document.body.offsetWidth; document.body.classList.add("pr-enter"); clearTimeout(window._prT); window._prT=setTimeout(()=>document.body.classList.remove("pr-enter"),1100); } } }catch(_){}
+    try{ if(currentView==="inicio") prStats(); }catch(_){}
+    try{ /*prSectionHeads*/ (window.prMoreDays=function(){ const p=document.querySelector("#liveNow .livenow-panel"); if(!p||window.innerWidth>=760||p.dataset.more) return;
+        const labs=[...p.querySelectorAll(".livenow-day-label")]; if(labs.length<=1) return; p.dataset.more="1";
+        let hide=false, n=0; [...p.children].forEach(el=>{ if(el===labs[1]) hide=true; if(hide){ el.classList.add("pr-hid"); n++; } });
+        const b=document.createElement("button"); b.className="pr-moredays"; b.textContent="Ver más días"; b.onclick=()=>{ p.querySelectorAll(".pr-hid").forEach(e=>e.classList.remove("pr-hid")); b.remove(); }; p.appendChild(b); })();
+      if(!window._prLN&&typeof renderLiveNow==='function'){ window._prLN=1; const _l=renderLiveNow; renderLiveNow=function(){ const o=_l.apply(this,arguments); try{ window.prMoreDays(); }catch(_){} return o; }; } const ln=document.getElementById("liveNow"); if(ln&&!document.getElementById("prShLive")){ const d=document.createElement("div"); d.className="pr-sh"; d.id="prShLive"; d.innerHTML='<span class="pr-eyebrow">En directo</span><h3>Qué se juega en la ETSII.</h3>'; ln.parentNode.insertBefore(d,ln); }
+      document.querySelectorAll("#homeSide .hs-h b").forEach((b,i)=>{ if(!b.dataset.eb){ b.dataset.eb=i===0?"Clasificación":"Resultados"; b.textContent=i===0?"Así va la temporada.":"Últimos partidos."; } }); }catch(_){}
+    try{ const h=document.querySelector('.profile-login-card h3'); if(h&&h.textContent==='ACCESO JUGADOR') h.textContent='Acceso jugador'; /*prFixLogin*/ }catch(_){}
+    return out; };
+})();
+/* ===== GSAP + ScrollTrigger: aparición al hacer scroll, parallax y cursor ===== */
+(function(){
+  const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const fine=window.matchMedia&&matchMedia("(hover: hover) and (pointer: fine)").matches;
+  if(reduce) return;
+  const load=src=>new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.async=true; s.onload=res; s.onerror=rej; document.head.appendChild(s); });
+  const SEL="#homePanel .hf-card,#homePanel .livenow-grid,#homePanel .next-hero,#homeSide .hs-st,#homeSide .rr,#content .st-a .st-card,#content .journey .match,#content .pf5,#content .pf4-card,#content .team-card,#content .rec,#content .season,.whatsapp-banner .wrap";
+  let ready=false;
+  function animateIn(){
+    if(!ready) return;
+    const g=window.gsap, ST=window.ScrollTrigger;
+    ST.getAll().forEach(t=>{ if(t.vars&&t.vars.id==="pr-in") t.kill(); });
+    const els=[...document.querySelectorAll(SEL)].filter(el=>el.offsetParent!==null);
+    g.set(els,{opacity:0,y:28});
+    ST.batch(els,{id:"pr-in",start:"top 92%",once:true,onEnter:b=>g.to(b,{opacity:1,y:0,duration:.9,ease:"expo.out",stagger:.07,overwrite:true,clearProps:"transform,opacity"})});
+    ST.refresh();
+    // Red de seguridad: nada se queda invisible si un disparador no llega a saltar
+    clearTimeout(window._prSafe); window._prSafe=setTimeout(()=>{ els.forEach(el=>{ const r=el.getBoundingClientRect(); if(r.top<innerHeight&&getComputedStyle(el).opacity==="0") g.to(el,{opacity:1,y:0,duration:.6,ease:"expo.out",clearProps:"transform,opacity"}); }); },1600);
+  }
+  function parallax(){
+    const g=window.gsap; const hero=document.getElementById("prHero"); if(!hero) return;
+    g.to(hero.querySelector("svg.court"),{yPercent:-38,ease:"none",scrollTrigger:{trigger:hero,start:"top top",end:"bottom top",scrub:.6}});
+    g.to(hero.querySelector(".glow"),{y:90,ease:"none",scrollTrigger:{trigger:hero,start:"top top",end:"bottom top",scrub:.6}});
+    g.to(hero.querySelector("h2"),{y:-30,opacity:.35,ease:"none",scrollTrigger:{trigger:hero,start:"top top",end:"bottom top",scrub:.6}});
+  }
+  Promise.all([load("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js")]).then(()=>load("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js")).then(()=>{
+    gsap.registerPlugin(ScrollTrigger); ready=true; parallax(); animateIn();
+    // Al cambiar de pantalla (no en cada refresco de datos) se vuelven a animar los bloques
+    let last=currentView+"|"+currentLeague;
+    const _r=render; render=function(){ const out=_r.apply(this,arguments); const k=currentView+"|"+currentLeague;
+      if(k!==last){ last=k; setTimeout(animateIn,260); } return out; };
+  }).catch(()=>{});
+
+  if(!fine) return;
+  /* Cursor personalizado (solo con ratón) */
+  const dot=document.createElement("div"), ring=document.createElement("div");
+  dot.className="pr-cur-dot"; ring.className="pr-cur-ring"; dot.setAttribute("aria-hidden","true"); ring.setAttribute("aria-hidden","true");
+  document.body.append(dot,ring); document.documentElement.classList.add("pr-cursor");
+  let x=innerWidth/2,y=innerHeight/2,rx=x,ry=y,shown=false;
+  addEventListener("pointermove",e=>{ x=e.clientX; y=e.clientY; if(!shown){ shown=true; rx=x; ry=y; document.documentElement.classList.add("pr-cur-on"); }
+    const t=e.target.closest&&e.target.closest("a,button,[onclick],.ag-row,.team-link,label,select,summary");
+    ring.classList.toggle("big",!!t); dot.classList.toggle("big",!!t);
+    const txt=e.target.closest&&e.target.closest("input,textarea,[contenteditable]"); document.documentElement.classList.toggle("pr-cur-text",!!txt); },{passive:true});
+  addEventListener("pointerdown",()=>ring.classList.add("press")); addEventListener("pointerup",()=>ring.classList.remove("press"));
+  document.addEventListener("pointerleave",()=>document.documentElement.classList.remove("pr-cur-on"));
+  (function loop(){ rx+=(x-rx)*.55; ry+=(y-ry)*.55; dot.style.transform=`translate3d(${x}px,${y}px,0)`; ring.style.transform=`translate3d(${rx}px,${ry}px,0)`; requestAnimationFrame(loop); })();
+})();
+
+/* ===== «¡Qué chulo!»: títulos palabra a palabra, cascada en la clasificación y vibración ===== */
+(function(){
+  const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const io=("IntersectionObserver" in window)?new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }),{threshold:.3}):null;
+  function split(el){ if(!el||el.dataset.split) return; el.dataset.split="1"; el.classList.add("pr-split");
+    const txt=el.textContent; el.setAttribute("aria-label",txt);
+    el.innerHTML=txt.split(" ").map((w,i)=>`<span class="pr-w" aria-hidden="true" style="--i:${i}">${w}</span>`).join(" ");
+    if(reduce||!io) el.classList.add("in"); else io.observe(el); }
+  function cascade(){ const st=document.querySelector("#homeSide .hs-st"); if(!st||st.dataset.cas===st.innerHTML.length+"") return;
+    const rows=[...st.querySelectorAll(".hs-r:not(.hd)")]; const pts=r=>+(r.children[5]&&r.children[5].textContent)||0;
+    const max=Math.max(1,...rows.map(pts));
+    rows.forEach((r,i)=>{ r.style.setProperty("--i",i); if(!r.querySelector(".pr-bar")){ const w=100*pts(r)/max, b=document.createElement("i"); b.className="pr-bar"; r.appendChild(b); requestAnimationFrame(()=>requestAnimationFrame(()=>b.style.setProperty("--w",w+"%"))); } });
+    if(!reduce){ st.classList.remove("pr-cas"); void st.offsetWidth; st.classList.add("pr-cas"); }
+    st.dataset.cas=st.innerHTML.length+""; }
+  function run(){ document.querySelectorAll(".pr-sh h3,#homeSide .hs-h b").forEach(split); cascade(); }
+  const _r=render; render=function(){ const o=_r.apply(this,arguments); setTimeout(run,30); return o; };
+  if(typeof renderHomeSide==="function"){ const _h=renderHomeSide; renderHomeSide=function(){ const o=_h.apply(this,arguments); setTimeout(run,0); return o; }; }
+  setTimeout(run,1200);
+  // vibración suave al tocar pestañas y botones (Android; el iPhone la ignora)
+  document.addEventListener("click",e=>{ if(e.target.closest(".hs-tabs button,.league-tabs button,.liga-sub button,.bottom-nav button,.primary,.hf-pub")&&navigator.vibrate) try{navigator.vibrate(8)}catch(_){} },{passive:true});
+})();
+
 trackEvent("visit");
 restorePlayerSession();
 if(location.hash==="#mis-partidos") currentView="profile";
@@ -5889,7 +6353,7 @@ if("serviceWorker" in navigator){
   var FILE = { padel: "padel", tenis: "tenis-o" };
   var BALL = { padel: [58.77, 30.70], tenis: [59.55, 30.70] };
   var DOTS = { masc: ["#1F6BEA", "#3FDED6"], fem: ["#E81E7C", "#F98BBE"], mix: ["#6A2EF0", "#DCF23A"], tenis: ["#5B22E0", "#C9E13A"], gen: ["#1E5BD8", "#F2B82E"] };
-  var THEME = { padel: "#CCFF00", tenis: "#C24A00" };
+  var THEME = { get padel(){ return root.classList.contains("dark")?"#0B0B0D":"#F2F1EC"; }, get tenis(){ return root.classList.contains("dark")?"#0B0B0D":"#F2F1EC"; } };
   var REDUCE = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var root = document.documentElement;
   var cat = null, emblem = null, busy = false;
