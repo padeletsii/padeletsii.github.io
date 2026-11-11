@@ -2544,7 +2544,7 @@ html[data-cat] body.pr header .profile-fab #profileFabLabel{color:#0B0B0D!import
 .pr-cur-dot,.pr-cur-ring{position:fixed;left:0;top:0;pointer-events:none;z-index:9999;opacity:0;transition:opacity .3s}
 html.pr-cur-on .pr-cur-dot,html.pr-cur-on .pr-cur-ring{opacity:1}
 html.pr-cur-text .pr-cur-dot,html.pr-cur-text .pr-cur-ring{opacity:0!important}
-.pr-cur-dot{width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:var(--hl,#CCFF00);transition:opacity .3s,width .3s,height .3s,margin .3s}
+.pr-cur-dot{width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:var(--hl,#CCFF00);transition:opacity .3s,width .2s,height .2s,margin .2s;will-change:transform}
 .pr-cur-ring{width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;box-shadow:inset 0 0 0 1.5px rgba(204,255,0,.55);transition:opacity .3s,width .45s cubic-bezier(.16,1,.3,1),height .45s cubic-bezier(.16,1,.3,1),margin .45s cubic-bezier(.16,1,.3,1),background .3s}
 .pr-cur-ring.big{width:58px;height:58px;margin:-29px 0 0 -29px;background:rgba(204,255,0,.08)}
 .pr-cur-ring.press{width:26px;height:26px;margin:-13px 0 0 -13px}
@@ -2626,6 +2626,46 @@ html[data-cat] body.pr .profile-login-card label{text-transform:none!important;l
 
 html[data-cat] body.pr .pr-hid,html[data-cat] body.pr .livenow-grid.pr-hid{display:none!important}
 html[data-cat] body.pr .pr-moredays{display:block;width:100%;margin:12px 0 0;padding:14px;border:0;border-radius:999px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px var(--line);color:var(--text);font:800 14px Inter;cursor:pointer}
+/* ======== «¡Qué chulo!» ======== */
+/* pelota que bota sobre la pista */
+.pr-ball{position:absolute;right:18%;top:20%;width:44px;height:44px;pointer-events:none;z-index:0;animation:prBounceX 3.2s cubic-bezier(.45,0,.55,1) infinite alternate}
+.pr-ball i{display:block;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 32% 30%,#F2FF8A,#CCFF00 40%,#8DB300 100%);box-shadow:0 18px 40px -12px rgba(204,255,0,.6),inset -5px -7px 12px rgba(0,0,0,.25);animation:prBounceY .8s cubic-bezier(.33,0,.66,0) infinite alternate;position:relative}
+.pr-ball i::before,.pr-ball i::after{content:"";position:absolute;inset:8%;border-radius:50%;border:2px solid rgba(255,255,255,.8);clip-path:inset(0 52% 0 0)}
+.pr-ball i::after{clip-path:inset(0 0 0 52%)}
+.pr-ball b{position:absolute;left:50%;bottom:-70px;width:34px;height:8px;margin-left:-17px;border-radius:50%;background:rgba(0,0,0,.55);filter:blur(3px);animation:prShadow .8s cubic-bezier(.33,0,.66,0) infinite alternate}
+@keyframes prBounceY{from{transform:translateY(0) rotate(0)}to{transform:translateY(70px) rotate(160deg)}}
+@keyframes prShadow{from{transform:scale(.45);opacity:.35}to{transform:scale(1);opacity:.8}}
+@keyframes prBounceX{from{transform:translateX(0)}to{transform:translateX(-90px)}}
+@media (min-width:760px){.pr-ball{width:64px;height:64px;right:22%}}
+/* brillo que recorre «pádel y tenis» */
+.pr-hero h2 em{background:linear-gradient(100deg,#CCFF00 0%,#CCFF00 40%,#F7FFC2 50%,#CCFF00 60%,#CCFF00 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:prSheen 3.6s ease-in-out 1.2s infinite}
+@keyframes prSheen{0%{background-position:100% 0}60%,100%{background-position:-50% 0}}
+/* partido en juego: borde lima que gira */
+html[data-cat] body.pr .next-hero{position:relative;isolation:isolate}
+html[data-cat] body.pr .next-hero::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1.5px;background:conic-gradient(from var(--pr-a,0deg),transparent 0 70%,#CCFF00 85%,transparent 100%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:prSpin 3.5s linear infinite;pointer-events:none;z-index:2}
+@property --pr-a{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes prSpin{to{--pr-a:360deg}}
+/* títulos palabra a palabra */
+.pr-w{display:inline-block;opacity:0;transform:translateY(60%) rotate(4deg);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);transition-delay:calc(var(--i)*70ms)}
+.pr-split.in .pr-w{opacity:1;transform:none}
+/* clasificación en cascada + barra de puntos */
+@keyframes prRow{from{opacity:0;transform:translateX(-14px)}}
+body.pr .hs-st.pr-cas .hs-r:not(.hd){animation:prRow .6s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--i)*45ms)}
+body.pr .hs-r{position:relative}
+body.pr .hs-r .pr-bar{position:absolute;left:0;bottom:0;height:2px;background:linear-gradient(90deg,rgba(204,255,0,.0),rgba(204,255,0,.55));width:var(--w,0%);transition:width 1s cubic-bezier(.16,1,.3,1)}
+/* respuesta al tocar */
+@media (hover:none){
+ html[data-cat] body.pr :is(.ag-row,.hf-card,.rr-r,.hs-r,.pr-stat,.next-hero,.match,.pf5){transition:transform .35s cubic-bezier(.16,1,.3,1)!important}
+ html[data-cat] body.pr :is(.ag-row,.hf-card,.rr-r,.hs-r,.pr-stat,.next-hero,.match,.pf5):active{transform:scale(.97)!important}
+}
+@media (prefers-reduced-motion:reduce){.pr-ball,.pr-ball i,.pr-ball b,.pr-hero h2 em,html[data-cat] body.pr .next-hero::before{animation:none!important}.pr-w{opacity:1;transform:none;transition:none}}
+@media (max-width:759px){
+ .pr-ball{right:5%;top:56px;width:38px;height:38px;animation-name:prBounceXm}
+ .pr-ball i{animation-name:prBounceYm}
+ .pr-ball b{bottom:-48px}
+ @keyframes prBounceYm{from{transform:translateY(0) rotate(0)}to{transform:translateY(46px) rotate(160deg)}}
+ @keyframes prBounceXm{from{transform:translateX(0)}to{transform:translateX(-60px)}}
+}
 </style>
 </head>
 <body>
@@ -6128,6 +6168,7 @@ document.body.classList.add("pr");
   if(hp){ const h=document.createElement("section"); h.className="pr-hero"; h.id="prHero";
     h.innerHTML=`<span class="glow" aria-hidden="true"></span><span class="glow b" aria-hidden="true"></span>
      <svg class="court" viewBox="0 0 400 200" aria-hidden="true"><rect x="10" y="10" width="380" height="180" rx="4"/><line class="net" x1="200" y1="6" x2="200" y2="194"/><line x1="70" y1="10" x2="70" y2="190"/><line x1="330" y1="10" x2="330" y2="190"/><line x1="70" y1="100" x2="330" y2="100"/></svg>
+     <span class="pr-ball" aria-hidden="true"><i></i><b></b></span>
      <span class="pr-eyebrow">CD Industriales · 2026/27</span>
      <h2><span class="ln"><span>La liga de</span></span><span class="ln"><span><em>pádel y tenis</em></span></span><span class="ln"><span>de la ETSII.</span></span></h2>
      <div class="pr-stats"><div class="pr-stat"><b>5</b><span>ligas</span></div><div class="pr-stat"><b id="prTeams">–</b><span>inscritos</span></div><div class="pr-stat"><b id="prPlayed">–</b><span>partidos</span></div></div>`;
@@ -6209,7 +6250,29 @@ document.body.classList.add("pr");
     const txt=e.target.closest&&e.target.closest("input,textarea,[contenteditable]"); document.documentElement.classList.toggle("pr-cur-text",!!txt); },{passive:true});
   addEventListener("pointerdown",()=>ring.classList.add("press")); addEventListener("pointerup",()=>ring.classList.remove("press"));
   document.addEventListener("pointerleave",()=>document.documentElement.classList.remove("pr-cur-on"));
-  (function loop(){ rx+=(x-rx)*.18; ry+=(y-ry)*.18; dot.style.transform=`translate3d(${x}px,${y}px,0)`; ring.style.transform=`translate3d(${rx}px,${ry}px,0)`; requestAnimationFrame(loop); })();
+  (function loop(){ rx+=(x-rx)*.55; ry+=(y-ry)*.55; dot.style.transform=`translate3d(${x}px,${y}px,0)`; ring.style.transform=`translate3d(${rx}px,${ry}px,0)`; requestAnimationFrame(loop); })();
+})();
+
+/* ===== «¡Qué chulo!»: títulos palabra a palabra, cascada en la clasificación y vibración ===== */
+(function(){
+  const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const io=("IntersectionObserver" in window)?new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }),{threshold:.3}):null;
+  function split(el){ if(!el||el.dataset.split) return; el.dataset.split="1"; el.classList.add("pr-split");
+    const txt=el.textContent; el.setAttribute("aria-label",txt);
+    el.innerHTML=txt.split(" ").map((w,i)=>`<span class="pr-w" aria-hidden="true" style="--i:${i}">${w}</span>`).join(" ");
+    if(reduce||!io) el.classList.add("in"); else io.observe(el); }
+  function cascade(){ const st=document.querySelector("#homeSide .hs-st"); if(!st||st.dataset.cas===st.innerHTML.length+"") return;
+    const rows=[...st.querySelectorAll(".hs-r:not(.hd)")]; const pts=r=>+(r.children[5]&&r.children[5].textContent)||0;
+    const max=Math.max(1,...rows.map(pts));
+    rows.forEach((r,i)=>{ r.style.setProperty("--i",i); if(!r.querySelector(".pr-bar")){ const w=100*pts(r)/max, b=document.createElement("i"); b.className="pr-bar"; r.appendChild(b); requestAnimationFrame(()=>requestAnimationFrame(()=>b.style.setProperty("--w",w+"%"))); } });
+    if(!reduce){ st.classList.remove("pr-cas"); void st.offsetWidth; st.classList.add("pr-cas"); }
+    st.dataset.cas=st.innerHTML.length+""; }
+  function run(){ document.querySelectorAll(".pr-sh h3,#homeSide .hs-h b").forEach(split); cascade(); }
+  const _r=render; render=function(){ const o=_r.apply(this,arguments); setTimeout(run,30); return o; };
+  if(typeof renderHomeSide==="function"){ const _h=renderHomeSide; renderHomeSide=function(){ const o=_h.apply(this,arguments); setTimeout(run,0); return o; }; }
+  setTimeout(run,1200);
+  // vibración suave al tocar pestañas y botones (Android; el iPhone la ignora)
+  document.addEventListener("click",e=>{ if(e.target.closest(".hs-tabs button,.league-tabs button,.liga-sub button,.bottom-nav button,.primary,.hf-pub")&&navigator.vibrate) try{navigator.vibrate(8)}catch(_){} },{passive:true});
 })();
 
 trackEvent("visit");
