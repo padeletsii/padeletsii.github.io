@@ -2291,6 +2291,12 @@ body:has(.modal.open) .install-bar,body:has(.wx-ov.open) .install-bar{display:no
 .wo-field small{display:block;font-size:12px;margin:-2px 0 6px}
 .wo-btns{display:flex;gap:6px;flex-wrap:wrap}.wo-btns button{font-size:12.5px!important;padding:7px 11px!important}
 .wo-btns button.on{outline:2px solid var(--hl-line,#8DB800)}
+/* Botón admin a mano en los dispositivos con la clave recordada */
+body.admin-device:not(.cfg-open) .admin-btn{display:inline-flex!important}
+html[data-cat] body .admin-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 13px!important;z-index:14}
+.admin-btn svg{width:16px;height:16px}
+.admin-btn .ab-on{display:none}body.admin-mode .admin-btn .ab-on{display:inline}body.admin-mode .admin-btn .ab-off{display:none}
+header .brand h1{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 </style>
 </head>
 <body>
@@ -2334,7 +2340,7 @@ body:has(.modal.open) .install-bar,body:has(.wx-ov.open) .install-bar{display:no
  <div>Liga interna ETSII · Pádel</div>
 </footer>
 <div id="syncStatus" class="sync-status bad">Sin conectar</div>
-<button class="admin-btn" onclick="toggleAdmin()">⚙ Admin</button>
+<button class="admin-btn" onclick="toggleAdmin()" aria-label="Modo admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8.2 8 9 4.6-.8 8-4.5 8-9V6Z"/></svg><span class="ab-on">Salir de admin</span><span class="ab-off">Admin</span></button>
 
 <nav id="bottomNav" class="bottom-nav">
  <button data-view="inicio" class="active"><span class="bn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="bn-stroke" d="M3 11.5 12 4l9 7.5"/><path class="bn-stroke" d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/><path class="bn-accent" d="M10 20v-5h4v5"/></svg></span><span class="bn-label">Inicio</span></button>
@@ -2398,6 +2404,10 @@ let currentLeague = "pro";
 let currentView = "inicio";
 let admin = false;
 const ADMIN_SESSION_KEY = "liga_etsii_admin_session";
+const ADMIN_REMEMBER_KEY = "liga_etsii_admin_device";
+function adminRemembered(){try{return localStorage.getItem(ADMIN_REMEMBER_KEY)||""}catch(_){return ""}}
+function paintAdminDevice(){document.body.classList.toggle("admin-device",!!adminRemembered())}
+function forgetAdminDevice(){try{localStorage.removeItem(ADMIN_REMEMBER_KEY)}catch(_){} paintAdminDevice(); if(typeof showToast==="function") showToast("Clave de admin olvidada en este dispositivo")}
 let currentRounds={pro:1,media:1,fem:1,mixta:1,tenis:1};
 let friendlies=[]; // Anuncios abiertos del tablón de amistosos (se cargan con loadCloudResults()).
 let promoBanner={enabled:false,text:"",cta:"",url:"",until:""}; // Banner de publicidad temporal, gestionado desde Admin.
@@ -4331,7 +4341,8 @@ async function renderConfig(){
      ${cfgRow("mail","Escribe a Velasco","Dudas, cambios o cualquier cosa de la liga",icon("chev","cfg-go"),"closeConfig();openContact()")}
      ${cfgRow("info","Información de la liga","",icon("chev","cfg-go"),"closeConfig();currentView='info';render();window.scrollTo({top:0})")}
      ${!standalone&&ios?cfgRow("phone","Instalar en el móvil","Compartir → «Añadir a pantalla de inicio»"):""}
-     ${cfgRow("shield","Acceso admin","",icon("chev","cfg-go"),"closeConfig();toggleAdmin()")}
+     ${cfgRow("shield",admin?"Salir del modo admin":"Acceso admin",adminRemembered()?"Clave recordada en este dispositivo":"",icon("chev","cfg-go"),"closeConfig();toggleAdmin()")}
+     ${adminRemembered()?cfgRow("shield","Olvidar la clave de admin","",icon("chev","cfg-go"),"forgetAdminDevice();renderConfig()"):""}
     </div>
    </div>`;
 }
@@ -5080,10 +5091,15 @@ async function toggleAdmin(force){
    if(currentView==="adminProposals"||currentView==="users")currentView="standings";render();return;
  }
  if(!admin){
-   const p=prompt("Clave de administrador:");
-   if(p===null||!p)return;
-   const ok=await validateAdminPassword(p);
-   if(!ok){alert("Contraseña de administrador incorrecta.");return}
+   let p=adminRemembered(), ok=!!p&&await validateAdminPassword(p);
+   if(!ok){
+     if(p) forgetAdminDevice();
+     p=prompt("Clave de administrador:");
+     if(p===null||!p)return;
+     ok=await validateAdminPassword(p);
+     if(!ok){alert("Contraseña de administrador incorrecta.");return}
+     if(confirm("¿Recordar la clave en este dispositivo? Así entrarás al modo admin con un solo toque.")){ try{localStorage.setItem(ADMIN_REMEMBER_KEY,p)}catch(_){} paintAdminDevice(); }
+   }
    adminPassword=p;admin=true;
    try{sessionStorage.setItem(ADMIN_SESSION_KEY,p)}catch(_){}
    document.getElementById("adminbar").classList.add("on");document.body.classList.add("admin-mode");
@@ -5098,6 +5114,7 @@ async function toggleAdmin(force){
 async function restoreAdminSession(){
  let p="";
  try{p=sessionStorage.getItem(ADMIN_SESSION_KEY)||""}catch(_){}
+ paintAdminDevice();
  if(!p) return;
  if(await validateAdminPassword(p)){
    adminPassword=p;admin=true;
@@ -5656,6 +5673,17 @@ function scheduleInstall(){
 try{ const n=(+localStorage.getItem("liga_visits")||0)+1; localStorage.setItem("liga_visits",String(n)); }catch(_){}
 if(isIOS()) scheduleInstall();
 
+// Atajo de admin: mantener pulsado el título de la cabecera (1 s) entra o sale del modo admin.
+(function(){
+  const h=document.querySelector("header .brand h1"); if(!h) return;
+  let t=null;
+  const start=()=>{ clearTimeout(t); t=setTimeout(()=>{ t=null; if(navigator.vibrate) navigator.vibrate(30); toggleAdmin(); },900); };
+  const stop=()=>{ clearTimeout(t); t=null; };
+  h.addEventListener("touchstart",start,{passive:true}); h.addEventListener("mousedown",start);
+  ["touchend","touchmove","touchcancel","mouseup","mouseleave"].forEach(e=>h.addEventListener(e,stop));
+  h.addEventListener("contextmenu",e=>e.preventDefault());
+})();
+paintAdminDevice();
 trackEvent("visit");
 restorePlayerSession();
 if(location.hash==="#mis-partidos") currentView="profile";
