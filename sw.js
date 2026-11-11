@@ -1,4 +1,4 @@
-const CACHE_NAME = "liga-etsii-v6";
+const CACHE_NAME = "liga-etsii-v7";
 const APP_SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (event) => {
