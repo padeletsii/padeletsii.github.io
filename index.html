@@ -2380,7 +2380,7 @@ html[data-cat] body.pr{background:#0B0B0D!important;color:var(--text);font-famil
 html[data-cat] body.pr :focus-visible{outline:2px solid var(--hl,#CCFF00)!important;outline-offset:3px}
 
 /* barra de progreso */
-.pr-progress{position:fixed;inset:0 0 auto 0;height:3px;background:var(--hl,#CCFF00);transform-origin:0 50%;transform:scaleX(0);z-index:30;pointer-events:none}
+.pr-progress{position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--hl,#CCFF00);transform-origin:0 50%;transform:scaleX(0);z-index:30;pointer-events:none}
 
 /* ---------- cabecera de cristal oscuro ---------- */
 html[data-cat] body.pr header{position:sticky!important;top:0;z-index:14;background:rgba(11,11,13,.78)!important;backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid var(--line)!important;box-shadow:none!important;padding:calc(10px + env(safe-area-inset-top)) 16px 10px!important;color:var(--text)!important}
@@ -2703,6 +2703,9 @@ html[data-cat]:not(.dark) body.pr .ag-row time{color:#111114}
 /* zona del notch / barra de estado: igual que el fondo, no lima */
 html[data-cat],html.dark[data-cat]{background-color:#0B0B0D!important}
 html[data-cat]:not(.dark){background-color:#F2F1EC!important}
+/* iOS colorea la zona del notch con la cabecera: que sea opaca */
+html[data-cat] body.pr header{background:#0B0B0D!important}
+html[data-cat]:not(.dark) body.pr header{background:#F2F1EC!important}
 </style>
 </head>
 <body>
@@ -6194,7 +6197,7 @@ document.body.classList.add("pr");
   const curMode=themeMode(); applyTheme(curMode==="auto"?systemDark():curMode==="dark");
   try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change",e=>{ if(themeMode()==="auto") applyTheme(e.matches); }); }catch(_){}
   // Barra de progreso de lectura
-  const bar=document.createElement("div"); bar.className="pr-progress"; bar.setAttribute("aria-hidden","true"); document.body.appendChild(bar);
+  const bar=document.createElement("div"); bar.className="pr-progress"; bar.setAttribute("aria-hidden","true"); (document.querySelector("header")||document.body).appendChild(bar);
   let tk=false; addEventListener("scroll",()=>{ if(tk) return; tk=true; requestAnimationFrame(()=>{ const h=document.documentElement.scrollHeight-innerHeight; bar.style.transform=`scaleX(${h>0?scrollY/h:0})`; tk=false; }); },{passive:true});
   // Onda al pulsar botones
   if(!reduce) document.addEventListener("pointerdown",e=>{
