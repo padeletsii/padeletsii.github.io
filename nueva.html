@@ -2558,6 +2558,35 @@ html.pr-cursor.pr-cur-on body,html.pr-cursor.pr-cur-on body *:not(input):not(tex
  html[data-cat] body.pr .ag-row:hover{transform:translateX(4px)}
  html[data-cat] body.pr .ag-row{transition:transform .5s cubic-bezier(.16,1,.3,1),background .3s!important}
 }
+/* ======== MÓVIL: más compacto y sin nombres cortados ======== */
+@media (max-width:759px){
+ /* portada reducida a una franja con las cifras */
+ .pr-hero{padding:14px 14px 12px;margin:12px 0 12px;border-radius:22px}
+ .pr-hero h2,.pr-hero svg.court{display:none}
+ .pr-hero .pr-eyebrow{font-size:10.5px}
+ .pr-stats{margin-top:10px;gap:6px}
+ .pr-stat{padding:9px 11px 8px;border-radius:14px}
+ .pr-stat b{font-size:20px}
+ .pr-stat span{font-size:11px;line-height:1.15;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ /* cabecera más baja */
+ html[data-cat] body.pr header{padding:calc(8px + env(safe-area-inset-top)) 16px 8px!important}
+ html[data-cat] body.pr header .id-emblem{width:30px!important;height:30px!important}
+ html[data-cat] body.pr header h1{font-size:16px!important}
+}
+/* cada pareja en su línea: nunca «Pa amb tomàquet vs…» */
+html[data-cat] body.pr .ag-row .livenow-teams{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:1px!important;white-space:normal!important;overflow:visible!important}
+html[data-cat] body.pr .ag-row .livenow-teams .team-link{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
+html[data-cat] body.pr .ag-row .livenow-vs{display:none!important}
+html[data-cat] body.pr .ag-row .livenow-teams .team-link+.livenow-vs+.team-link::before{content:"vs  ";color:var(--muted);font-weight:500;font-size:.85em}
+html[data-cat] body.pr .ag-row small{margin-top:4px!important}
+/* títulos antiguos en mayúsculas → estilo nuevo */
+html[data-cat] body.pr :is(.pf4-top h2,.login-card h2,.login-card h3,.player-login h2,.pl-title){font-family:Inter!important;font-weight:900!important;letter-spacing:-.03em!important;text-transform:none!important}
+/* acceso de jugadores con el estilo nuevo */
+html[data-cat] body.pr .profile-login-card{background:var(--paper)!important;border:0!important;box-shadow:inset 0 0 0 1px var(--line)!important;border-radius:26px!important}
+html[data-cat] body.pr .profile-login-eyebrow{color:var(--hl,#CCFF00)!important;font:800 11.5px Inter!important;letter-spacing:.16em!important;display:inline-flex;align-items:center;gap:8px}
+html[data-cat] body.pr .profile-login-eyebrow::before{content:"";width:18px;height:2px;background:currentColor;border-radius:2px}
+html[data-cat] body.pr .profile-login-card h3{font:900 30px/1.05 Inter!important;letter-spacing:-.035em!important;text-transform:none!important;color:var(--text)!important}
+html[data-cat] body.pr .profile-login-card label{text-transform:none!important;letter-spacing:0!important;font:600 13px Inter!important;color:var(--muted)!important}
 </style>
 </head>
 <body>
@@ -6062,7 +6091,7 @@ document.body.classList.add("pr");
      <svg class="court" viewBox="0 0 400 200" aria-hidden="true"><rect x="10" y="10" width="380" height="180" rx="4"/><line class="net" x1="200" y1="6" x2="200" y2="194"/><line x1="70" y1="10" x2="70" y2="190"/><line x1="330" y1="10" x2="330" y2="190"/><line x1="70" y1="100" x2="330" y2="100"/></svg>
      <span class="pr-eyebrow">CD Industriales · 2026/27</span>
      <h2><span class="ln"><span>La liga de</span></span><span class="ln"><span><em>pádel y tenis</em></span></span><span class="ln"><span>de la ETSII.</span></span></h2>
-     <div class="pr-stats"><div class="pr-stat"><b>5</b><span>ligas</span></div><div class="pr-stat"><b id="prTeams">–</b><span>parejas y jugadores</span></div><div class="pr-stat"><b id="prPlayed">–</b><span>partidos jugados</span></div></div>`;
+     <div class="pr-stats"><div class="pr-stat"><b>5</b><span>ligas</span></div><div class="pr-stat"><b id="prTeams">–</b><span>inscritos</span></div><div class="pr-stat"><b id="prPlayed">–</b><span>partidos</span></div></div>`;
     hp.insertBefore(h,hp.firstChild); }
   let counted=false;
   window.prStats=function(){
@@ -6087,6 +6116,7 @@ document.body.classList.add("pr");
   const _r=render; render=function(){ const out=_r.apply(this,arguments);
     try{ if(currentView!==lastView){ lastView=currentView; if(!reduce){ document.body.classList.remove("pr-enter"); void document.body.offsetWidth; document.body.classList.add("pr-enter"); clearTimeout(window._prT); window._prT=setTimeout(()=>document.body.classList.remove("pr-enter"),1100); } } }catch(_){}
     try{ if(currentView==="inicio") prStats(); }catch(_){}
+    try{ const h=document.querySelector('.profile-login-card h3'); if(h&&h.textContent==='ACCESO JUGADOR') h.textContent='Acceso jugador'; /*prFixLogin*/ }catch(_){}
     return out; };
 })();
 /* ===== GSAP + ScrollTrigger: aparición al hacer scroll, parallax y cursor ===== */
